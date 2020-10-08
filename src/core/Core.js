@@ -10,7 +10,7 @@ import { sort } from '../utils/common';
 import GLContext from './GLContext';
 import CollisionManager from './manager/CollisionManager';
 import Camera from '../camera/Camera';
-import BucketManager from '../bucket/BucketManager';
+import BucketManager from '../layers/BucketManager';
 
 export default class Core extends Base {
   /**

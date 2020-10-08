@@ -1,5 +1,5 @@
-import AbstractBuffer from './AbstractBuffer';
-export default class FillBuffer extends AbstractBuffer {
+import AbstractBuffer from '../AbstractBuffer';
+export default class FrameBuffer extends AbstractBuffer {
     constructor(gl) {
         super(gl);
         this.fillIndicesNum = 0;

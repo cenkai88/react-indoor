@@ -61,7 +61,6 @@ export default class Matrix4 {
             e[i + 8] = ai0 * b[8] + ai1 * b[9] + ai2 * b[10] + ai3 * b[11];
             e[i + 12] = ai0 * b[12] + ai1 * b[13] + ai2 * b[14] + ai3 * b[15];
         }
-        console.log(other, this)
         return this;
     };
     transpose() {

@@ -1,4 +1,4 @@
-import FillBucket from './FillBucket';
+import FrameBucket from './Frame/FrameBucket';
 // import FillExtrusionBucket from './FillExtrusionBucket';
 // import CircleBucket from './CircleBucket';
 // import SymbolBucket from './SymbolBucket';
@@ -13,7 +13,7 @@ export default class BucketFactor {
     calculate(data) {
         let bucket;
         if (data.type === 'fill') {
-            bucket = new FillBucket(data);
+            bucket = new FrameBucket(data);
         }
         // else if (data.type === 'fillExtrusion') {
         //     bucket = new FillExtrusionBucket(data);

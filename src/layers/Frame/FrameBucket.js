@@ -1,11 +1,11 @@
 import earcut from 'earcut';
 
-import { getStyle, parseColor } from "../utils/style";
-import AbstractBucket from "./AbstractBucket";
-import { GlobalIdGenerator } from "../utils/common";
-import { Indices } from "../utils/common";
+import { getStyle, parseColor } from "../../utils/style";
+import AbstractBucket from "../AbstractBucket";
+import { GlobalIdGenerator } from "../../utils/common";
+import { Indices } from "../../utils/common";
 
-export default class FillBucket extends AbstractBucket {
+export default class FrameBucket extends AbstractBucket {
     constructor(data) {
         super(data);
         this._geometryMap = {};
@@ -91,8 +91,8 @@ export default class FillBucket extends AbstractBucket {
     }
     _getGeometryKey(properties) {
         const arr = [];
-        for (let i = 0; i < FillBucket.GEOMETRY_KEYS.length; i += 1) {
-            const style = getStyle(this._layout, FillBucket.GEOMETRY_KEYS[i], properties);
+        for (let i = 0; i < FrameBucket.GEOMETRY_KEYS.length; i += 1) {
+            const style = getStyle(this._layout, FrameBucket.GEOMETRY_KEYS[i], properties);
             style !== undefined && arr.push(style);
         }
         return arr.join('-');

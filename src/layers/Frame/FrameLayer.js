@@ -1,16 +1,16 @@
 /**
- * @file FillLayer
+ * @file FrameLayer
  * Shared methods and properties among different layer Class(mainly event related)
 
 */
 
-import AbstractLayer from '../layers/AbstractLayer';
-import FillBuffer from '../webglBuffer/FillBuffer';
-import { polygonsContain } from '../utils/common';
+import AbstractLayer from '../AbstractLayer';
+import FrameBuffer from './FrameBuffer';
+import { polygonsContain } from '../../utils/common';
 
-export default class FillLayer extends AbstractLayer {
+export default class FrameLayer extends AbstractLayer {
     constructor(layout) {
-        super('Fill', { ...FillLayer.DEFAULT_LAYOUT, ...layout });
+        super('Fill', { ...FrameLayer.DEFAULT_LAYOUT, ...layout });
         this._geometryRenderList = [];
     }
     clear() {
@@ -21,9 +21,8 @@ export default class FillLayer extends AbstractLayer {
         if (!this._engine) return;
         this._geometryRenderList.length = 0;
         const { info } = data;
-        console.log(data)
         for (let i = 0; i < info.length; i += 1) {
-            const buffer = new FillBuffer(this._engine.getGl());
+            const buffer = new FrameBuffer(this._engine.getGl());
             buffer.update({
                 fillIndices: info[i].fillIndices,
                 outlineIndices: info[i].outlineIndices,

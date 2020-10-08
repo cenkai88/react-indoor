@@ -837,7 +837,7 @@ class AbstractBucket {
   }
 }
 
-class FillBucket extends AbstractBucket {
+class FrameBucket extends AbstractBucket {
   constructor(data) {
     super(data);
     this._geometryMap = {};
@@ -923,8 +923,8 @@ class FillBucket extends AbstractBucket {
   }
   _getGeometryKey(properties) {
     const arr = [];
-    for (let i = 0; i < FillBucket.GEOMETRY_KEYS.length; i += 1) {
-      const style = StyleUtils.getStyle(this._layout, FillBucket.GEOMETRY_KEYS[i], properties);
+    for (let i = 0; i < FrameBucket.GEOMETRY_KEYS.length; i += 1) {
+      const style = StyleUtils.getStyle(this._layout, FrameBucket.GEOMETRY_KEYS[i], properties);
       style !== undefined && arr.push(style);
     }
     return arr.join('-');
@@ -1688,7 +1688,7 @@ class BucketFactor {
   calculate(data) {
     let bucket;
     if (data.type === 'fill') {
-      bucket = new FillBucket(data);
+      bucket = new FrameBucket(data);
     }
     else if (data.type === 'fillExtrusion') {
       bucket = new FillExtrusionBucket(data);

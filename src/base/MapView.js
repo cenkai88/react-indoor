@@ -5,7 +5,7 @@ import Core from '../core/Core';
 import Point from '../geometry/Point';
 import StyleManager from '../style/Style';
 
-import FillLayer from '../layers/FillLayer';
+import FrameLayer from '../layers/Frame/FrameLayer';
 
 export default class MapView extends Base {
   constructor(options) {
@@ -101,7 +101,7 @@ export default class MapView extends Base {
     if (!this._styleMng) return;
     const frameStyle = this._styleMng.getStyle('frame');
     if (!frameStyle) return;
-    const layer = new FillLayer(frameStyle);
+    const layer = new FrameLayer(frameStyle);
     layer.setFeatures(features).setFloorId(floorId).setName('frame');
     this._layers.push(layer);
   }
