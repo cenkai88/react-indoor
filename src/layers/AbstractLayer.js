@@ -8,16 +8,9 @@ import { GlobalIdGenerator } from '../utils/common';
 import Base from '../base/Base';
 
 const config = {
-  Fill: { order: 1, shaderName: 'fill' },
-  Picture: { order: 2, shaderName: 'picture' },
-  Line: { order: 2, shaderName: 'line' },
-  Connection: { order: 2, shaderName: 'connection' },
-  FillExtrusion: { order: 3, shaderName: 'fillExtrusion' },
-  Track: { order: 4, shaderName: 'track' },
-  Circle: { order: 5, shaderName: 'circle' },
-  Heatmap: { order: 5, shaderName: 'heatmap' },
-  Symbol: { order: 6, shaderName: 'symbol' },
-  Model: { order: 7, shaderName: 'model' },
+  Frame: { order: 1, shaderName: 'frame' },
+  Room: { order: 3, shaderName: 'room' },
+  Icon: { order: 6, shaderName: 'icon' },
 };
 
 export default class AbstractLayer extends Base {
@@ -102,7 +95,7 @@ export default class AbstractLayer extends Base {
   }
 
   _getTaskId() {
-    return GlobalIdGenerator.getId();
+    return GlobalIdGenerator.getId('task');
   }
 
   setSync(sync) {

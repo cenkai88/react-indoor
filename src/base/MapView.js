@@ -6,12 +6,19 @@ import Point from '../geometry/Point';
 import StyleManager from '../style/Style';
 
 import FrameLayer from '../layers/Frame/FrameLayer';
+import RoomLayer from '../layers/Room/RoomLayer';
+import IconLayer from '../layers/Icon/IconLayer';
+import { getStyle } from '../utils/style';
+import { createFeaturePoint, step } from '../utils/common';
+import { MAX_ROOM_PER_RENDER } from '../utils/constants';
 
 export default class MapView extends Base {
   constructor(options) {
     super();
     this._canvasContainer = options.container;
     this._mapCanvas = options.mapCanvas;
+    this._glyphCanvas = options.glyphCanvas;
+    this._textureCanvas = options.textureCanvas;
     this._layers = [];
     this._styleMng = new StyleManager(options.styleJson);
     this._hasDrawFloorId = new Set();
@@ -19,11 +26,17 @@ export default class MapView extends Base {
     this._maxZoom = options.maxZoom;
     this._options = options;
     this.on('moveEnd', this._onMoveEnd.bind(this));
-     // gesture
-     this._gestureManager = new GestureManager(this);
+    // gesture
+    this._gestureManager = new GestureManager(this);
   }
   init(currentFloor, style) {
-    this._engine = new Core(this._canvasContainer, this._mapCanvas, {
+    this._engine = new Core(
+      this._canvasContainer,
+      {
+        mapCanvas: this._mapCanvas,
+        glyphCanvas: this._glyphCanvas,
+        textureCanvas: this._textureCanvas,
+      }, {
       zoom: this._options.zoom,
       rotate: this._options.rotate,
       pitch: this._options.pitch,
@@ -86,14 +99,16 @@ export default class MapView extends Base {
       this._update(this._floors);
       return;
     }
-    this._drawFloorLayer(floorData);
+    this._drawFloorLayers(floorData);
     this._update(this._floors);
   }
-  _drawFloorLayer(floorData) {
+  _drawFloorLayers(floorData) {
     const { id: floorId } = floorData;
     if (this._hasDrawFloorId.has(floorId)) return;
-    const { frame, area, property, room } = floorData;
+    const { frame, property, room } = floorData;
     this._drawFrame(frame.features, floorId);
+    const { text } = this._drawRoom(room.features, floorId);
+    this._drawIcon(text, floorId);
     this._hasDrawFloorId.add(floorId);
   }
   _drawFrame(features, floorId) {
@@ -103,6 +118,37 @@ export default class MapView extends Base {
     if (!frameStyle) return;
     const layer = new FrameLayer(frameStyle);
     layer.setFeatures(features).setFloorId(floorId).setName('frame');
+    this._layers.push(layer);
+  }
+  _drawRoom(features, floorId) {
+    if (!this._styleMng) return { text: [], extra: [] };
+    const areaStyle = this._styleMng.getStyle('area');
+    if (!areaStyle) return { text: [], extra: [] };
+    const roomFeatures = [];
+    const areaTextFeatures = [];
+    for (let i = 0; i < features.length; i += 1) {
+      const { properties } = features[i];
+      roomFeatures.push(features[i]);
+      const point = properties && (properties.labelpoint || properties.center);
+      if (point) areaTextFeatures.push(createFeaturePoint(point, properties));
+    }
+
+    if (roomFeatures.length !== 0) {
+      step(roomFeatures, MAX_ROOM_PER_RENDER, item => {
+        const layer = new RoomLayer(areaStyle);
+        layer.setFeatures(item).setName('room').setFloorId(floorId);
+        this._layers.push(layer);
+      });
+    }
+    return { text: areaTextFeatures };
+  }
+  _drawIcon(features, floorId) {
+    if (!this._styleMng || features.length === 0) return;
+    const areaTextStyle = this._styleMng.getStyle('areaText');
+    if (!areaTextStyle) return;
+    const layer = new IconLayer(areaTextStyle);
+    layer.setFeatures(features).setName('icon').setFloorId(floorId);
+    console.log(layer);
     this._layers.push(layer);
   }
   _fireEvent(params, suffix) {
@@ -116,7 +162,7 @@ export default class MapView extends Base {
     if (typeof rotate === 'number') this.fire(`rotate${suffix}`);
     if (typeof pitch === 'number') this.fire(`pitch${suffix}`);
   }
- 
+
   _addLayer(layer) {
     this._layers.push(layer);
   }
@@ -148,7 +194,7 @@ export default class MapView extends Base {
     }
     if (isNeedUpdate) {
       this._engine.render();
-      if (layer.getType() === 'Symbol' && layer.getCollisionRenderList().length > 0) this._engine.updateCollision();
+      if (layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0) this._engine.updateCollision();
     }
   }
   _checkIsNeedAdd(layer) {

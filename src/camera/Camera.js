@@ -20,6 +20,7 @@ export default class Camera {
         this._projectionInvertMatrix = new Matrix4();
         this._viewInvertMatrix = new Matrix4();
         this._normalMatrix = new Matrix4();
+        this._textureMatrix = new Matrix4();
         this._far = 9E9;
         this._fov = 45;
         this._near = 0.5;
@@ -89,6 +90,7 @@ export default class Camera {
         this._calcViewMatrix();
         this._calcNormalMatrix();
         this._calcOnePixelToWorld();
+        this._calcTextureMatrix();
     }
     resize(width, height) {
         this._width = width;
@@ -111,6 +113,7 @@ export default class Camera {
             this._constrain();
         }
         this._calcViewMatrix();
+        this._calcTextureMatrix();
         if (zoom !== undefined && zoom > 0) this._calcOnePixelToWorld();
         if (rotate !== undefined) this._calcNormalMatrix();
     }
@@ -161,6 +164,11 @@ export default class Camera {
         const focalLength = Math.pow(2, (this._NATIVE_ZOOM - this._zoom));
         const top = Math.tan(this._fov / 2 / 180 * Math.PI) * focalLength;
         this._onePixelToWorld = top * 2 / this._height;
+    }
+    _calcTextureMatrix() {
+        this._textureMatrix = new Matrix4();
+        this._textureMatrix.rotate(-this._rotate, 0, 0, 1);
+        this._textureMatrix.rotate(this._pitch, 1, 0, 0);
     }
     screenToWorldCoordinate(screenX, screenY) {
         const tempTenWorldPoint = new Vector4([0, 0, -10, 1]);
@@ -261,6 +269,9 @@ export default class Camera {
     }
     get viewMatrix() {
         return this._viewMatrix.getValue();
+    }
+    get textureMatrix() {
+        return this._textureMatrix.getValue();
     }
     get projectionMatrix() {
         return this._projectionMatrix.getValue();

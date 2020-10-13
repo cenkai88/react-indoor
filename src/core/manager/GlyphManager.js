@@ -4,19 +4,17 @@ GlyphManager用于Marker和Area Text相关的渲染，getTexture直接操作webg
 
 */
 
-import Canvas2d from '../core/Canvas2d';
-
-export default class GlyphManager extends Canvas2d {
-    constructor(gl, options) {
-        super();
+export default class GlyphManager {
+    constructor(gl, options, glyphCanvas) {
+        this._ctx = glyphCanvas.getContext('2d');
         this._baseSize = 14;
         this._gl = gl;
         this._options = options;
         this._ctx.textAlign = 'left';
         this._ctx.textBaseline = 'middle';
         this._ctx.lineWidth = 3;
-        const size = this._baseSize * this._pixelRatio;
-        this._ctx.font = `${this._options.fontWeight} ${size}px ${this._options.fontFamily}`;
+        const size = this._baseSize * devicePixelRatio;
+        this._ctx.font = `${this._options.fontWeight || 400} ${size}px ${this._options.fontFamily || 'PingFang SC'}`;
     }
     getBaseSize() {
         return this._baseSize;
@@ -24,11 +22,11 @@ export default class GlyphManager extends Canvas2d {
     getPixels(options) {
         const buffer = this._options.buffer;
         const { fillColor, strokeColor, textArr, width: w, height: h } = options;
-        const width = w * this._pixelRatio;
-        const height = h * this._pixelRatio;
+        const width = w * devicePixelRatio;
+        const height = h * devicePixelRatio;
         this._ctx.clearRect(0, 0, width, height);
         for (let i = 0; i < textArr.length; i += 1) {
-            const y = (this._baseSize / 2 + i * this._baseSize + (i + 1) * buffer) * this._pixelRatio;
+            const y = (this._baseSize / 2 + i * this._baseSize + (i + 1) * buffer) * devicePixelRatio;
             if (strokeColor) {
                 this._ctx.strokeStyle = strokeColor;
                 this._ctx.strokeText(textArr[i], buffer, y);
@@ -53,7 +51,7 @@ export default class GlyphManager extends Canvas2d {
         return texture;
     }
     getTextBound(text) {
-        const { buffer, textMaxWidth, textSplit } = this._options;
+        const { buffer, textMaxWidth = 10, textSplit } = this._options;
         let textArr = [];
         if (textSplit && text.indexOf(textSplit) !== -1) {
             textArr = text.split(textSplit);
@@ -72,7 +70,7 @@ export default class GlyphManager extends Canvas2d {
             }
         }
         return {
-            width: Math.round(width + buffer * 2) / this._pixelRatio,
+            width: Math.round(width + buffer * 2) / devicePixelRatio,
             height: Math.round(this._baseSize * textArr.length + buffer * (textArr.length + 1)),
             textArr,
         };

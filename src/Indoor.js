@@ -214,7 +214,7 @@ export default class Indoor extends MapView {
     if (this._engine) this._engine.updateCollision();
   }
   removeLayer(layer) {
-    const isNeedUpdateCollision = layer.getType() === 'Symbol' && layer.getCollisionRenderList().length > 0;
+    const isNeedUpdateCollision = layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0;
     this._removeLayer(layer);
     if (this._engine) {
       this._engine.render();

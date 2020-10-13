@@ -1,6 +1,5 @@
 "use strict";
 importScripts('./earcut.js');
-let collision;
 
 class Matrix4 {
   constructor(value) {
@@ -934,7 +933,7 @@ class FrameBucket extends AbstractBucket {
   }
 }
 
-class FillExtrusionBucket extends AbstractBucket {
+class RoomBucket extends AbstractBucket {
   constructor(data) {
     super(data);
     this._geometryMap = {};
@@ -1013,7 +1012,7 @@ class FillExtrusionBucket extends AbstractBucket {
           sideVertices.push(nextX, nextY);
           sideVertices.push(nextX, nextY);
         }
-        topNormals.push(0, 0, FillExtrusionBucket.FACTOR + 1);
+        topNormals.push(0, 0, RoomBucket.FACTOR + 1);
         vertices.push(curX, curY);
       }
       if (i < polygon.length - 1) {
@@ -1061,8 +1060,8 @@ class FillExtrusionBucket extends AbstractBucket {
   }
   _getGeometryKey(properties) {
     const arr = [];
-    for (let i = 0; i < FillExtrusionBucket.GEOMETRY_KEYS.length; i += 1) {
-      const style = StyleUtils.getStyle(this._layout, FillExtrusionBucket.GEOMETRY_KEYS[i], properties);
+    for (let i = 0; i < RoomBucket.GEOMETRY_KEYS.length; i += 1) {
+      const style = StyleUtils.getStyle(this._layout, RoomBucket.GEOMETRY_KEYS[i], properties);
       style !== undefined && arr.push(style);
     }
     return arr.join('-');
@@ -1112,7 +1111,7 @@ class CircleBucket extends AbstractBucket {
   }
 }
 
-class SymbolBucket extends AbstractBucket {
+class IconBucket extends AbstractBucket {
   constructor(data) {
     super(data);
     this._baseTextSize = data.baseTextSize;
@@ -1149,6 +1148,7 @@ class SymbolBucket extends AbstractBucket {
     else if (textZHeight) {
       base += textZHeight;
     }
+    // console.log(resultPoint, item)
     const imgSymbol = this._calcImage(resultPoint, item, base, opacity);
     const textSymbol = this._calcText(resultPoint, item, base, opacity);
     const isCollision = StyleUtils.getStyle(this._layout, 'collision', item.properties);
@@ -1687,17 +1687,17 @@ class PictureBucket extends AbstractBucket {
 class BucketFactor {
   calculate(data) {
     let bucket;
-    if (data.type === 'fill') {
+    if (data.type === 'frame') {
       bucket = new FrameBucket(data);
     }
-    else if (data.type === 'fillExtrusion') {
-      bucket = new FillExtrusionBucket(data);
+    else if (data.type === 'room') {
+      bucket = new RoomBucket(data);
     }
     else if (data.type === 'circle') {
       bucket = new CircleBucket(data);
     }
-    else if (data.type === 'symbol') {
-      bucket = new SymbolBucket(data);
+    else if (data.type === 'icon') {
+      bucket = new IconBucket(data);
     }
     else if (data.type === 'connection') {
       bucket = new ConnectionBucket(data);
@@ -1723,6 +1723,8 @@ class BucketFactor {
     }
   }
 }
+
+let collision;
 onmessage = function (t) {
   const { data } = t;
   const { type, view, viewMatrix, projectionMatrix, zoom, z, center, onePixelToWorld, isForce, list } = data;

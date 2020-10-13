@@ -43,7 +43,7 @@ export default class BucketManager {
     _onMessage(data) {
         const item = this._taskMap.get(data.id);
         if (!item) return;
-        if (this._isInNormalize && data.type === 'symbol') {
+        if (this._isInNormalize && data.type === 'icon') {
             this._isNeedUpdateCollision = true;
         }
         const index = item.indexOf(data.taskId);

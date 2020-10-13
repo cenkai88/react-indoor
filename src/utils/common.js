@@ -263,10 +263,31 @@ export function step(arr, step, callback) {
   }
 }
 
+export function containedInContour(contour, pointList) {
+  for (let i = 0; i < contour.length; i += 1)
+    for (let j = 0; j < pointList.length; j += 1) {
+      const {
+        leftBottom: [x1, y1],
+        rightTop: [x2, y2],
+      } = contour[i];
+      const {
+        leftBottom: [x3, y3],
+        rightTop: [x4, y4],
+      } = pointList[j];
+      const deltaX1 = Math.abs(x1 + x2 - x3 - x4);
+      const deltaX2 = Math.abs(x1 - x2) + Math.abs(x3 - x4);
+      const deltaY1 = Math.abs(y1 + y2 - y3 - y4);
+      const deltaY2 = Math.abs(y1 - y2) + Math.abs(y3 - y4);
+      if (deltaX1 <= deltaX2 && deltaY1 <= deltaY2)
+        return true;
+    }
+  return false;
+}
+
 export class GlobalIdGenerator {
-  static getId() {
+  static getId(prefix = 'react-indoor') {
     GlobalIdGenerator.id += 1;
-    return `react-indoor-${GlobalIdGenerator.id}`;
+    return `${prefix}-${GlobalIdGenerator.id}`;
   }
 }
 GlobalIdGenerator.id = 0;

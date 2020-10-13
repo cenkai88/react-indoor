@@ -5,6 +5,11 @@ import floorData from '../example/floor';
 import buildingData from '../example/building';
 import styleJson from '../example/style';
 
+const canvas2dStyleWidth = 1080;
+const canvas2dStyleHeight = 960;
+const canvas2dWidth = canvas2dStyleWidth * devicePixelRatio;
+const canvas2dHeight = canvas2dStyleHeight * devicePixelRatio;
+
 export default () => {
   const container = useRef();
   const mapCanvas = useRef();
@@ -49,7 +54,7 @@ export default () => {
 
   return <div ref={container} style={{ width: '100%', height: '100%', fontSize: 0 }}>
     <canvas style={{ width: `${canvasWidth}px`, height: `${canvasHeight}px` }} width={canvasWidth * devicePixelRatio} height={canvasHeight * devicePixelRatio} ref={mapCanvas} />
-    <canvas style={{ display: 'none' }} ref={textureCanvas} />
-    <canvas style={{ display: 'none' }} ref={glyphCanvas} />
+    <canvas style={{ display: 'none', width: canvas2dStyleWidth, height: canvas2dStyleHeight }} width={canvas2dWidth} height={canvas2dHeight} ref={textureCanvas} />
+    <canvas style={{ display: 'none', width: canvas2dStyleWidth, height: canvas2dStyleHeight }} width={canvas2dWidth} height={canvas2dHeight} ref={glyphCanvas} />
   </div>
 }

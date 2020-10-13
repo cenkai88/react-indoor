@@ -21,10 +21,10 @@ export default {
       "values": [
         {
           "key": [
-            "d8d8e0"
+            "d8d8e0",
           ],
           "height": 1,
-          "fillColor": "#ffbf80"
+          "fillColor": "#ffbf80",
         },
         {
           "key": [
@@ -251,6 +251,13 @@ export default {
         "categoryid"
       ],
       "values": [
+        {
+          "key": [
+            "d8d8e0"
+          ],
+          "weight": 15,
+          "iconImage": "https://static.yingxuys.com/icons/door.png",
+        },
         {
           "key": [
             6

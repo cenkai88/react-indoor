@@ -4,11 +4,9 @@ TextureManager 目前只是初始化用
 
 */
 
-import Canvas2d from '../core/Canvas2d';
-
-export default class TextureManager extends Canvas2d {
-    constructor(gl) {
-        super();
+export default class TextureManager {
+    constructor(gl, textureCanvas) {
+        this._ctx = textureCanvas.getContext('2d');
         this._textureMap = new Map();
         this._hasRequestTextureMap = new Map();
         this._gl = gl;
@@ -18,7 +16,7 @@ export default class TextureManager extends Canvas2d {
         this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.LINEAR);
         this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
         this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
-        const pixels = document.querySelector('#canvas1');
+        const pixels = textureCanvas;
         this._gl.texImage2D(this._gl.TEXTURE_2D, 0, this._gl.RGBA, this._gl.RGBA, this._gl.UNSIGNED_BYTE, pixels);
     }
     getTexture(url, options) {

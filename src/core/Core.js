@@ -9,8 +9,11 @@ import Base from '../base/Base';
 import { sort } from '../utils/common';
 import GLContext from './GLContext';
 import CollisionManager from './manager/CollisionManager';
+import TextureManager from './manager/TextureManager';
+import GlyphManager from './manager/GlyphManager';
 import Camera from '../camera/Camera';
 import BucketManager from '../layers/BucketManager';
+import { parseColor } from '../utils/style';
 
 export default class Core extends Base {
   /**
@@ -20,10 +23,19 @@ export default class Core extends Base {
      * @param {Object} options - options
      * @return {Renderer} The Renderer.
   */
-  constructor(container, mapCanvas, options) {
+  constructor(container, {
+    mapCanvas,
+    glyphCanvas,
+    textureCanvas,
+  },
+    options) {
     super();
     this._layers = [];
     this._lightPos = [1, -1, 1];
+    this._ambientColor = [0.8, 0.8, 0.8];
+    this._ambientMaterial = [1, 1, 1];
+    this._diffuseColor = [0.1, 0.1, 0.1];
+    this._diffuseMaterial = [1, 1, 1];
     this._bucketMng = new BucketManager();
     this._normalResult = { data: {}, opacity: 1 };
     this._renderQueue = [];
@@ -39,6 +51,7 @@ export default class Core extends Base {
       alpha: true, // 包含alpha缓冲区
       failIfMajorPerformanceCaveat: true, // 如果系统性能较低，是否创建上下文
     };
+    this._setupLight(options);
     this._gl = this._canvas.getContext('webgl', glOptions) || this._canvas.getContext('experimental-webgl', glOptions);
     this._gl.viewport(0, 0, this._canvas.width, this._canvas.height);
     this._camera = new Camera(clientWidth, clientHeight, {
@@ -52,6 +65,15 @@ export default class Core extends Base {
       animateDuration: 300,
       collisionDuration: 600,
     });
+    this._collisionMng.on('change', this._onCollisionChange.bind(this));
+    this._textureMng = new TextureManager(this._gl, textureCanvas);
+    this._glyphMng = new GlyphManager(this._gl, {
+      fontWeight: options.fontWeight,
+      fontFamily: options.localFontFamily,
+      buffer: 3,
+      textMaxWidth: options.maxTextSize,
+      textSplit: options.textSplit,
+    }, glyphCanvas);
     this._glContext = new GLContext(this._gl, {
       width: this._canvas.width,
       height: this._canvas.height,
@@ -62,6 +84,12 @@ export default class Core extends Base {
   }
   getCollisionMng() {
     return this._collisionMng;
+  }
+  getGlyphMng() {
+    return this._glyphMng;
+  }
+  getTextureMng() {
+    return this._textureMng;
   }
   _onCollisionChange(data) {
     const { hideResult, showResult, normalResult } = data;
@@ -182,20 +210,24 @@ export default class Core extends Base {
     this._glContext.clear();
     for (let i = 0; i < this._layers.length; i += 1) {
       const type = this._layers[i].getType();
-      if (type === 'Fill') {
-        this._drawFill(this._layers[i]);
+      if (type === 'Frame') {
+        this._drawFrame(this._layers[i]);
+      } else if (type === 'Room') {
+        this._drawRoom(this._layers[i]);
+      } else if (type === 'Icon') {
+        this._drawIcon(this._layers[i]);
       }
     }
   }
-  _drawFill(fill) {
-    this._glContext.use(fill.getShaderName());
+  _drawFrame(frame) {
+    this._glContext.use(frame.getShaderName());
     // 关闭deptTest，因为z轴的管理由外面的框架完成
     this._glContext.disableDepthTest();
     // 开启半透明
     this._glContext.enableAlpha();
     // 半透明的计算color(RGBA) = (sourceColor * SRC_ALPHA) + (destinationColor * (1 - SRC_ALPHA))
     this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
-    const geometryRenderList = fill.getGeometryRenderList();
+    const geometryRenderList = frame.getGeometryRenderList();
     const program = this._glContext.getActiveProgram();
     if (!program) return;
     this._initViewProjectionMatrix(program);
@@ -216,6 +248,107 @@ export default class Core extends Base {
       this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0); // 画外轮廓
     }
   }
+  _drawRoom(room) {
+    this._glContext.use(room.getShaderName());
+    this._glContext.enableAlpha();
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
+    this._glContext.enableDepthTest();
+    const program = this._glContext.getActiveProgram();
+    if (!program) return;
+    this._initViewProjectionMatrix(program);
+    this._setLight(program);
+    // program里一系列变量定义，下面实际是 WebGLUniformLocation 对象，用于变量给shader里传
+    const u_color = program.getUniformLocation('u_color');
+    const u_height = program.getUniformLocation('u_height');
+    const u_base = program.getUniformLocation('u_base');
+    const u_opacity = program.getUniformLocation('u_opacity');
+    const a_position = program.getAttribLocation('a_position');
+    const a_normal = program.getAttribLocation('a_normal');
+    const u_drawLine = program.getUniformLocation('u_drawLine');
+    const geometryRenderList = room.getGeometryRenderList();
+    const zoom = this._camera.getZoom();
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
+      const { fillColor, base, buffer, height, outlineColor, opacity, zoomRange } = geometryRenderList[i];
+      this._gl.uniform1f(u_base, base);
+      buffer.bindData(a_position, a_normal);
+      this._gl.uniform1f(u_height, height);
+      let zoomOpacity = 1;
+      if (zoomRange) {
+        const num = 1 - (zoom - zoomRange[0]) / (zoomRange[1] - zoomRange[0]);
+        zoomOpacity = num > 1 ? 1 : (num > 0 ? num : 0);
+      }
+      this._gl.uniform1f(u_opacity, opacity * zoomOpacity);
+      this._gl.uniform4fv(u_color, outlineColor);
+      this._gl.uniform1i(u_drawLine, 1);
+      buffer.bindIndices('outline');
+      this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0);
+      this._gl.uniform4fv(u_color, fillColor);
+      this._gl.uniform1i(u_drawLine, 0);
+      buffer.bindIndices('fill');
+      this._gl.drawElements(this._gl.TRIANGLES, buffer.fillIndicesNum, this._gl.UNSIGNED_SHORT, 0);
+    }
+  }
+  _drawIcon(icon) {
+    this._glContext.use(icon.getShaderName());
+    this._glContext.enableAlpha();
+    this._gl.blendFuncSeparate(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA, this._gl.ONE, this._gl.ONE_MINUS_SRC_ALPHA);
+    this._glContext.disableDepthTest();
+    const program = this._glContext.getActiveProgram();
+    if (!program) return;
+    this._initViewProjectionMatrix(program);
+    const u_modelMatrix = program.getUniformLocation('u_modelMatrix');
+    this._gl.uniformMatrix4fv(u_modelMatrix, false, this._camera.textureMatrix);
+    const u_resolution = program.getUniformLocation('u_resolution');
+    this._gl.uniform2fv(u_resolution, [this._camera.getWidth(), this._camera.getHeight()]);
+    const u_position = program.getUniformLocation('u_position');
+    const u_offset = program.getUniformLocation('u_offset');
+    const u_opacity = program.getUniformLocation('u_opacity');
+    const u_sampler = program.getUniformLocation('u_sampler');
+    this._gl.uniform1i(u_sampler, 0);
+    const u_base = program.getUniformLocation('u_base');
+    const a_position = program.getAttribLocation('a_position');
+    const a_texCoord = program.getAttribLocation('a_texCoord');
+    const geometryRenderList = icon.getGeometryRenderList();
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
+      for (let j = 0; j < geometryRenderList[i].length; j += 1) {
+        const { buffer, point, offset, base, opacity } = geometryRenderList[i][j];
+        this._gl.uniform2fv(u_position, point);
+        this._gl.uniform2fv(u_offset, offset);
+        this._gl.uniform1f(u_base, base);
+        this._gl.uniform1f(u_opacity, opacity);
+        buffer.bind(a_position, a_texCoord);
+        this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, buffer.verticesNum);
+      }
+    }
+    const data = {
+      u_position,
+      u_offset,
+      u_base,
+      u_opacity,
+      a_position,
+      a_texCoord,
+    };
+    if (this._hideResult) this._drawCollisionResult(this._hideResult, icon, data);
+    if (this._showResult) this._drawCollisionResult(this._showResult, icon, data);
+    this._drawCollisionResult(this._normalResult, icon, data);
+  }
+  _drawCollisionResult(result, layer, locations) {
+    const arr = result.data[layer.id];
+    if (!arr) return;
+    const renderList = layer.getCollisionRenderList();
+    for (let i = 0; i < arr.length; i += 1) {
+      const list = renderList[arr[i]] || [];
+      for (let j = 0; j < list.length; j += 1) {
+        const { buffer, point, offset, base, opacity } = list[j];
+        this._gl.uniform2fv(locations.u_position, point);
+        this._gl.uniform2fv(locations.u_offset, offset);
+        this._gl.uniform1f(locations.u_base, base);
+        this._gl.uniform1f(locations.u_opacity, opacity * result.opacity);
+        buffer.bind(locations.a_position, locations.a_texCoord);
+        this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, buffer.verticesNum);
+      }
+    }
+  }
   destroy() {
     this._canvas.remove();
     this._collisionMng.off('change', this._onCollisionChange.bind(this));
@@ -230,6 +363,38 @@ export default class Core extends Base {
   }
   getLayers() {
     return this._layers;
+  }
+  _setLight(program) {
+    const u_normalMatrix = program.getUniformLocation('u_normalMatrix');
+    this._gl.uniformMatrix4fv(u_normalMatrix, false, this._camera.normalMatrix);
+    const u_lightPos = program.getUniformLocation('u_lightPos');
+    this._gl.uniform3fv(u_lightPos, this._lightPos);
+    const u_ambientColor = program.getUniformLocation('u_ambientColor');
+    this._gl.uniform3fv(u_ambientColor, this._ambientColor);
+    const u_ambientMaterial = program.getUniformLocation('u_ambientMaterial');
+    this._gl.uniform3fv(u_ambientMaterial, this._ambientMaterial);
+    const u_diffuseColor = program.getUniformLocation('u_diffuseColor');
+    this._gl.uniform3fv(u_diffuseColor, this._diffuseColor);
+    const u_diffuseMaterial = program.getUniformLocation('u_diffuseMaterial');
+    this._gl.uniform3fv(u_diffuseMaterial, this._diffuseMaterial);
+  }
+  _setupLight(options) {
+    const { lightPos, ambientColor, ambientMaterial, diffuseColor, diffuseMaterial } = options;
+    if (lightPos) {
+      this._lightPos = [lightPos.x, lightPos.y, lightPos.z];
+    }
+    if (ambientColor) {
+      this._ambientColor = parseColor(ambientColor);
+    }
+    if (ambientMaterial) {
+      this._ambientMaterial = parseColor(ambientMaterial);
+    }
+    if (diffuseColor) {
+      this._diffuseColor = parseColor(diffuseColor);
+    }
+    if (diffuseMaterial) {
+      this._diffuseMaterial = parseColor(diffuseMaterial);
+    }
   }
   /**
      * Check if a layer is in renderer's layer list.

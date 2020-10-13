@@ -4,7 +4,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: './index.js',
+  entry: {
+    main: './index.js',
+    bucketWorker: './src/layers/BucketFactor.js',
+  },
   devServer: {
     publicPath: '/',
     compress: true,
@@ -48,11 +51,11 @@ module.exports = {
       template: './example/index.ejs',
       filename: 'index.html',
     }),
-    new CopyWebpackPlugin([
-      {
-        from: './example/worker',
-        to: 'worker',
-      },
-    ]),
+    // new CopyWebpackPlugin([
+    //   {
+    //     from: './example/worker',
+    //     to: 'worker',
+    //   },
+    // ]),
   ],
 };
