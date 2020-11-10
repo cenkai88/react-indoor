@@ -102,10 +102,10 @@ export default class TouchZoomRotate extends AbstractGesture {
         return this._zoomEnable || this._pitchEnable || this._rotateEnable;
     }
     _frameUpdate() {
-        const engine = this._mapView.getEngine();
-        if (engine && this._startAround && this._eventData) {
+        const renderer = this._mapView.getRenderer();
+        if (renderer && this._startAround && this._eventData) {
             const { center, rotateDelta, zoomScale, pitchDelta } = this._eventData;
-            const camera = engine.getCamera();
+            const camera = renderer.getCamera();
             const params = {};
             if (this._isPitch) {
                 params.pitch = camera.getPitch() - pitchDelta;
@@ -131,8 +131,8 @@ export default class TouchZoomRotate extends AbstractGesture {
             if (!this._isPitch) {
                 camera.setCenterAtPoint(this._startAround, center);
             }
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
             this._lastTouches = this._curTouches;
         }
         this._timer = requestAnimationFrame(this._frameUpdate.bind(this));
@@ -207,11 +207,11 @@ export default class TouchZoomRotate extends AbstractGesture {
         this._inertias = [];
     }
     _zoomInertia(zoomOffset, rotateOffset, duration, center, event) {
-        const engine = this._mapView.getEngine();
+        const renderer = this._mapView.getRenderer();
         const around = this._startAround;
-        if (!engine || !around)
+        if (!renderer || !around)
             return;
-        const camera = engine.getCamera();
+        const camera = renderer.getCamera();
         const startZoom = camera.getZoom();
         const startRotate = camera.getRotate();
         const endZoom = getFit(startZoom + zoomOffset, this._mapView._minZoom, this._mapView._maxZoom);
@@ -223,8 +223,8 @@ export default class TouchZoomRotate extends AbstractGesture {
             const itemRotate = startRotate + rotateOffset * e.num;
             camera.set({ zoom: itemZoom, rotate: itemRotate });
             camera.setCenterAtPoint(around, center);
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
             this._mapView.fire('move', event);
             this._mapView.fire('rotate', event);
         }).on('complete', () => {

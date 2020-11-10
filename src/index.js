@@ -1,56 +1,185 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Indoor from './Indoor';
 
-import floorData from '../example/floor';
-import buildingData from '../example/building';
-import styleJson from '../example/style';
+import defaultstyleData from '../data/style';
+import HeatmapLayer from './layers/Heatmap/HeatmapLayer';
+import { convertPercentToWorld } from './utils/common';
+import Marker from './overlay/Marker';
+import LineLayer from './layers/Line/LineLayer';
 
 const canvas2dStyleWidth = 1080;
 const canvas2dStyleHeight = 960;
 const canvas2dWidth = canvas2dStyleWidth * devicePixelRatio;
 const canvas2dHeight = canvas2dStyleHeight * devicePixelRatio;
 
-export default () => {
+const defaultOption = {
+  maxZoom: 23,
+  minZoom: 11,
+  zoom: 15,
+  rotate: 0,
+  pitch: 0,
+  center: {
+    x: 0,
+    y: 0,
+  },
+  heatmapRadius: 20,
+};
+
+export default ({
+  floorId,
+  floorData,
+  buildingData,
+  heatmapData,
+  lineData,
+  markerData,
+  styleData = defaultstyleData,
+  options,
+  onInit,
+}) => {
+
+  console.log(buildingData)
+
   const container = useRef();
   const mapCanvas = useRef();
   const textureCanvas = useRef();
   const glyphCanvas = useRef();
 
+  const mergedOptions = {
+    ...defaultOption,
+    ...options,
+  };
+
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(600);
   const [domReady, setDomReady] = useState(false);
+  const [mapIns, setMapIns] = useState();
+  const [heatmapLayer, setHeatmapLayer] = useState();
+  const [lineLayer, setLineLayer] = useState();
+  const [markersOverlay, setMarkersOverlay] = useState();
+
+  const updateHeatmap = (data) => {
+    if (!mapIns) return
+    let heatmap
+    if (!heatmapLayer) {
+      heatmap = new HeatmapLayer({ radius: mergedOptions.heatmapRadius });
+      setHeatmapLayer(heatmap);
+      mapIns.addLayer(heatmap);
+    } else {
+      heatmap = heatmapLayer;
+    }
+    heatmap.setFloorId(mapIns.currentFloor.floorId);
+    const { bounds } = mapIns.currentFloor;
+    const deltaX = bounds[1][0] - bounds[0][0];
+    const deltaY = bounds[1][1] - bounds[0][1];
+
+    const features = data.map(item => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: convertPercentToWorld(item, bounds, deltaX, deltaY),
+      },
+    }));
+    heatmap.setFeatures(features);
+    mapIns.updateLayer(heatmap);
+  }
+
+  const updateLine = (data) => {
+    if (!mapIns) return
+    let line
+    if (!lineLayer) {
+      line = new LineLayer({
+        lineWidth: 10,
+        lineColor: '#0548A0',
+      });
+      setLineLayer(line);
+      mapIns.addLayer(line);
+    } else {
+      line = LineLayer;
+    }
+    line.setFloorId(mapIns.currentFloor.floorId);
+    const { bounds } = mapIns.currentFloor;
+    const deltaX = bounds[1][0] - bounds[0][0];
+    const deltaY = bounds[1][1] - bounds[0][1];
+
+    const features = [{
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: data.map(item => convertPercentToWorld(item, bounds, deltaX, deltaY)),
+      },
+    }];
+    line.setFeatures(features);
+    mapIns.updateLayer(line);
+  }
+
+  const updateMarkers = (data) => {
+    if (!mapIns) return
+    if (markersOverlay) markersOverlay.forEach(item => item.remove());
+
+    const { bounds } = mapIns.currentFloor;
+    const deltaX = bounds[1][0] - bounds[0][0];
+    const deltaY = bounds[1][1] - bounds[0][1];
+
+    const markers = data.map(item => {
+      const [x, y] = convertPercentToWorld(item, bounds, deltaX, deltaY);
+      return new Marker({
+        iconImage: item.iconUrl,
+        iconAnchor: 'bottom',
+        iconSize: 0.1,
+        x,
+        y,
+        text: item.text,
+      }, mapIns.currentFloor.floorId)
+    });
+    markers.forEach(item => item.addTo(mapIns));
+    setMarkersOverlay(markers);
+  }
 
   useEffect(() => {
     setCanvasWidth(container.current.clientWidth);
     setCanvasHeight(container.current.clientHeight);
-    setDomReady(true);
-  }, []);
-
-  useEffect(() => {
     const map = new Indoor({
+      ...mergedOptions,
       container: container.current,
       mapCanvas: mapCanvas.current,
       textureCanvas: textureCanvas.current,
       glyphCanvas: glyphCanvas.current,
-      styleJson,
-      maxZoom: 23,
-      minZoom: 16,
-      zoom: 19,
-      rotate: 0,
-      pitch: 30,
-      center: {
-        x: 1254.8271713616455,
-        y: 117.50345301174428,
-      },
-    });
-    if (domReady) {
-      map.init({ floorData, buildingData });
-      // console.log(map.layers);
-      setTimeout(() => {
-        // map.pitch = 30;
-      }, 2000)
+      styleData,
+    })
+    setMapIns(map);
+    setDomReady(true);
+    return () => {
+      map.destroy();
     }
-  }, [domReady])
+  }, []);
+
+  useEffect(() => {
+    if (mapIns) mapIns.currentFloorId = floorId;
+  }, [floorId]);
+
+  useEffect(() => {
+    console.log(floorData, buildingData)
+    if (mapIns) mapIns.destroy();
+    if (domReady) mapIns.init({ floorData, buildingData });
+  }, [floorData, buildingData]);
+
+  useEffect(() => {
+    if (mapIns && domReady) updateHeatmap(heatmapData);
+  }, [heatmapData]);
+
+  useEffect(() => {
+    if (mapIns && domReady) updateMarkers(markerData);
+  }, [markerData]);
+
+  useEffect(() => {
+    if (domReady) {
+      mapIns.init({ floorData, buildingData });
+      if (typeof onInit === 'function') onInit();
+      if (heatmapData) updateHeatmap(heatmapData)
+      if (markerData) updateMarkers(markerData)
+      if (lineData) updateLine(lineData)
+    }
+  }, [domReady]);
 
   return <div ref={container} style={{ width: '100%', height: '100%', fontSize: 0 }}>
     <canvas style={{ width: `${canvasWidth}px`, height: `${canvasHeight}px` }} width={canvasWidth * devicePixelRatio} height={canvasHeight * devicePixelRatio} ref={mapCanvas} />

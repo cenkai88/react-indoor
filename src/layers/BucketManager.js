@@ -5,9 +5,7 @@
 */
 
 import BucketFactor from './BucketFactor';
-import workers from "../worker/index";
-
-const { BucketWorker } = workers;
+import WebWorker from "../worker/index";
 
 export default class BucketManager {
     constructor() {
@@ -21,11 +19,10 @@ export default class BucketManager {
         this._listeners = new Map();
         const num = (navigator.hardwareConcurrency || 4) - 1;
         for (let i = 0; i < num; i += 1) {
-            this._workerPool.push(new BucketWorker());
+            this._workerPool.push(new WebWorker());
             this._freeIndies.push(i);
             this._workerPool[i].addEventListener('message', e => {
                 this._freeIndies.push(i);
-                
                 this._onMessage(e.data);
                 if (this._dataList.length > 0) {
                     const data = this._dataList.shift();
@@ -106,6 +103,7 @@ export default class BucketManager {
     destroy() {
         this.clear();
         for (let i = 0; i < this._workerPool.length; i += 1) {
+            console.log('t')
             this._workerPool[i].terminate();
         }
         this._listeners.clear();

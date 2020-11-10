@@ -15,7 +15,7 @@ export default class StyleManager {
   updateStyle(styleData) {
     return StyleManager.checkStyleDiff(this._style, styleData);
   }
-  getStyleJson() {
+  getstyleData() {
     return { ...this._style }
   }
   _parseStyle() {
@@ -23,20 +23,20 @@ export default class StyleManager {
     this._styleLayout = {
       mapBackgroundColor: this._style.mapBackgroundColor,
       frame: this._style.frame,
-      area: {
-        ...this._style.area.default,
-        keys: this._style.area.style.keys,
-        values: this._parseValues(this._style.area.style.values),
+      room: {
+        ...this._style.room.default,
+        keys: this._style.room.style.keys,
+        values: this._parseValues(this._style.room.style.values),
       },
       property: {
         ...this._style.property.default,
         keys: this._style.property.style.keys,
         values: this._parseValues(this._style.property.style.values),
       },
-      areaText: {
-        ...this._style.areaText.default,
-        keys: this._style.areaText.style.keys,
-        values: this._parseValues(this._style.areaText.style.values),
+      roomIcon: {
+        ...this._style.roomIcon.default,
+        keys: this._style.roomIcon.style.keys,
+        values: this._parseValues(this._style.roomIcon.style.values),
       },
     };
     if (this._style.extra) {
@@ -76,17 +76,17 @@ export default class StyleManager {
   }
   static checkStyleDiff(oldStyle, newStyle) {
     if (!oldStyle) {
-      return ['frame', 'area', 'areaText', 'property', 'extra'];
+      return ['frame', 'room', 'roomIcon', 'property', 'extra'];
     }
     const arr = [];
     if (!equalObject(oldStyle.frame, newStyle.frame)) {
       arr.push('frame');
     }
-    if (!equalObject(oldStyle.area, newStyle.area)) {
-      arr.push('area');
+    if (!equalObject(oldStyle.room, newStyle.room)) {
+      arr.push('room');
     }
-    if (!equalObject(oldStyle.areaText, newStyle.areaText)) {
-      arr.push('areaText');
+    if (!equalObject(oldStyle.roomIcon, newStyle.roomIcon)) {
+      arr.push('roomIcon');
     }
     if (!equalObject(oldStyle.property, newStyle.property)) {
       arr.push('property');

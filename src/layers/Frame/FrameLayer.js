@@ -18,11 +18,11 @@ export default class FrameLayer extends AbstractLayer {
         this._geometryRenderList.length = 0;
     }
     _updateRenderList(data) {
-        if (!this._engine) return;
+        if (!this._renderer) return;
         this._geometryRenderList.length = 0;
         const { info } = data;
         for (let i = 0; i < info.length; i += 1) {
-            const buffer = new FrameBuffer(this._engine.getGl());
+            const buffer = new FrameBuffer(this._renderer.getGl());
             buffer.update({
                 fillIndices: info[i].fillIndices,
                 outlineIndices: info[i].outlineIndices,
@@ -45,14 +45,14 @@ export default class FrameLayer extends AbstractLayer {
         return polygonsContain(this._layout, this._features, { x, y });
     }
     _update() {
-        if (!this._engine) return;
-        const bucketMng = this._engine.getBucketMng();
+        if (!this._renderer) return;
+        const bucketMng = this._renderer.getBucketMng();
         bucketMng.update({
             type: 'frame',
             id: this.id,
             layout: this._layout,
             features: this._features,
-            offset: this._engine.getOffset(),
+            offset: this._renderer.getOffset(),
             taskId: this._getTaskId(),
             sync: this.getSync(),
         });

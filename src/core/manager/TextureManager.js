@@ -1,6 +1,6 @@
 /* 
 
-TextureManager 目前只是初始化用
+TextureManager gets texture from image
 
 */
 

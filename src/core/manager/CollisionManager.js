@@ -1,20 +1,18 @@
-/* 
+/**
 
-CollisionManager
-利用web worker计算各个图层的碰撞，通过change事件将collisionResult发出
+@file CollisionManager calculate the result for collison detection when it is necessary.
 
 */
 
 import Base from '../../base/Base';
-import workers from "../../worker/index";
-
-const { CollisionWorker } = workers;
+import WebWorker from "../../worker/index";
 
 export default class CollisionManager extends Base {
     constructor(camera, options) {
         super();
         this._collisionList = [];
-        this._worker = new CollisionWorker();
+        console.log('a1')
+        this._worker = new WebWorker();
         this._updateQueue = [];
         this._camera = camera;
         this._options = options;
@@ -92,6 +90,7 @@ export default class CollisionManager extends Base {
         this._worker.postMessage(collisionData);
     }
     destroy() {
+        console.log('c')
         this._worker.terminate();
         this.clear();
         this.clearListeners();

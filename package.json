@@ -20,6 +20,7 @@
     "earcut": "^2.2.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-syntax-highlighter": "^15.2.1",
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
@@ -35,11 +36,18 @@
     "babel-loader": "^8.0.4",
     "babel-preset-react-app": "^6.1.0",
     "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^5.0.0",
     "eslint": "^6.0.0",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.0",
     "raw-loader": "^4.0.1",
+    "sass": "^1.27.0",
+    "sass-loader": "^10.0.3",
+    "style-loader": "^2.0.0",
+    "url-loader": "^4.1.1",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "worker-loader": "^3.0.5"
   }
 }

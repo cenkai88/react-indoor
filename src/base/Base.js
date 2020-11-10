@@ -1,6 +1,6 @@
-/*
+/** 
   
-基础类，几乎所有class都是由此extend出
+@file Base: Basic class with event related functions
   
 */
 
@@ -20,7 +20,6 @@ export default class Base {
     this._listeners = {};
     this._onetimeListeners = {};
   }
-  // 仅内部使用
   getIndexByOrder(arr, options) {
     for (let i = 0; i < arr.length; i += 1) {
       if (options.type === 'top') {
@@ -33,7 +32,6 @@ export default class Base {
     }
     return arr.length;
   }
-  // 绑定事件
   on(type, listener, options) {
     if (!validateParameter(type, listener)) return this
     const arr = this._listeners[type];
@@ -55,7 +53,6 @@ export default class Base {
     }
     return this;
   }
-  // // 绑定一次性事件
   once(type, listener, options) {
     if (!validateParameter(type, listener)) return this
     const arr = this._onetimeListeners[type];
@@ -77,7 +74,6 @@ export default class Base {
     }
     return this;
   }
-  // 解绑事件
   off(type, listener) {
     if (!validateParameter(type, listener)) return this
     const arr = this._listeners[type] || [];
@@ -96,7 +92,6 @@ export default class Base {
     if (onetimeArr.length === 0) delete this._onetimeListeners[type];
     return this;
   }
-  // 触发事件
   fire(type, eventData) {
     const arr = Array.from(this._listeners[type] || []);
     for (let i = 0; i < arr.length; i += 1) {
@@ -109,7 +104,6 @@ export default class Base {
     delete this._onetimeListeners[type];
     return this;
   }
-  // 清除所有已绑定事件
   clearListeners() {
     this._listeners = {};
     this._onetimeListeners = {};

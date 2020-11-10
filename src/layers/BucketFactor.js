@@ -6,8 +6,8 @@ import Matrix4 from '../geometry/Matrix4';
 import Vector4 from '../geometry/Vector4';
 import { containedInContour, createScreenBounds, filter } from '../utils/common';
 // import ConnectionBucket from './ConnectionBucket';
-// import HeatmapBucket from './HeatmapBucket';
-// import LineBucket from './LineBucket';
+import HeatmapBucket from './Heatmap/HeatmapBucket';
+import LineBucket from './Line/LineBucket';
 // import ModelBucket from './ModelBucket';
 // import TrackBucket from './TrackBucket';
 // import PictureBucket from './PictureBucket';
@@ -30,12 +30,12 @@ export default class BucketFactor {
         // else if (data.type === 'connection') {
         //     bucket = new ConnectionBucket(data);
         // }
-        // else if (data.type === 'heatmap') {
-        //     bucket = new HeatmapBucket(data);
-        // }
-        // else if (data.type === 'line') {
-        //     bucket = new LineBucket(data);
-        // }
+        else if (data.type === 'heatmap') {
+            bucket = new HeatmapBucket(data);
+        }
+        else if (data.type === 'line') {
+            bucket = new LineBucket(data);
+        }
         // else if (data.type === 'model') {
         //     bucket = new ModelBucket(data);
         // }

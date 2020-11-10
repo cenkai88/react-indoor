@@ -59,11 +59,11 @@ export default class ScrollZoom {
         }
     };
     _frameUpdate() {
-        const engine = this._mapView.getEngine();
+        const renderer = this._mapView.getRenderer();
         this._onScroll();
-        if (engine) {
-            engine.render();
-            engine.updateCollision(false);
+        if (renderer) {
+            renderer.render();
+            renderer.updateCollision(false);
         }
         this._mapView.fire('move');
         this._mapView.fire('zoom');

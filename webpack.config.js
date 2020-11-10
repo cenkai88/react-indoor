@@ -6,7 +6,7 @@ module.exports = {
   mode: 'development',
   entry: {
     main: './index.js',
-    bucketWorker: './src/layers/BucketFactor.js',
+    reactIndoorWorker: './src/layers/BucketFactor.js',
   },
   devServer: {
     publicPath: '/',
@@ -26,19 +26,25 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.less/,
-        exclude: /node_modules/,
+        test: /\.scss/,
+        exclude: /node_modules|src\/assets\/common\.scss/,
         use: [
           'style-loader',
           {
             loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: '[local]-[hash:base64:10]',
-            },
           },
-          'less-loader',
+          {
+            loader: 'sass-loader',
+          },
         ],
+      },
+      {
+        test: [/\.gif$/, /\.png$/, /\.jpe?g$/, /\.svg/],
+        exclude: /node_modules/,
+        loader: 'url-loader',
+        options: {
+          limit: 8000,
+        },
       },
       {
         test: /\.glsl$/,
@@ -48,14 +54,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './example/index.ejs',
+      template: './public/index.ejs',
       filename: 'index.html',
     }),
-    // new CopyWebpackPlugin([
-    //   {
-    //     from: './example/worker',
-    //     to: 'worker',
-    //   },
-    // ]),
+    new CopyWebpackPlugin([{
+      from: './demo/assets/icons',
+      to: 'icons',
+    }]),
   ],
 };

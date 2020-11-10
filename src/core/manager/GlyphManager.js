@@ -1,6 +1,6 @@
 /* 
 
-GlyphManager用于Marker和Area Text相关的渲染，getTexture直接操作webgl
+GlyphManager renders the image and text in Icon Layer
 
 */
 

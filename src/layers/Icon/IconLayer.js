@@ -23,8 +23,8 @@ export default class IconLayer extends AbstractLayer {
     const oldNum = this._collisionRenderList.length;
     super._onBucketChange(data);
     const newNum = this._collisionRenderList.length;
-    if (data.isRender && (oldNum !== newNum || newNum > 0) && this._engine) {
-      this._engine.updateCollision();
+    if (data.isRender && (oldNum !== newNum || newNum > 0) && this._renderer) {
+      this._renderer.updateCollision();
     }
   }
   clear() {
@@ -37,15 +37,15 @@ export default class IconLayer extends AbstractLayer {
     this._layout = { ...this._layout, layout };
     if (this._features.length !== 0) this._update();
   }
-  onAdd(engine) {
-    super.onAdd(engine);
-    const collisionMng = engine.getCollisionMng();
+  onAdd(renderer) {
+    super.onAdd(renderer);
+    const collisionMng = renderer.getCollisionMng();
     collisionMng.add(this.getCollisionData());
     collisionMng.on('change', this._onCollisionChange.bind(this));
   }
   unbind() {
-    if (this._engine) {
-      const collisionMng = this._engine.getCollisionMng();
+    if (this._renderer) {
+      const collisionMng = this._renderer.getCollisionMng();
       collisionMng.remove(this.getCollisionData());
       collisionMng.off('change', this._onCollisionChange.bind(this));
     }
@@ -65,8 +65,8 @@ export default class IconLayer extends AbstractLayer {
     };
   }
   queryFeaturesByWorld(x, y) {
-    if (!this._engine) return [];
-    const screen = this._engine.getCamera().worldToScreenCoordinate(x, y);
+    if (!this._renderer) return [];
+    const screen = this._renderer.getCamera().worldToScreenCoordinate(x, y);
     const result = [];
     const collisionSet = new Set(this._collisionIndices);
     let index = 0;
@@ -90,8 +90,8 @@ export default class IconLayer extends AbstractLayer {
     return result;
   }
   _checkDataItem(feature, screen) {
-    if (!this._engine) return false;
-    const textBaseSize = this._engine.getGlyphMng().getBaseSize();
+    if (!this._renderer) return false;
+    const textBaseSize = this._renderer.getGlyphMng().getBaseSize();
     const { textSize, iconSize, properties } = feature;
     const textOffset = getStyle(this._layout, 'textOffset', properties);
     const textAnchor = getStyle(this._layout, 'textAnchor', properties);
@@ -103,17 +103,17 @@ export default class IconLayer extends AbstractLayer {
       (iconSize && this._check(feature, screen, iconAnchor, iconOffset, iconSize, iconScale));
   }
   _check(feature, screen, anchor, offset, bounds, scale) {
-    if (!this._engine) return false;
+    if (!this._renderer) return false;
     const size = [bounds[0] * scale, bounds[1] * scale];
     const { geometry } = feature;
     if (geometry.type === 'Point') {
-      const point = this._engine.getCamera().worldToScreenCoordinate(geometry.coordinates[0], geometry.coordinates[1]);
+      const point = this._renderer.getCamera().worldToScreenCoordinate(geometry.coordinates[0], geometry.coordinates[1]);
       const bounds_1 = createScreenBounds([point.x - offset[0], point.y - offset[1]], size[0], size[1], anchor);
       return IconLayer.checkInBounds(screen, bounds_1);
     }
     else if (geometry.type === 'MultiPoint') {
       for (let j = 0; j < geometry.coordinates.length; j += 1) {
-        const point = this._engine.getCamera().worldToScreenCoordinate(geometry.coordinates[j][0], geometry.coordinates[j][1]);
+        const point = this._renderer.getCamera().worldToScreenCoordinate(geometry.coordinates[j][0], geometry.coordinates[j][1]);
         const bounds_2 = createScreenBounds([point.x - offset[0], point.y - offset[1]], size[0], size[1], anchor);
         if (IconLayer.checkInBounds(screen, bounds_2)) return true
       }
@@ -121,18 +121,18 @@ export default class IconLayer extends AbstractLayer {
     return false;
   }
   _updateRenderList(data) {
-    if (!this._engine) return;
+    if (!this._renderer) return;
     this._collisionList.length = 0;
     this._geometryRenderList.length = 0;
     this._collisionRenderList.length = 0;
-    const textureMng = this._engine.getTextureMng();
+    const textureMng = this._renderer.getTextureMng();
     const { info } = data;
     for (let i = 0; i < info.length; i += 1) {
       const { isCollision, collision } = info[i];
       const arr = [];
       for (let j = 0; j < info[i].data.length; j += 1) {
         const geometry = info[i].data[j];
-        const buffer = new TextBuffer(this._engine.getGl());
+        const buffer = new TextBuffer(this._renderer.getGl());
         let texture = void 0;
         if (geometry.iconUrl) {
           const temp = textureMng.getTexture(geometry.iconUrl, IconLayer.TEXTURE_PARAMS);
@@ -146,7 +146,7 @@ export default class IconLayer extends AbstractLayer {
           texture: texture,
           textOptions: geometry.textOptions,
         });
-        buffer.setGlyphMng(this._engine.getGlyphMng());
+        buffer.setGlyphMng(this._renderer.getGlyphMng());
         const render = {
           point: geometry.point,
           base: geometry.base,
@@ -166,7 +166,7 @@ export default class IconLayer extends AbstractLayer {
     }
   }
   _update() {
-    if (!this._engine) return;
+    if (!this._renderer) return;
     const dataItemList = [];
     for (let i = 0; i < this._features.length; i += 1) {
       this._calcPoint(this._features[i], res => {
@@ -174,13 +174,13 @@ export default class IconLayer extends AbstractLayer {
       });
     }
     this._dataItemList = dataItemList;
-    const bucketMng = this._engine.getBucketMng();
+    const bucketMng = this._renderer.getBucketMng();
     const data = {
       type: 'icon',
       layout: this._layout,
       features: this._dataItemList,
-      offset: this._engine.getOffset(),
-      baseTextSize: this._engine.getGlyphMng().getBaseSize(),
+      offset: this._renderer.getOffset(),
+      baseTextSize: this._renderer.getGlyphMng().getBaseSize(),
       id: this.id,
       taskId: this._getTaskId(),
       sync: this.getSync(),
@@ -200,9 +200,9 @@ export default class IconLayer extends AbstractLayer {
     let iconSize;
     let textSize;
     let textArr;
-    if (!this._engine) return;
-    const glyphMng = this._engine.getGlyphMng();
-    const textureMng = this._engine.getTextureMng();
+    if (!this._renderer) return;
+    const glyphMng = this._renderer.getGlyphMng();
+    const textureMng = this._renderer.getTextureMng();
     const iconUrl = getStyle(this._layout, 'iconImage', feature.properties);
     let tempTexture;
     if (iconUrl) {

@@ -9,8 +9,10 @@ import Base from '../base/Base';
 
 const config = {
   Frame: { order: 1, shaderName: 'frame' },
+  Line: { order: 2, shaderName: 'line' },
   Room: { order: 3, shaderName: 'room' },
   Icon: { order: 6, shaderName: 'icon' },
+  Heatmap: { order: 5, shaderName: 'heatmap' },
 };
 
 export default class AbstractLayer extends Base {
@@ -70,10 +72,10 @@ export default class AbstractLayer extends Base {
   }
 
   _checkBind(type, listener) {
-    if (this._bindMap.has(type) || !this._engine) return;
+    if (this._bindMap.has(type) || !this._renderer) return;
     const listeners = this.getListeners(type);
     if (listeners && listeners.length !== 0) {
-      this._engine.on(type, listener, { order: this._order, type: 'top' });
+      this._renderer.on(type, listener, { order: this._order, type: 'top' });
       this._bindMap.set(type, true);
     }
   }
@@ -82,7 +84,7 @@ export default class AbstractLayer extends Base {
     const listeners = this.getListeners(type);
     if (!listeners || listeners.length === 0) {
       this._bindMap.delete(type);
-      if (this._engine) this._engine.off(type, listener);
+      if (this._renderer) this._renderer.off(type, listener);
     }
   }
 
@@ -176,26 +178,26 @@ export default class AbstractLayer extends Base {
     return this._groupId;
   }
 
-  onAdd(engine) {
-    const hasAdd = Boolean(this._engine);
-    this._engine = engine;
+  onAdd(renderer) {
+    const hasAdd = Boolean(this._renderer);
+    this._renderer = renderer;
     this._checkBind('click', this._onclick.bind(this));
     this._checkBind('mousedown', this._onmousedown.bind(this));
     this._checkBind('mousemove', this._onmousemove.bind(this));
     this._checkBind('mouseup', this._onmouseup.bind(this));
     if (!hasAdd) {
-      const bucketMng = this._engine.getBucketMng();
+      const bucketMng = this._renderer.getBucketMng();
       bucketMng.register(this._id, this._onBucketChange.bind(this));
       this._update();
     }
   }
 
   unbind() {
-    if (this._engine) {
-      this._engine.off('click', this._onclick.bind(this));
-      this._engine.off('mousedown', this._onmousedown.bind(this));
-      this._engine.off('mousemove', this._onmousemove.bind(this));
-      this._engine.off('mouseup', this._onmouseup.bind(this));
+    if (this._renderer) {
+      this._renderer.off('click', this._onclick.bind(this));
+      this._renderer.off('mousedown', this._onmousedown.bind(this));
+      this._renderer.off('mousemove', this._onmousemove.bind(this));
+      this._renderer.off('mouseup', this._onmouseup.bind(this));
       this._bindMap.clear();
     }
   }
@@ -203,18 +205,18 @@ export default class AbstractLayer extends Base {
   onRemove() {
     this.clear();
     this.unbind();
-    if (this._engine) {
-      const bucketMng = this._engine.getBucketMng();
+    if (this._renderer) {
+      const bucketMng = this._renderer.getBucketMng();
       bucketMng.unregister(this._id);
-      delete this._engine;
+      delete this._renderer;
     }
   }
 
   _onBucketChange(data) {
     this._updateRenderList(data);
-    if (this._engine) {
-      if (data.isRender) this._engine.render();
-      if (data.isUpdateCollision) this._engine.updateCollision();
+    if (this._renderer) {
+      if (data.isRender) this._renderer.render();
+      if (data.isUpdateCollision) this._renderer.updateCollision();
     }
   }
 

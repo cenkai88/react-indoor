@@ -1,14 +1,13 @@
 import Base from './Base';
 
 import GestureManager from '../gesture/GestureManager';
-import Core from '../core/Core';
+import Renderer from '../core/Renderer';
 import Point from '../geometry/Point';
 import StyleManager from '../style/Style';
 
 import FrameLayer from '../layers/Frame/FrameLayer';
 import RoomLayer from '../layers/Room/RoomLayer';
 import IconLayer from '../layers/Icon/IconLayer';
-import { getStyle } from '../utils/style';
 import { createFeaturePoint, step } from '../utils/common';
 import { MAX_ROOM_PER_RENDER } from '../utils/constants';
 
@@ -20,7 +19,7 @@ export default class MapView extends Base {
     this._glyphCanvas = options.glyphCanvas;
     this._textureCanvas = options.textureCanvas;
     this._layers = [];
-    this._styleMng = new StyleManager(options.styleJson);
+    this._styleMng = new StyleManager(options.styleData);
     this._hasDrawFloorId = new Set();
     this._minZoom = options.minZoom;
     this._maxZoom = options.maxZoom;
@@ -30,7 +29,7 @@ export default class MapView extends Base {
     this._gestureManager = new GestureManager(this);
   }
   init(currentFloor, style) {
-    this._engine = new Core(
+    this._renderer = new Renderer(
       this._canvasContainer,
       {
         mapCanvas: this._mapCanvas,
@@ -46,29 +45,29 @@ export default class MapView extends Base {
       maxTextSize: this._options.maxTextSize,
       textSplit: this._options.textSplit,
     });
-    this._engine.getCamera().set({ center: this._options.center });
+    this._renderer.getCamera().set({ center: this._options.center });
     // set camera
     this._initCamera(currentFloor);
   }
 
   _onMoveEnd() {
-    if (this._engine) this._engine.updateCollision();
+    if (this._renderer) this._renderer.updateCollision();
   }
   _initCamera(currentFloor) {
-    if (!this._engine) return;
-    const camera = this._engine.getCamera();
+    if (!this._renderer) return;
+    const camera = this._renderer.getCamera();
     const [x, y] = currentFloor.center.coordinates;
     const { bounds } = currentFloor;
     camera.setMaxBounds(bounds && {
       topLeft: { x: bounds[0][0], y: bounds[1][1] },
       bottomRight: { x: bounds[1][0], y: bounds[0][1] },
     });
-    this._engine.setOffset(-x, -y);
+    this._renderer.setOffset(-x, -y);
     if (!this._options.center) camera.set({ center: { x, y } });
   }
   _update(floors) {
-    if (!this._engine) return;
-    this._engine.clear();
+    if (!this._renderer) return;
+    this._renderer.clear();
     const layerMap = new Map();
     for (let i = 0; i < floors.length; i += 1) {
       layerMap.set(floors[i].floorId, []);
@@ -80,12 +79,12 @@ export default class MapView extends Base {
     }
     layerMap.forEach(value => {
       for (let i = 0; i < value.length; i += 1) {
-        this._engine.addLayer(value[i]);
+        this._renderer.addLayer(value[i]);
       }
     });
-    this._engine.sortLayer();
-    this._engine.render();
-    this._engine.updateCollision();
+    this._renderer.sortLayer();
+    this._renderer.render();
+    this._renderer.updateCollision();
   }
   _processLayer(layer, layerMap) {
     let groupId = this.currentFloor.floorId;
@@ -122,35 +121,36 @@ export default class MapView extends Base {
   }
   _drawRoom(features, floorId) {
     if (!this._styleMng) return { text: [], extra: [] };
-    const areaStyle = this._styleMng.getStyle('area');
-    if (!areaStyle) return { text: [], extra: [] };
+    const roomStyle = this._styleMng.getStyle('room');
+    if (!roomStyle) return { text: [], extra: [] };
     const roomFeatures = [];
-    const areaTextFeatures = [];
+    const roomIconFeatures = [];
     for (let i = 0; i < features.length; i += 1) {
       const { properties } = features[i];
       roomFeatures.push(features[i]);
       const point = properties && (properties.labelpoint || properties.center);
-      if (point) areaTextFeatures.push(createFeaturePoint(point, properties));
+      if (point) roomIconFeatures.push(createFeaturePoint(point, properties));
     }
 
     if (roomFeatures.length !== 0) {
       step(roomFeatures, MAX_ROOM_PER_RENDER, item => {
-        const layer = new RoomLayer(areaStyle);
+        const layer = new RoomLayer(roomStyle);
         layer.setFeatures(item).setName('room').setFloorId(floorId);
         this._layers.push(layer);
       });
     }
-    return { text: areaTextFeatures };
+    return { text: roomIconFeatures };
   }
   _drawIcon(features, floorId) {
     if (!this._styleMng || features.length === 0) return;
-    const areaTextStyle = this._styleMng.getStyle('areaText');
-    if (!areaTextStyle) return;
-    const layer = new IconLayer(areaTextStyle);
+    const roomIconStyle = this._styleMng.getStyle('roomIcon');
+    if (!roomIconStyle) return;
+    const layer = new IconLayer(roomIconStyle);
     layer.setFeatures(features).setName('icon').setFloorId(floorId);
-    console.log(layer);
     this._layers.push(layer);
   }
+  
+
   _fireEvent(params, suffix) {
     const {
       zoom,
@@ -169,7 +169,7 @@ export default class MapView extends Base {
   _removeLayer(layer) {
     const index = this._layers.findIndex(item => item.id === layer.id);
     if (index !== -1) this._layers.splice(index, 1);
-    if (this._engine) this._engine.removeLayer(layer);
+    if (this._renderer) this._renderer.removeLayer(layer);
   }
   hasLayer(layer) {
     for (let i = 0; i < this._layers.length; i += 1) {
@@ -179,22 +179,22 @@ export default class MapView extends Base {
   }
   updateLayer(layer) {
     const floorId = layer.getFloorId();
-    if (!this._engine || !floorId) return;
-    const isContain = this._engine.contains(layer);
+    if (!this._renderer || !floorId) return;
+    const isContain = this._renderer.contains(layer);
     let isNeedUpdate = false;
     if (this._checkIsNeedAdd(layer)) {
       if (!isContain) {
-        this._engine.addLayer(layer);
-        this._engine.sortLayer();
+        this._renderer.addLayer(layer);
+        this._renderer.sortLayer();
         isNeedUpdate = true;
       }
     } else if (isContain) {
-      this._engine.removeLayer(layer, false);
+      this._renderer.removeLayer(layer, false);
       isNeedUpdate = true;
     }
     if (isNeedUpdate) {
-      this._engine.render();
-      if (layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0) this._engine.updateCollision();
+      this._renderer.render();
+      if (layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0) this._renderer.updateCollision();
     }
   }
   _checkIsNeedAdd(layer) {
@@ -202,20 +202,20 @@ export default class MapView extends Base {
     return layer.getFloorId() === this.currentFloor.floorId || layer.getAlwaysShow();
   }
   screenToWorldCoordinate(screenX, screenY) {
-    if (!this._engine) return new Point(0, 0);
-    const camera = this._engine.getCamera();
+    if (!this._renderer) return new Point(0, 0);
+    const camera = this._renderer.getCamera();
     return camera.screenToWorldCoordinate(screenX, screenY);
   }
   worldToScreenCoordinate(worldX, worldY) {
-    if (!this._engine) return new Point(0, 0);
-    const camera = this._engine.getCamera();
+    if (!this._renderer) return new Point(0, 0);
+    const camera = this._renderer.getCamera();
     return camera.worldToScreenCoordinate(worldX, worldY);
   }
-  getEngine() {
-    return this._engine;
+  getRenderer() {
+    return this._renderer;
   }
   getCamera() {
-    return this._engine && this._engine.getCamera();
+    return this._renderer && this._renderer.getCamera();
   }
   getCanvasContainer() {
     return this._canvasContainer;

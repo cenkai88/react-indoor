@@ -48,7 +48,7 @@ export default class Indoor extends MapView {
     }
     this._status = 'RENDERERING';
     this.fire('render');
-    this._floors = buildingData;
+    this._floors = [...buildingData];
     buildingData.forEach(item => {
       this._floorMap.set(item.floorId, item)
     });
@@ -64,18 +64,18 @@ export default class Indoor extends MapView {
     this.fire('rendered')
   }
   destroy() {
-    this._engine && this._engine.destroy();
+    this._renderer && this._renderer.destroy();
     if (this._canvasContainer) delete this._canvasContainer;
     this._gestureManager.destroy();
     this._reset();
   }
   resize() {
-    if (this._engine) this._engine.resize();
+    if (this._renderer) this._renderer.resize();
     this.fire('move');
   }
   jumpTo(params = {}) {
-    if (!this._engine) return;
-    const camera = this._engine.getCamera();
+    if (!this._renderer) return;
+    const camera = this._renderer.getCamera();
     const {
       center,
       zoom,
@@ -98,14 +98,14 @@ export default class Indoor extends MapView {
     const endCenter = center ? new Point(center.x, center.y) : locationAtOffset.clone();
     camera.set(cameraOptions);
     camera.setCenterAtPoint(endCenter, pointAtOffset);
-    this._engine.render();
+    this._renderer.render();
     this._fireEvent(params, 'Start');
     this._fireEvent(params, '');
     this._fireEvent(params, 'End');
   }
   easeTo(params = {}) {
-    if (!this._engine) return;
-    const camera = this._engine.getCamera();
+    if (!this._renderer) return;
+    const camera = this._renderer.getCamera();
     const startZoom = camera.getZoom();
     const startRotate = camera.getRotate();
     const startPitch = camera.getPitch();
@@ -130,7 +130,7 @@ export default class Indoor extends MapView {
     if (timgingFns[timingFn]) this._transitor.setTimingFn(timingFn);
     const endRotate = Camera.normalizeRotate(rotate, startRotate);
     this._transitor.on('update', (e) => {
-      if (!this._engine) return;
+      if (!this._renderer) return;
       const progress = e.num / 1;
       const cameraOptions = {
         zoom: startZoom + (zoom - startZoom) * progress,
@@ -141,8 +141,8 @@ export default class Indoor extends MapView {
       const delta = centerDelta.clone().multiply(progress);
       const newCenter = from.clone().add(delta);
       camera.setCenterAtPoint(newCenter, pointAtOffset);
-      this._engine.render();
-      this._engine.updateCollision(false);
+      this._renderer.render();
+      this._renderer.updateCollision(false);
       this._fireEvent(params, '');
     }).on('complete', () => {
       delete this._transitor
@@ -151,22 +151,22 @@ export default class Indoor extends MapView {
     }).start();
   }
   zoomIn() {
-    if (!this._engine) return;
+    if (!this._renderer) return;
     const endZoom = getFit(this.zoom + 1, this._options.minZoom, this._options.maxZoom);
     this.easeTo({ zoom: endZoom, duration: 550 });
   }
   zoomOut() {
-    if (!this._engine) return;
+    if (!this._renderer) return;
     const endZoom = getFit(this.zoom - 1, this._options.minZoom, this._options.maxZoom);
     this.easeTo({ zoom: endZoom, duration: 550 });
   }
   fitBounds(bounds, padding = 0) {
-    if (!this._engine) return;
+    if (!this._renderer) return;
     const { topLeft, bottomRight } = bounds;
     if (!topLeft || !bottomRight) return;
     const world1 = new Point(topLeft.x, topLeft.y);
     const world2 = new Point(bottomRight.x, bottomRight.y);
-    const camera = this._engine.getCamera();
+    const camera = this._renderer.getCamera();
     const center = {
       x: (world1.x + world2.x) / 2,
       y: (world1.y + world2.y) / 2,
@@ -192,33 +192,33 @@ export default class Indoor extends MapView {
       if (!this.hasLayer(layers[i])) {
         this._addLayer(layers[i]);
         if (this._checkIsNeedAdd(layers[i])) {
-          if (this._engine) this._engine.addLayer(layers[i]);
+          if (this._renderer) this._renderer.addLayer(layers[i]);
         }
       }
     }
-    if (!this._engine) return;
-    this._engine.sortLayer();
+    if (!this._renderer) return;
+    this._renderer.sortLayer();
   }
   addLayer(layer) {
     if (this.hasLayer(layer)) return;
     this._addLayer(layer);
-    if (this._checkIsNeedAdd(layer) && this._engine) {
-      this._engine.addLayer(layer);
-      this._engine.sortLayer();
+    if (this._checkIsNeedAdd(layer) && this._renderer) {
+      this._renderer.addLayer(layer);
+      this._renderer.sortLayer();
     }
   }
   removeLayers(layers) {
     for (let i = 0; i < layers.length; i += 1) {
       this._removeLayer(layers[i]);
     }
-    if (this._engine) this._engine.updateCollision();
+    if (this._renderer) this._renderer.updateCollision();
   }
   removeLayer(layer) {
     const isNeedUpdateCollision = layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0;
     this._removeLayer(layer);
-    if (this._engine) {
-      this._engine.render();
-      if (isNeedUpdateCollision) this._engine.updateCollision();
+    if (this._renderer) {
+      this._renderer.render();
+      if (isNeedUpdateCollision) this._renderer.updateCollision();
     }
   }
 
@@ -254,28 +254,28 @@ export default class Indoor extends MapView {
   }
 
   get center() {
-    return this._engine && this._engine.getCamera().getCenter();
+    return this._renderer && this._renderer.getCamera().getCenter();
   }
   set center(center) {
     this.jumpTo({ center });
   }
 
   get zoom() {
-    return this._engine && this._engine.getCamera().getZoom();
+    return this._renderer && this._renderer.getCamera().getZoom();
   }
   set zoom(zoom) {
     this.jumpTo({ zoom });
   }
 
   get rotate() {
-    return this._engine && this._engine.getCamera().getRotate();
+    return this._renderer && this._renderer.getCamera().getRotate();
   }
   set rotate(rotate) {
     this.jumpTo({ rotate });
   }
 
   get pitch() {
-    return this._engine && this._engine.getCamera().getPitch();
+    return this._renderer && this._renderer.getCamera().getPitch();
   }
   set pitch(pitch) {
     this.jumpTo({ pitch });

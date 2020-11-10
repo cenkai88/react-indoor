@@ -103,8 +103,8 @@ export default class DragPan extends AbstractGesture {
         this._stopFrameUpdate(e);
     }
     _onMove(e) {
-        const engine = this._mapView.getEngine();
-        if (!this._lastPos || !engine) return;
+        const renderer = this._mapView.getRenderer();
+        if (!this._lastPos || !renderer) return;
         if (this._state === 'pending') {
             this._state = 'active';
             this._startFrameUpdate();
@@ -116,14 +116,14 @@ export default class DragPan extends AbstractGesture {
         this._inertias.push([Date.now(), this._curPos]);
     }
     _frameUpdate() {
-        const engine = this._mapView.getEngine();
-        if (engine && this._lastPos && this._curPos) {
-            const camera = engine.getCamera();
+        const renderer = this._mapView.getRenderer();
+        if (renderer && this._lastPos && this._curPos) {
+            const camera = renderer.getCamera();
             const world = camera.screenToWorldCoordinate(this._lastPos.x, this._lastPos.y);
             camera.setCenterAtPoint(world, this._curPos);
             this._lastPos = this._curPos;
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
         }
         this._mapView.fire('move');
         this._mapView.fire('drag');
@@ -162,9 +162,9 @@ export default class DragPan extends AbstractGesture {
         this._inertias = [];
     }
     _moveInertia(offset, duration, event) {
-        const engine = this._mapView.getEngine();
-        if (!engine) return;
-        const camera = engine.getCamera();
+        const renderer = this._mapView.getRenderer();
+        if (!renderer) return;
+        const camera = renderer.getCamera();
         const pointAtOffset = camera.centerPoint.add(offset);
         const locationAtOffset = camera.screenToWorldCoordinate(pointAtOffset.x, pointAtOffset.y);
         const end = camera.getCenter();
@@ -177,8 +177,8 @@ export default class DragPan extends AbstractGesture {
             const delta = centerDelta.clone().multiply(e.num);
             const newCenter = from.clone().add(delta);
             camera.setCenterAtPoint(newCenter, pointAtOffset);
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
             this._mapView.fire('move', event);
         }).on('complete', () => {
             this._mapView.fire('moveEnd', event);

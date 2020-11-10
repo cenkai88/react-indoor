@@ -1,0 +1,29 @@
+.sidemenu{
+  width: 20%;
+  min-width: 200px;
+  max-width: 300px;
+  padding: 24px 0;
+  font-size: 14px;
+  &-item {
+    line-height: 1.7;
+    padding: 8px 16px;
+    cursor: pointer;
+    &-active{
+      color: #1967D2;
+      background-color: #E9F3FE;
+      position: relative;
+      &::after {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 4px;
+        background-color: #0548A0;
+        right: 0;
+        top: 0;
+      }
+    }
+    &:hover {
+      color: #1967D2;
+    }
+  }
+}

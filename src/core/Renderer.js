@@ -1,6 +1,6 @@
 /**
  * @file  
-  Renderer用于绘制图像，将抽象好的数据传给webGL，是绘图的核心
+  Renderer is used to link the json data, camera, webGl engine
 
 */
 
@@ -42,14 +42,13 @@ export default class Core extends Base {
     this._container = container;
     this._canvas = mapCanvas;
     const { clientWidth, clientHeight } = mapCanvas;
-    // 获取webgl renderer
     const glOptions = {
       antialias: true,
-      depth: true, // 绘图缓冲区的深度缓冲区至少为16位
-      premultipliedAlpha: true, // 表示页面合成器将假定绘图缓冲区包含具有预乘alpha的颜色
-      preserveDrawingBuffer: false, // 会清除缓冲区
-      alpha: true, // 包含alpha缓冲区
-      failIfMajorPerformanceCaveat: true, // 如果系统性能较低，是否创建上下文
+      depth: true,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      alpha: true,
+      failIfMajorPerformanceCaveat: true,
     };
     this._setupLight(options);
     this._gl = this._canvas.getContext('webgl', glOptions) || this._canvas.getContext('experimental-webgl', glOptions);
@@ -152,7 +151,6 @@ export default class Core extends Base {
   updateCollision(isForce = true) {
     this._collisionMng.update(isForce);
   }
-  // 决定z轴上渲染时哪一层在上哪一层在下
   sortLayer() {
     const map = new Map();
     for (let i = 0; i < this._layers.length; i += 1) {
@@ -205,27 +203,34 @@ export default class Core extends Base {
     }
     this._drawLayers();
   }
-  // 分各种类型渲染
   _drawLayers() {
     this._glContext.clear();
     for (let i = 0; i < this._layers.length; i += 1) {
       const type = this._layers[i].getType();
-      if (type === 'Frame') {
-        this._drawFrame(this._layers[i]);
-      } else if (type === 'Room') {
-        this._drawRoom(this._layers[i]);
-      } else if (type === 'Icon') {
-        this._drawIcon(this._layers[i]);
+      switch (type) {
+        case "Frame":
+          this._drawFrame(this._layers[i]);
+          break
+        case "Room":
+          this._drawRoom(this._layers[i]);
+          break
+        case "Icon":
+          this._drawIcon(this._layers[i]);
+          break
+        case "Heatmap":
+          this._drawHeatmap(this._layers[i]);
+          break
+        case "Line":
+          this._drawLine(this._layers[i]);
+          break
       }
     }
   }
   _drawFrame(frame) {
     this._glContext.use(frame.getShaderName());
-    // 关闭deptTest，因为z轴的管理由外面的框架完成
     this._glContext.disableDepthTest();
-    // 开启半透明
     this._glContext.enableAlpha();
-    // 半透明的计算color(RGBA) = (sourceColor * SRC_ALPHA) + (destinationColor * (1 - SRC_ALPHA))
+    // color(RGBA) = (sourceColor * SRC_ALPHA) + (destinationColor * (1 - SRC_ALPHA))
     this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
     const geometryRenderList = frame.getGeometryRenderList();
     const program = this._glContext.getActiveProgram();
@@ -235,17 +240,17 @@ export default class Core extends Base {
     const u_color = program.getUniformLocation('u_color');
     const u_base = program.getUniformLocation('u_base');
     const u_opacity = program.getUniformLocation('u_opacity');
-    for (let i = 0; i < geometryRenderList.length; i += 1) { // 画每一个geometry元素，获取其fillColor填充色、outlineColor轮廓色，buffer，base，和透明度
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
       const { outlineColor, fillColor, buffer, base, opacity } = geometryRenderList[i];
       buffer.bindData(a_position);
       this._gl.uniform1f(u_base, base);
       this._gl.uniform1f(u_opacity, opacity);
       this._gl.uniform4fv(u_color, fillColor);
       buffer.bindIndices('fill');
-      this._gl.drawElements(this._gl.TRIANGLES, buffer.fillIndicesNum, this._gl.UNSIGNED_SHORT, 0); // 填充内部颜色
+      this._gl.drawElements(this._gl.TRIANGLES, buffer.fillIndicesNum, this._gl.UNSIGNED_SHORT, 0);
       this._gl.uniform4fv(u_color, outlineColor);
       buffer.bindIndices('outline');
-      this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0); // 画外轮廓
+      this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0);
     }
   }
   _drawRoom(room) {
@@ -257,7 +262,6 @@ export default class Core extends Base {
     if (!program) return;
     this._initViewProjectionMatrix(program);
     this._setLight(program);
-    // program里一系列变量定义，下面实际是 WebGLUniformLocation 对象，用于变量给shader里传
     const u_color = program.getUniformLocation('u_color');
     const u_height = program.getUniformLocation('u_height');
     const u_base = program.getUniformLocation('u_base');
@@ -331,6 +335,85 @@ export default class Core extends Base {
     if (this._hideResult) this._drawCollisionResult(this._hideResult, icon, data);
     if (this._showResult) this._drawCollisionResult(this._showResult, icon, data);
     this._drawCollisionResult(this._normalResult, icon, data);
+  }
+  _drawHeatmap(layer) {
+    this._glContext.use(layer.getShaderName());
+    this._glContext.disableDepthTest();
+    this._glContext.enableAlpha();
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE);
+    const buffer = layer.getBuffer();
+    const program = this._glContext.getActiveProgram();
+    if (!buffer || !program) return;
+    this._initViewProjectionMatrix(program);
+    const u_radius = program.getUniformLocation('u_radius');
+    const a_normal = program.getAttribLocation('a_normal');
+    const u_resolution = program.getUniformLocation('u_resolution');
+    this._gl.uniform2fv(u_resolution, [this._camera.getWidth(), this._camera.getHeight()]);
+    const u_position = program.getUniformLocation('u_position');
+    buffer.bind(a_normal);
+    this._glContext.enableFrameBuffer();
+    const geometryRenderList = layer.getGeometryRenderList();
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
+      const _a = geometryRenderList[i], point = _a.point, radius = _a.radius;
+      this._gl.uniform2fv(u_position, point);
+      this._gl.uniform1f(u_radius, radius);
+      this._gl.drawArrays(this._gl.TRIANGLE_FAN, 0, buffer.verticesNum);
+    }
+    this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+    this._drawHeatMapTexture(layer);
+  }
+  _drawHeatMapTexture(layer) {
+    this._glContext.use('heatmapTexture');
+    this._glContext.enableAlpha();
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
+    this._glContext.disableDepthTest();
+    const program = this._glContext.getActiveProgram();
+    if (!program) return;
+    const a_position = program.getAttribLocation('a_position');
+    const u_resolution = program.getUniformLocation('u_resolution');
+    const u_opacity = program.getUniformLocation('u_opacity');
+    const opacity = layer.getLayout().opacity;
+    this._gl.uniform1f(u_opacity, opacity);
+    const { width, height } = this._glContext.getViewRect();
+    this._gl.uniform2fv(u_resolution, [width, height]);
+    const vertices = [-1, -1, -1, 1, 1, -1, 1, 1];
+    this._glContext.initArrayBuffer(a_position, new Float32Array(vertices), 2);
+    this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
+  }
+  _drawLine(line) {
+    const geometryRenderList = line.getGeometryRenderList();
+    this._glContext.use(line.getShaderName());
+    this._glContext.disableDepthTest();
+    this._glContext.enableAlpha();
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
+    const program = this._glContext.getActiveProgram();
+    if (!program) return;
+    this._initViewProjectionMatrix(program);
+    const a_position = program.getAttribLocation('a_position');
+    const a_normal = program.getAttribLocation('a_normal');
+    const a_texCoord = program.getAttribLocation('a_texCoord');
+    const a_deviation = program.getAttribLocation('a_deviation');
+    const u_color = program.getUniformLocation('u_color');
+    const u_onePixelToWorld = program.getUniformLocation('u_onePixelToWorld');
+    const u_sampler = program.getUniformLocation('u_sampler');
+    this._gl.uniform1i(u_sampler, 0);
+    const u_lineWidth = program.getUniformLocation('u_lineWidth');
+    const u_imgSize = program.getUniformLocation('u_imgSize');
+    const u_opacity = program.getUniformLocation('u_opacity');
+    const u_useTexture = program.getUniformLocation('u_useTexture');
+    const u_base = program.getUniformLocation('u_base');
+    this._gl.uniform1f(u_onePixelToWorld, this._camera.getOnePixelToWorld());
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
+      const { lineColor, buffer, useTexture, imgSize, lineWidth, base, opacity } = geometryRenderList[i];
+      this._gl.uniform1i(u_useTexture, useTexture ? 1 : 0);
+      this._gl.uniform1f(u_lineWidth, lineWidth);
+      this._gl.uniform1f(u_base, base);
+      this._gl.uniform1f(u_opacity, opacity);
+      this._gl.uniform2fv(u_imgSize, imgSize);
+      this._gl.uniform4fv(u_color, lineColor);
+      buffer.bind({ a_position, a_normal, a_deviation, a_texCoord });
+      this._gl.drawElements(this._gl.TRIANGLES, buffer.indicesNum, this._gl.UNSIGNED_SHORT, 0);
+    }
   }
   _drawCollisionResult(result, layer, locations) {
     const arr = result.data[layer.id];
@@ -413,10 +496,9 @@ export default class Core extends Base {
     return this._gl;
   }
   _initViewProjectionMatrix(program) {
-    // 获取视图矩阵、投影矩阵
-    const u_projectionMatrix = program.getUniformLocation('u_projectionMatrix'); // 获取u_projectionMatrix在GPU内存的位置，是一个WebGLUniformLocation对象
-    const u_viewMatrix = program.getUniformLocation('u_viewMatrix'); // 获取u_viewMatrix在GPU内存的位置，是一个WebGLUniformLocation对象
-    this._gl.uniformMatrix4fv(u_projectionMatrix, false, this._camera.projectionMatrix); // 将4*4的矩阵传给shader中的变量，供GPU渲染
+    const u_projectionMatrix = program.getUniformLocation('u_projectionMatrix');
+    const u_viewMatrix = program.getUniformLocation('u_viewMatrix');
+    this._gl.uniformMatrix4fv(u_projectionMatrix, false, this._camera.projectionMatrix);
     this._gl.uniformMatrix4fv(u_viewMatrix, false, this._camera.viewMatrix);
   }
 }

@@ -213,7 +213,6 @@ export const getFit = (num, min, max) => {
   return max;
 }
 
-
 export const sort = (arr, callback) => {
   for (let i = 0; i < arr.length; i += 1) {
     for (let j = 0; j < arr.length - i - 1; j += 1) {
@@ -254,6 +253,7 @@ export function equalObject(obj1, obj2) {
   }
   return true;
 }
+
 export function step(arr, step, callback) {
   const num = Math.ceil(arr.length / step);
   for (let i = 0; i < num; i += 1) {
@@ -284,6 +284,9 @@ export function containedInContour(contour, pointList) {
   return false;
 }
 
+export function convertPercentToWorld({ x, y }, bounds, deltaX, deltaY) {
+  return [bounds[0][0] + x * deltaX, bounds[1][1] - y * deltaY];
+}
 export class GlobalIdGenerator {
   static getId(prefix = 'react-indoor') {
     GlobalIdGenerator.id += 1;
@@ -313,7 +316,6 @@ export class Indices {
     return this._value;
   };
 }
-
 
 export const UTILS = /*#__PURE__*/Object.freeze({
   __proto__: null,

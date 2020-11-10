@@ -49,9 +49,9 @@ export default class GestureManager {
   _fireClick(e) {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);
     if (this._startPos && pos.distanceTo(this._startPos) < 1) {
-      const engine = this._mapView.getEngine();
+      const renderer = this._mapView.getRenderer();
       const event = new MapEvent(e, this._mapView);
-      if (engine) engine.fire('click', event);
+      if (renderer) renderer.fire('click', event);
       if (!event.isCancel()) this._mapView.fire('click', event);
     }
   }
@@ -67,14 +67,13 @@ export default class GestureManager {
   }
   _animateDbClickZoom(point, zoomDelta) {
     this._transitor && this._transitor.stop();
-    const engine = this._mapView.getEngine();
-    if (!engine)
+    const renderer = this._mapView.getRenderer();
+    if (!renderer)
       return;
-    const camera = engine.getCamera();
+    const camera = renderer.getCamera();
     const rect = this._dom.getBoundingClientRect();
     const x = point.x - rect.left;
     const y = point.y - rect.top;
-    console.log(rect, x, y)
     const around = camera.screenToWorldCoordinate(x, y);
     const startZoom = camera.getZoom();
     const endZoom = getFit(startZoom + zoomDelta, this._mapView._minZoom, this._mapView._maxZoom);
@@ -87,8 +86,8 @@ export default class GestureManager {
       this._mapView.fire('gesture');
       camera.set({ zoom: e.num });
       camera.setCenterAtPoint(around, { x, y });
-      engine.render();
-      engine.updateCollision(false);
+      renderer.render();
+      renderer.updateCollision(false);
     }).on('complete', () => {
       this._fireEvent({ zoom: zoomDelta }, 'End');
       this._mapView.fire('gestureEnd');
@@ -107,35 +106,35 @@ export default class GestureManager {
     this._startPos = new Point(e.clientX, e.clientY);
     this._dragPan.onMousedown(e);
     this._dragRotate.onMousedown(e);
-    const engine = this._mapView.getEngine();
+    const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    engine && engine.fire('mousedown', event);
+    renderer && renderer.fire('mousedown', event);
     !event.isCancel() && this._mapView.fire('mousedown', event);
   }
   _onMousemove(e) {
     GestureManager.stopOriginEvent(e);
     this._dragPan.onMousemove(e);
     this._dragRotate.onMousemove(e);
-    const engine = this._mapView.getEngine();
+    const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    engine && engine.fire('mousemove', event);
+    renderer && renderer.fire('mousemove', event);
     !event.isCancel() && this._mapView.fire('mousemove', event);
   }
   _onMouseup(e) {
     GestureManager.stopOriginEvent(e);
     this._dragPan.onMouseup(e);
     this._dragRotate.onMouseup(e);
-    const engine = this._mapView.getEngine();
+    const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    engine && engine.fire('mouseup', event);
+    renderer && renderer.fire('mouseup', event);
     !event.isCancel() && this._mapView.fire('mouseup', event);
   }
   _onMouseleave(e) {
     this._dragPan.onMouseleave(e);
     this._dragRotate.onMouseleave(e);
-    const engine = this._mapView.getEngine();
+    const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    engine && engine.fire('mouseleave', event);
+    renderer && renderer.fire('mouseleave', event);
     !event.isCancel() && this._mapView.fire('mouseleave', event);
   }
   _onTouchstart(e) {

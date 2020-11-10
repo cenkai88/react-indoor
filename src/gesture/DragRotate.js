@@ -65,9 +65,9 @@ export default class DragRotate extends AbstractGesture {
         this._curPos = new Point(e.clientX, e.clientY);
     }
     _frameUpdate() {
-        const engine = this._mapView.getEngine();
-        if (engine && this._lastPos && this._curPos) {
-            const camera = engine.getCamera();
+        const renderer = this._mapView.getRenderer();
+        if (renderer && this._lastPos && this._curPos) {
+            const camera = renderer.getCamera();
             const angle = this._curPos.x - this._lastPos.x;
             let rotate = camera.getRotate();
             rotate += angle / 3;
@@ -85,8 +85,8 @@ export default class DragRotate extends AbstractGesture {
             }
             camera.set(params);
             this._lastPos = this._curPos;
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
         }
         this._mapView.fire('move');
         this._rotateEnable && this._mapView.fire('rotate');
@@ -122,9 +122,9 @@ export default class DragRotate extends AbstractGesture {
         this._inertias = [];
     }
     _rotateInertia(offset, duration, event) {
-        const engine = this._mapView.getEngine();
-        if (!engine) return;
-        const camera = engine.getCamera();
+        const renderer = this._mapView.getRenderer();
+        if (!renderer) return;
+        const camera = renderer.getCamera();
         const startRotate = camera.getRotate();
         const transitor = new Transitor().init(0, 1, duration);
         this.transitor = transitor;
@@ -132,8 +132,8 @@ export default class DragRotate extends AbstractGesture {
         transitor.on('update', e => {
             const curRotate = offset * e.num + startRotate;
             camera.set({ rotate: curRotate });
-            engine.render();
-            engine.updateCollision(false);
+            renderer.render();
+            renderer.updateCollision(false);
             this._mapView.fire('move', e);
             this._mapView.fire('rotate', e);
         }).on('complete', () => {

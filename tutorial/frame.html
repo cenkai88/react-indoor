@@ -1,0 +1,182 @@
+<html>
+<div></div>
+<canvas id="frame-canvas" style="width: 800px;height: 800px;border: 1px solid #111;" width="1600"
+  height="1600"></canvas>
+<script src="./shaders.js"></script>
+<script src="./camera.js"></script>
+<script src="./earcut.dev.js"></script>
+<script>
+  const floorData = {
+    "floorName": "F1",
+    "floorId": "RJ00201010001",
+    "altitude": 1,
+    "buildingId": "0",
+    "center": { "type": "Point", "coordinates": [1254.8271713616468, 117.50345301174438] },
+    "defaultFloor": true,
+    "bounds": [[1165.7057589583742, 75.92669991819075], [1315.3470083480227, 183.7035993932884]],
+  };
+  const frameFeatures = [{
+    "featureid": "RJ00202010301",
+    "type": "Feature",
+    "properties": { "id": "RJ00201010001", "name": "F1" },
+    "geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [[[[1303.3520287337649, 76.84175008908919], [1300.0556017318117, 77.18821859494855], [1300.2228959212648, 78.779917203347], [1287.0099031234133, 80.16865859738996], [1287.4078867049561, 83.94983688108137], [1280.0467949080812, 84.7078249792259], [1279.6512285628664, 80.94406429807356], [1279.65121830896, 80.94396639768293], [1266.5235189071045, 82.32384219113996], [1266.3562733626711, 80.7326070837181], [1262.9748989119873, 81.08800387326887], [1230.1179661116944, 81.08702059690168], [1230.11786674646, 81.08797311155011], [1226.7377463240969, 80.73260702268293], [1226.5705029158937, 82.32382168332747], [1213.4428221297608, 80.94396639768293], [1213.0456035628663, 84.72324960080793], [1205.6844223494875, 83.96607937375715], [1206.0833479476319, 80.17055550901105], [1206.083351914917, 80.17045492307356], [1198.1271727156984, 79.3343279089134], [1192.955658921753, 78.79077981321028], [1193.1229045272219, 77.19954482785872], [1189.741529954468, 76.84414809934309], [1189.3286425032961, 80.77250948850325], [1181.9691805281984, 79.99899899045637], [1182.382067918335, 76.07063741819074], [1179.0006935286867, 75.71524068967511], [1178.8334479232178, 77.30647561399152], [1165.7057589583742, 75.92669991819075], [1164.038529954468, 91.78932412473371], [1160.0604429183352, 91.37121041623762], [1158.6336295028077, 104.9464225134056], [1186.480242539917, 107.87323129026106], [1186.1039399276124, 111.4535100988548], [1192.4003205428469, 112.1152868932884], [1192.4070079207766, 120.32341311399152], [1181.0470621199952, 120.32356258908918], [1178.2470039534912, 120.3235993932884], [1178.24703471521, 152.92359921018294], [1178.1762805037843, 164.32360030881574], [1178.1501813216555, 171.73132101194074], [1178.1553103499757, 183.703587125222], [1186.1470125594483, 183.70359921018294], [1186.1470079207766, 186.723587125222], [1234.1470079207766, 186.72358657590559], [1234.1470079207766, 194.6235993932884], [1237.7970367293703, 194.6235993932884], [1237.7970367293703, 195.6235973180931], [1248.6970367293702, 195.6235973180931], [1248.6970367293702, 194.62358730832747], [1258.9470365462648, 194.62358730832747], [1258.9470367293702, 186.7235993932884], [1305.3470083480227, 186.72358822385482], [1305.3470083480227, 183.7035993932884], [1315.3470083480227, 183.7035993932884], [1315.3470083480227, 175.22360049192122], [1315.3470083480227, 172.6235993932884], [1315.3470079207766, 164.3235982946556], [1306.6970079207765, 164.3235948156517], [1306.6970079207765, 156.2235982946556], [1312.8470079207766, 156.2235982946556], [1312.8470079207766, 155.2735984167259], [1314.4470079207765, 155.2735984167259], [1314.4470079207765, 152.7235984167259], [1314.8470079207766, 152.7235982946556], [1314.8470079207766, 120.32359829465558], [1308.4470079207765, 120.32359829465558], [1306.6469979110109, 120.32359829465558], [1306.1720079207764, 120.32359829465558], [1289.797008103882, 120.32359872190169], [1282.697008103882, 120.32359890500715], [1266.8470283065187, 120.3235993932884], [1266.8470283065187, 114.02359957639386], [1266.847017930542, 112.052991422097], [1267.7470283065186, 111.95835281125716], [1269.0143759627688, 111.82508761350324], [1287.2205989241945, 109.91153640500715], [1287.5969013533936, 113.4918152136009], [1306.9941671614993, 111.45308340207747], [1306.59666752771, 107.67112569944075], [1306.5967091536866, 107.67112130490949], [1334.4603977523195, 104.94633431760481], [1333.436018723999, 95.20001962033918], [1329.4579311385498, 95.61813351194074], [1327.388267503296, 75.92659957639387], [1314.2605785384524, 77.30637569944075], [1314.093333116089, 75.71514071408919], [1310.7119585433352, 76.07053738156965], [1311.276168321167, 81.43863387815168], [1303.9172375350342, 82.21208889524152], [1303.3520287337649, 76.84175008908919]]]]
+    }
+  }];
+  const FRAME_COLOR = [0.9333333333333333, 0.9333333333333333, 0.9333333333333333, 1];
+  const OUTLINE_COLOR = [0, 0, 0, 1];
+
+  const canvas = document.getElementById('frame-canvas');
+  const gl = canvas.getContext('webgl', {
+    antialias: true,
+    depth: true,
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: false,
+    alpha: true,
+    failIfMajorPerformanceCaveat: true,
+  });
+  gl.viewport(0, 0, 1600, 1600);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+  const offset = floorData.center.coordinates;
+
+  const getProgram = () => {
+    const program = gl.createProgram();
+
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, frameVertexShaderStr);
+    gl.compileShader(vertexShader);
+    gl.attachShader(program, vertexShader);
+
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, frameFragmentShaderStr);
+    gl.compileShader(fragmentShader);
+    gl.attachShader(program, fragmentShader);
+
+    gl.linkProgram(program);
+    return program
+  }
+
+  const calcPolygon = (polygon, properties) => {
+    if (polygon.length === 0) return;
+    const vertices = [];
+    const holes = [];
+    const outlineIndices = [];
+    for (let i = 0; i < polygon.length; i += 1) {
+      const face = polygon[i];
+      for (let j = 0; j < face.length; j += 1) {
+        const verticesCount = vertices.length / 2;
+        if (j < face.length - 1) {
+          outlineIndices.push(verticesCount, verticesCount + 1);
+        }
+        vertices.push(face[j][0] - offset[0], face[j][1] - offset[1]);
+      }
+      if (i < polygon.length - 1) {
+        holes.push(vertices.length / 2);
+      }
+    }
+    const fillIndices = earcut(vertices, holes.length === 0 ? undefined : holes, 2);
+    return {
+      vertices,
+      fillIndices,
+      outlineIndices,
+    };
+  }
+
+  const getBuffer = ({ vertices, fillIndices, outlineIndices }) => {
+    const verticesBuffer = gl.createBuffer(); // 创建 WebGLBuffer 对象，来保存顶点、颜色等数据
+    const fillIndicesBuffer = gl.createBuffer(); // 创建 WebGLBuffer 对象保存填充色的绘制顺序信息（每个数字都是索引，每三个点组成一个三角形）
+    const outlineIndicesBuffer = gl.createBuffer(); // 创建 WebGLBuffer 对象保存轮廓的绘制顺序信息
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer); // 把WebGLBuffer对象绑定为ARRAY_BUFFER
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW); // 向buffer中存入数据
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, fillIndicesBuffer); // 把WebGLBuffer对象绑定为ELEMENT_ARRAY_BUFFER
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(fillIndices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, outlineIndicesBuffer); // 把WebGLBuffer对象绑定为ELEMENT_ARRAY_BUFFER
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(outlineIndices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    return {
+      verticesBuffer,
+      fillIndicesBuffer,
+      outlineIndicesBuffer,
+      fillIndicesNum: fillIndices.length,
+      outlineIndicesNum: outlineIndices.length,
+    }
+  }
+
+  const getRenderInfo = (features) => {
+    let renderInfo = [];
+    for (let i = 0; i < features.length; i += 1) {
+      const { geometry, properties } = features[i];
+      if (geometry.type === 'Polygon') {
+        renderInfo.push(calcPolygon(geometry.coordinates, properties));
+      }
+      else if (geometry.type === 'MultiPolygon') {
+        for (let j = 0; j < geometry.coordinates.length; j += 1) {
+          renderInfo.push(calcPolygon(geometry.coordinates[j], properties));
+        }
+      }
+    }
+    return renderInfo.map(item => getBuffer(item))
+  }
+
+  const bindData = (location, buffer, size) => {
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    const FSIZE = Float32Array.BYTES_PER_ELEMENT;
+    gl.vertexAttribPointer(location, size, gl.FLOAT, false, FSIZE * size, 0);
+    gl.enableVertexAttribArray(location);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  }
+
+  const drawFrame = () => {
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+    const program = getProgram();
+    gl.useProgram(program);
+    // 关闭deptTest，因为z轴的管理由外面的框架完成
+    gl.disable(gl.DEPTH_TEST);
+    // 开启半透明
+    gl.enable(gl.BLEND);
+    // 半透明的计算color(RGBA) = (sourceColor * SRC_ALPHA) + (destinationColor * (1 - SRC_ALPHA))
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const renderInfo = getRenderInfo(frameFeatures);
+
+    const u_projectionMatrix = gl.getUniformLocation(program, 'u_projectionMatrix'); // 获取u_projectionMatrix在GPU内存的位置，是一个WebGLUniformLocation对象
+    const u_viewMatrix = gl.getUniformLocation(program, 'u_viewMatrix'); // 获取u_viewMatrix在GPU内存的位置，是一个WebGLUniformLocation对象
+    gl.uniformMatrix4fv(u_projectionMatrix, false, new Float32Array([2.4142136573791504, 0, 0, 0, 0, 2.4142136573791504, 0, 0, 0, 0, -1, -1, 0, 0, -1, 0])); // 将4*4的矩阵传给shader中的变量，供GPU渲染
+    gl.uniformMatrix4fv(u_viewMatrix, false, new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 8.498506546020508, -11.429930686950684, -223.5882568359375, 1]));
+
+    // this._initViewProjectionMatrix(program);
+
+    const a_position = gl.getAttribLocation(program, 'a_position');
+    const u_color = gl.getUniformLocation(program, 'u_color');
+    const u_base = gl.getUniformLocation(program, 'u_base');
+    const u_opacity = gl.getUniformLocation(program, 'u_opacity');
+    for (let i = 0; i < renderInfo.length; i += 1) { // 画每一个geometry元素，获取其fillColor填充色、outlineColor轮廓色，buffer，base，和透明度
+      const { fillIndicesBuffer, fillIndicesNum, outlineIndicesBuffer, outlineIndicesNum, verticesBuffer } = renderInfo[i];
+      bindData(a_position, verticesBuffer, 2);
+      gl.uniform1f(u_base, 0);
+      gl.uniform1f(u_opacity, 1);
+      gl.uniform4fv(u_color, FRAME_COLOR);
+
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, fillIndicesBuffer);
+      gl.drawElements(gl.TRIANGLES, fillIndicesNum, gl.UNSIGNED_SHORT, 0); // 填充内部颜色
+      gl.uniform4fv(u_color, OUTLINE_COLOR);
+
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, outlineIndicesBuffer);
+      gl.drawElements(gl.LINES, outlineIndicesNum, gl.UNSIGNED_SHORT, 0); // 画外轮廓
+    }
+  }
+
+  drawFrame();
+
+</script>
+
+</html>
