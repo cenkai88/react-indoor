@@ -4,19 +4,16 @@
 
 */
 
-import Base from '../../base/Base';
-import WebWorker from "../../worker/index";
+import { GlobalIdGenerator } from "../../utils/common";
 
-export default class CollisionManager extends Base {
+export default class CollisionManager {
     constructor(camera, options) {
-        super();
         this._collisionList = [];
-        this._worker = new WebWorker();
+        this._workerPool = options.workerPool;
         this._updateQueue = [];
         this._camera = camera;
         this._options = options;
         this._step = 1 / Math.floor(options.animateDuration / 16);
-        this._worker.addEventListener('message', this._onMessage.bind(this));
     }
     getStep() {
         return this._step;
@@ -41,12 +38,6 @@ export default class CollisionManager extends Base {
         if (this._updateTimer) {
             clearInterval(this._updateTimer);
             delete this._updateTimer;
-        }
-    }
-    _onMessage(e) {
-        const result = e.data;
-        if (result.type === 'collisionResult') {
-            this.fire('change', result);
         }
     }
     add(item) {
@@ -76,6 +67,8 @@ export default class CollisionManager extends Base {
         const offset = this._camera.getOffset();
         const collisionData = {
             type: 'collision',
+            mapId: this._options.mapId,
+            taskId: GlobalIdGenerator.getId('task'),
             isForce,
             zoom: this._camera.getZoom(),
             z: this._camera.getZ(),
@@ -86,12 +79,12 @@ export default class CollisionManager extends Base {
             projectionMatrix: this._camera.projectionMatrix,
             list: this._collisionList,
         };
-        this._worker.postMessage(collisionData);
+        this._workerPool.addTask(collisionData);
     }
     destroy() {
-        this._worker.terminate();
-        this.clear();
-        this.clearListeners();
+        // this._worker.terminate();
+        // this.clear();
+        // this.clearListeners();
     }
     resize(width, height) {
         this._options.viewWidth = width;

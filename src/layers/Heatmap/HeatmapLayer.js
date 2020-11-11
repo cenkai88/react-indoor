@@ -53,8 +53,8 @@ export default class HeatmapLayer extends AbstractLayer {
       taskId: this._getTaskId(),
       sync: this.getSync(),
     };
-    const bucketMng = this._renderer.getBucketMng();
-    bucketMng.update(data);
+    const workerPool = this._renderer.getWorkerPool();
+    workerPool.addTask(data);
   }
   getBase() {
     return this._layout.base;

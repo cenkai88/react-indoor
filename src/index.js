@@ -37,8 +37,6 @@ export default ({
   onInit,
 }) => {
 
-  console.log(buildingData)
-
   const container = useRef();
   const mapCanvas = useRef();
   const textureCanvas = useRef();

@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 import Base from './Base';
 
 import GestureManager from '../gesture/GestureManager';
@@ -24,6 +26,7 @@ export default class MapView extends Base {
     this._minZoom = options.minZoom;
     this._maxZoom = options.maxZoom;
     this._options = options;
+    this._id = uuid();
     this.on('moveEnd', this._onMoveEnd.bind(this));
     // gesture
     this._gestureManager = new GestureManager(this);
@@ -32,18 +35,19 @@ export default class MapView extends Base {
     this._renderer = new Renderer(
       this._canvasContainer,
       {
+        mapId: this._id,
         mapCanvas: this._mapCanvas,
         glyphCanvas: this._glyphCanvas,
         textureCanvas: this._textureCanvas,
       }, {
-      zoom: this._options.zoom,
-      rotate: this._options.rotate,
-      pitch: this._options.pitch,
-      lightPos: this._options.lightPos,
-      localFontFamily: this._options.localFontFamily,
-      fontWeight: this._options.fontWeight,
-      maxTextSize: this._options.maxTextSize,
-      textSplit: this._options.textSplit,
+        zoom: this._options.zoom,
+        rotate: this._options.rotate,
+        pitch: this._options.pitch,
+        lightPos: this._options.lightPos,
+        localFontFamily: this._options.localFontFamily,
+        fontWeight: this._options.fontWeight,
+        maxTextSize: this._options.maxTextSize,
+        textSplit: this._options.textSplit,
     });
     this._renderer.getCamera().set({ center: this._options.center });
     // set camera

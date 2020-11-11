@@ -23,7 +23,7 @@ export default () => {
         <tbody>
           <tr>
             <td>bounds</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>An 2-d array indicating the bounding box of one floor, used to calculate the position of a point since all the point are in percentage format.</td>
           </tr>
           <tr>
@@ -76,7 +76,7 @@ export default () => {
         <tbody>
           <tr>
             <td>features.geometry.coordinates</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>The coordinates array that describe the floor frame.</td>
           </tr>
         </tbody>
@@ -94,32 +94,32 @@ export default () => {
         <tbody>
           <tr>
             <td>features.properties.id</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>The unique identifier of room</td>
           </tr>
           <tr>
             <td>features.properties.name</td>
-            <td></td>
+            <td></td>
             <td>Name of room, will be rendered as text on map.</td>
           </tr>
           <tr>
             <td>features.properties.center</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>Center point of room, decides the position of room icon and room name on map.</td>
           </tr>
           <tr>
             <td>features.properties.hasProperty</td>
-            <td></td>
+            <td></td>
             <td>Whether there is any facility bond to this room. You can specify how room looks depends on this field.</td>
           </tr> 
           <tr>
             <td>features.properties.iconId</td>
-            <td></td>
+            <td></td>
             <td>The iconId is used to specify the style of this room in style data.</td>
           </tr>
           <tr>
             <td>features.geometry.coordinates</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>The coordinates array that describe the room.</td>
           </tr>
         </tbody>
@@ -137,22 +137,22 @@ export default () => {
         <tbody>
           <tr>
             <td>features.properties.id</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>The unique identifier of facility</td>
           </tr>
           <tr>
             <td>features.properties.name</td>
-            <td></td>
+            <td></td>
             <td>Name of facility, will be rendered as text on map.</td>
           </tr>
           <tr>
             <td>features.properties.center</td>
-            <td>☑️</td>
+            <td>☑️</td>
             <td>Center point of facility, decides the position of facility icon and facility name on map.</td>
           </tr>
           <tr>
             <td>features.properties.iconId</td>
-            <td></td>
+            <td></td>
             <td>The iconId is used to specify the style of this facility in style data.</td>
           </tr>
         </tbody>

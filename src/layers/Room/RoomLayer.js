@@ -43,8 +43,8 @@ export default class RoomLayer extends AbstractLayer {
     }
     _update() {
         if (!this._renderer) return;
-        const bucketMng = this._renderer.getBucketMng();
-        bucketMng.update({
+        const workerPool = this._renderer.getWorkerPool();
+        workerPool.addTask({
             type: 'room',
             layout: this._layout,
             offset: this._renderer.getOffset(),

@@ -6,7 +6,6 @@ module.exports = {
   mode: 'development',
   entry: {
     main: './index.js',
-    // reactIndoorWorker: './src/layers/BucketFactor.js',
   },
   devServer: {
     publicPath: '/',

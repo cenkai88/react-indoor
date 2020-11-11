@@ -67,7 +67,7 @@ export default class LineLayer extends AbstractLayer {
     for (let i = 0; i < this._features.length; i += 1) {
       this._calcPolyline(this._features[i]);
     }
-    const bucketMng = this._renderer.getBucketMng();
+    const workerPool = this._renderer.getWorkerPool();
     const data = {
       id: this.id,
       type: 'line',
@@ -78,13 +78,13 @@ export default class LineLayer extends AbstractLayer {
       sync: this.getSync(),
     };
     if (this._loadPromiseSet.size === 0) {
-      bucketMng.update(data);
+      workerPool.addTask(data);
     }
     else {
       new Promise(resolve => {
         Promise.all(this._loadPromiseSet).then(resolve).catch(resolve);
       }).then(() => {
-        bucketMng.update(data);
+        workerPool.addTask(data);
       });
     }
   }

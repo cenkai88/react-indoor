@@ -9,7 +9,6 @@ import Base from '../base/Base';
 import WebpackPool from '../worker/pool';
 import { sort } from '../utils/common';
 import GLContext from './GLContext';
-import BucketManager from '../layers/BucketManager';
 import CollisionManager from './manager/CollisionManager';
 import TextureManager from './manager/TextureManager';
 import GlyphManager from './manager/GlyphManager';
@@ -25,19 +24,25 @@ export default class Renderer extends Base {
      * @return {Renderer} The Renderer.
   */
   constructor(container, {
+    mapId,
     mapCanvas,
     glyphCanvas,
     textureCanvas,
   }, options) {
     super();
+    this._mapId=mapId;
     this._layers = [];
     this._lightPos = [1, -1, 1];
     this._ambientColor = [0.8, 0.8, 0.8];
     this._ambientMaterial = [1, 1, 1];
     this._diffuseColor = [0.1, 0.1, 0.1];
     this._diffuseMaterial = [1, 1, 1];
-    if (!window.indoorWorkerPool) window.indoorWorkerPool = new WebpackPool();
-    this._bucketMng = new BucketManager();
+    if (!window.indoorWorkerPool) {
+      window.indoorWorkerPool = new WebpackPool(mapId);
+    } else {
+      window.indoorWorkerPool.addMapInsId(mapId);
+    }
+    this._workerPool = window.indoorWorkerPool;
     this._normalResult = { data: {}, opacity: 1 };
     this._renderQueue = [];
     this._container = container;
@@ -64,8 +69,10 @@ export default class Renderer extends Base {
       viewHeight: clientHeight,
       animateDuration: 300,
       collisionDuration: 600,
+      mapId,
+      workerPool: window.indoorWorkerPool
     });
-    this._collisionMng.on('change', this._onCollisionChange.bind(this));
+    this._collisionMng._workerPool.listen(mapId, this._onCollisionChange.bind(this));
     this._textureMng = new TextureManager(this._gl, textureCanvas);
     this._glyphMng = new GlyphManager(this._gl, {
       fontWeight: options.fontWeight,
@@ -79,8 +86,8 @@ export default class Renderer extends Base {
       height: this._canvas.height,
     });
   }
-  getBucketMng() {
-    return this._bucketMng;
+  getWorkerPool() {
+    return this._workerPool;
   }
   getCollisionMng() {
     return this._collisionMng;
@@ -435,9 +442,9 @@ export default class Renderer extends Base {
   }
   destroy() {
     this._canvas.remove();
-    this._collisionMng.off('change', this._onCollisionChange.bind(this));
-    this._collisionMng.destroy();
-    this._bucketMng.destroy();
+    window.indoorWorkerPool.destroy(this._mapId);
+    // this._collisionMng.off('change', this._onCollisionChange.bind(this));
+    // this._collisionMng.destroy();
   }
   getCamera() {
     return this._camera;

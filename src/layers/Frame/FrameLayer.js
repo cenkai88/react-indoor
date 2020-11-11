@@ -46,8 +46,8 @@ export default class FrameLayer extends AbstractLayer {
     }
     _update() {
         if (!this._renderer) return;
-        const bucketMng = this._renderer.getBucketMng();
-        bucketMng.update({
+        const workerPool = this._renderer.getWorkerPool();
+        workerPool.addTask({
             type: 'frame',
             id: this.id,
             layout: this._layout,

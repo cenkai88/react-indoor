@@ -1,4 +1,4 @@
-import indoorWorker from '../layers/BucketFactor.worker.js';
+import indoorWorker from './indoor.worker.js';
 
 export default class WebWorker {
   constructor() {

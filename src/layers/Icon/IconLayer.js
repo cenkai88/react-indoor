@@ -41,13 +41,13 @@ export default class IconLayer extends AbstractLayer {
     super.onAdd(renderer);
     const collisionMng = renderer.getCollisionMng();
     collisionMng.add(this.getCollisionData());
-    collisionMng.on('change', this._onCollisionChange.bind(this));
+    collisionMng._workerPool.listen(this._renderer._mapId, this._onCollisionChange.bind(this));
   }
   unbind() {
     if (this._renderer) {
       const collisionMng = this._renderer.getCollisionMng();
       collisionMng.remove(this.getCollisionData());
-      collisionMng.off('change', this._onCollisionChange.bind(this));
+      // collisionMng.off('change', this._onCollisionChange.bind(this));
     }
     super.unbind();
   }
@@ -174,7 +174,7 @@ export default class IconLayer extends AbstractLayer {
       });
     }
     this._dataItemList = dataItemList;
-    const bucketMng = this._renderer.getBucketMng();
+    const workerPool = this._renderer.getWorkerPool();
     const data = {
       type: 'icon',
       layout: this._layout,
@@ -186,13 +186,13 @@ export default class IconLayer extends AbstractLayer {
       sync: this.getSync(),
     };
     if (this._loadPromiseSet.size === 0) {
-      bucketMng.update(data);
+      workerPool.addTask(data);
     }
     else {
       new Promise(resolve => {
         Promise.all(this._loadPromiseSet).then(resolve).catch(resolve);
       }).then(() => {
-        bucketMng.update(data);
+        workerPool.addTask(data);
       });
     }
   }

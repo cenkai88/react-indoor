@@ -186,8 +186,8 @@ export default class AbstractLayer extends Base {
     this._checkBind('mousemove', this._onmousemove.bind(this));
     this._checkBind('mouseup', this._onmouseup.bind(this));
     if (!hasAdd) {
-      const bucketMng = this._renderer.getBucketMng();
-      bucketMng.register(this._id, this._onBucketChange.bind(this));
+      const workerPool = this._renderer.getWorkerPool();
+      workerPool.listen(this._id, this._onBucketChange.bind(this));
       this._update();
     }
   }
@@ -206,8 +206,8 @@ export default class AbstractLayer extends Base {
     this.clear();
     this.unbind();
     if (this._renderer) {
-      const bucketMng = this._renderer.getBucketMng();
-      bucketMng.unregister(this._id);
+      const workerPool = this._renderer.getWorkerPool();
+      workerPool.listen(this._id);
       delete this._renderer;
     }
   }
