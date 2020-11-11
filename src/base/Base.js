@@ -11,7 +11,7 @@ const defaultOptions = {
 
 const validateParameter = (type, listener) => {
   const valid = typeof type === 'string' && typeof listener === 'function';
-  if (!valid) console.warn('type is expected to be string and listener is expected to function');
+  if (!valid) console.warn('type is expected to be string and listener is expected to be function');
   return valid
 }
 

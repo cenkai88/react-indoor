@@ -6,13 +6,14 @@
 
 import Base from '../base/Base';
 
+import WebpackPool from '../worker/pool';
 import { sort } from '../utils/common';
 import GLContext from './GLContext';
+import BucketManager from '../layers/BucketManager';
 import CollisionManager from './manager/CollisionManager';
 import TextureManager from './manager/TextureManager';
 import GlyphManager from './manager/GlyphManager';
 import Camera from '../camera/Camera';
-import BucketManager from '../layers/BucketManager';
 import { parseColor } from '../utils/style';
 
 export default class Renderer extends Base {
@@ -35,6 +36,7 @@ export default class Renderer extends Base {
     this._ambientMaterial = [1, 1, 1];
     this._diffuseColor = [0.1, 0.1, 0.1];
     this._diffuseMaterial = [1, 1, 1];
+    if (!window.indoorWorkerPool) window.indoorWorkerPool = new WebpackPool();
     this._bucketMng = new BucketManager();
     this._normalResult = { data: {}, opacity: 1 };
     this._renderQueue = [];
@@ -94,7 +96,7 @@ export default class Renderer extends Base {
     this._hideResult = { data: hideResult, opacity: 1 };
     this._showResult = { data: showResult, opacity: 0 };
     this._normalResult = { data: normalResult, opacity: 1 };
-    if (data.isForce && !this._bucketMng.isInNormalize()) this.render();
+    if (data.isForce) this.render();
   }
   _startRenderQueue() {
     if (!this._renderTimer) this._frameRender();

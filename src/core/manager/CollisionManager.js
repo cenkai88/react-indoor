@@ -89,7 +89,6 @@ export default class CollisionManager extends Base {
         this._worker.postMessage(collisionData);
     }
     destroy() {
-        console.log('c')
         this._worker.terminate();
         this.clear();
         this.clearListeners();

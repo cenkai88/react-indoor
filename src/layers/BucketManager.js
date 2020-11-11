@@ -13,7 +13,6 @@ export default class BucketManager {
         this._freeIndies = [];
         this._dataList = [];
         this._taskMap = new Map();
-        this._isInNormalize = false;
         this._isNeedUpdateCollision = false;
         this._factor = new BucketFactor();
         this._listeners = new Map();
@@ -31,28 +30,21 @@ export default class BucketManager {
             });
         }
     }
-    enableNormalize() {
-        this._isInNormalize = true;
-    }
-    isInNormalize() {
-        return this._isInNormalize;
-    }
     _onMessage(data) {
         const item = this._taskMap.get(data.id);
         if (!item) return;
-        if (this._isInNormalize && data.type === 'icon') {
+        if (data.type === 'icon') {
             this._isNeedUpdateCollision = true;
         }
         const index = item.indexOf(data.taskId);
         if (index === item.length - 1) {
             this._taskMap.delete(data.id);
         }
-        data.isRender = !this._isInNormalize || this._taskMap.size === 0;
+        data.isRender = this._taskMap.size === 0;
         if (this._taskMap.size === 0) {
             if (this._isNeedUpdateCollision) {
                 data.isUpdateCollision = true;
             }
-            this._isInNormalize = false;
             this._isNeedUpdateCollision = false;
         }
         const listener = this._listeners.get(data.id);
@@ -103,7 +95,6 @@ export default class BucketManager {
     destroy() {
         this.clear();
         for (let i = 0; i < this._workerPool.length; i += 1) {
-            console.log('t')
             this._workerPool[i].terminate();
         }
         this._listeners.clear();
