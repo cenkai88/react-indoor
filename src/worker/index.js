@@ -1,6 +1,8 @@
+import indoorWorker from '../layers/BucketFactor.worker.js';
+
 export default class WebWorker {
   constructor() {
-    this._worker = new Worker('./reactIndoorWorker.js');
+    this._worker = new indoorWorker();
   }
   addEventListener(type, listener) {
     this._worker.addEventListener(type, listener);

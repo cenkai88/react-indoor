@@ -11,7 +11,6 @@ export default class CollisionManager extends Base {
     constructor(camera, options) {
         super();
         this._collisionList = [];
-        console.log('a1')
         this._worker = new WebWorker();
         this._updateQueue = [];
         this._camera = camera;

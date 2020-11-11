@@ -6836,8 +6836,8 @@ worker-farm@^1.7.0:
 
 worker-loader@^3.0.5:
   version "3.0.5"
-  resolved "https://registry.npm.taobao.org/worker-loader/download/worker-loader-3.0.5.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fworker-loader%2Fdownload%2Fworker-loader-3.0.5.tgz#6e13a583c4120ba419eece8e4f2e098b014311bf"
-  integrity sha1-bhOlg8QSC6QZ7s6OTy4JiwFDEb8=
+  resolved "https://registry.yarnpkg.com/worker-loader/-/worker-loader-3.0.5.tgz#6e13a583c4120ba419eece8e4f2e098b014311bf"
+  integrity sha512-cOh4UqTtvT8eHpyuuTK2C66Fg/G5Pb7g11bwtKm7uyD0vj2hCGY1APlSzVD75V9ciYZt44VPbFPiSFTSLxkQ+w==
   dependencies:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"

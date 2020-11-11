@@ -6,7 +6,7 @@ module.exports = {
   mode: 'development',
   entry: {
     main: './index.js',
-    reactIndoorWorker: './src/layers/BucketFactor.js',
+    // reactIndoorWorker: './src/layers/BucketFactor.js',
   },
   devServer: {
     publicPath: '/',
@@ -20,6 +20,13 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+      },
+      {
+        test: /\.worker\.js$/,
+        loader: 'worker-loader',
+        options: {
+          inline: 'no-fallback',
+        }
       },
       {
         test: /\.css$/,

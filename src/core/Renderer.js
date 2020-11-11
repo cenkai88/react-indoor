@@ -15,7 +15,7 @@ import Camera from '../camera/Camera';
 import BucketManager from '../layers/BucketManager';
 import { parseColor } from '../utils/style';
 
-export default class Core extends Base {
+export default class Renderer extends Base {
   /**
      * Create a Renderer.
      * @param {HTMLDivElement} container - div containerer of the indoor map.
@@ -27,8 +27,7 @@ export default class Core extends Base {
     mapCanvas,
     glyphCanvas,
     textureCanvas,
-  },
-    options) {
+  }, options) {
     super();
     this._layers = [];
     this._lightPos = [1, -1, 1];
