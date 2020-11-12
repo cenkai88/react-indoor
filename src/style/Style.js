@@ -20,55 +20,13 @@ export default class StyleManager {
   }
   _parseStyle() {
     if (!this._style) return;
+    const { frame, room, facility, roomIcon } = this._style;
     this._styleLayout = {
-      mapBackgroundColor: this._style.mapBackgroundColor,
-      frame: this._style.frame,
-      room: {
-        ...this._style.room.default,
-        keys: this._style.room.style.keys,
-        values: this._parseValues(this._style.room.style.values),
-      },
-      property: {
-        ...this._style.property.default,
-        keys: this._style.property.style.keys,
-        values: this._parseValues(this._style.property.style.values),
-      },
-      roomIcon: {
-        ...this._style.roomIcon.default,
-        keys: this._style.roomIcon.style.keys,
-        values: this._parseValues(this._style.roomIcon.style.values),
-      },
+      frame,
+      room,
+      property: facility,
+      roomIcon,
     };
-    if (this._style.extra) {
-      this._styleLayout.extra = {
-        ...this._style.extra.default,
-        keys: this._style.extra.style.keys,
-        values: this._parseValues(this._style.extra.style.values),
-      };
-    }
-  }
-  filterExtra(properties) {
-    if (!this._styleLayout || !this._styleLayout.extra || !properties) return false;
-    const { keys, values } = this._styleLayout.extra;
-    if (!keys || !values) return false;
-    for (let i = 0; i < keys.length; i += 1) {
-      if (values[properties[keys[i]]] !== undefined) {
-        return true;
-      }
-    }
-    return false;
-  }
-  _parseValues(values) {
-    const result = {};
-    for (let i = 0; i < values.length; i += 1) {
-      const key = values[i].key;
-      for (let j = 0; j < key.length; j += 1) {
-        let otherObj = { ...values[i] };
-        delete otherObj.key;
-        result[key[j]] = { ...result[key[j]], ...otherObj };
-      }
-    }
-    return result;
   }
   getStyle(name) {
     if (!this._styleLayout) return;
@@ -76,7 +34,7 @@ export default class StyleManager {
   }
   static checkStyleDiff(oldStyle, newStyle) {
     if (!oldStyle) {
-      return ['frame', 'room', 'roomIcon', 'property', 'extra'];
+      return ['frame', 'room', 'roomIcon', 'property'];
     }
     const arr = [];
     if (!equalObject(oldStyle.frame, newStyle.frame)) {
@@ -90,9 +48,6 @@ export default class StyleManager {
     }
     if (!equalObject(oldStyle.property, newStyle.property)) {
       arr.push('property');
-    }
-    if (!equalObject(oldStyle.extra, newStyle.extra)) {
-      arr.push('extra');
     }
     return arr;
   }

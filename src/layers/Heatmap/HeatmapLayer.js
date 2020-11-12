@@ -4,8 +4,14 @@ import CircleBuffer from './HeatmapBuffer';
 import Vector2 from '../../geometry/Vector2';
 
 export default class HeatmapLayer extends AbstractLayer {
-  constructor(layout) {
-    super('Heatmap', { ...HeatmapLayer.DEFAULT_LAYOUT, ...layout });
+  constructor(style) {
+    super('Heatmap', {
+      ...style,
+      default: {
+        ...HeatmapLayer.DEFAULT_STYLE,
+        ...style.default,
+      },
+    });
     this._geometryRenderList = [];
   }
   getGeometryRenderList() {
@@ -73,12 +79,12 @@ export default class HeatmapLayer extends AbstractLayer {
     }
     return HeatmapLayer.CIRCLE_NORMALS;
   }
-  static get DEFAULT_LAYOUT() {
+  static get DEFAULT_STYLE() {
     return {
       visible: true,
       base: 0,
       opacity: 1,
-      radius: 30,
+      radius: 20,
     }
   }
 }

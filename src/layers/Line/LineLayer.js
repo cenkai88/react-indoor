@@ -5,8 +5,14 @@ import { getStyle } from '../../utils/style';
 // import Vector2 from '../../geometry/Vector2';
 
 export default class LineLayer extends AbstractLayer {
-  constructor(layout) {
-    super('Line', { ...LineLayer.DEFAULT_LAYOUT, ...layout });
+  constructor(style) {
+    super('Line', {
+      ...style,
+      default: {
+        ...LineLayer.DEFAULT_STYLE,
+        ...style.default,
+      },
+    });
     this._geometryRenderList = [];
     this._loadPromiseSet = new Set();
   }
@@ -104,7 +110,7 @@ export default class LineLayer extends AbstractLayer {
   static get TEXTURE_PARAMS() {
     return { xRepeat: true, yRepeat: true }
   }
-  static get DEFAULT_LAYOUT() {
+  static get DEFAULT_STYLE() {
     return {
       visible: true,
       lineWidth: 10,

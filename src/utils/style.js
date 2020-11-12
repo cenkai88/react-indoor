@@ -35,19 +35,14 @@ export const parseColor = color => {
     }
 }
 
-export const getStyle = (layout, name, properties) => {
-    const keys = layout.keys, values = layout.values;
-    let style = layout[name];
-    if (keys && values && properties) {
-        for (let i = 0; i < keys.length; i += 1) {
-            const otherLayout = values[properties[keys[i]]];
-            if (otherLayout && otherLayout[name] !== undefined) {
-                style = otherLayout[name];
-                return style;
-            }
-        }
+export const getStyle = (styleData, name, properties) => {
+    const { default: defaultValue, styleKey, styleMap = {} } = styleData;
+    const keyValue = properties[styleKey];
+    if (keyValue && styleMap[keyValue]) {
+        return styleMap[keyValue][name] || defaultValue[name]
+    } else {
+        return defaultValue[name]
     }
-    return style;
 }
 
 export default {

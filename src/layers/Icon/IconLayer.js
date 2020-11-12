@@ -4,8 +4,14 @@ import { getStyle } from '../../utils/style';
 import { createScreenBounds } from '../../utils/common';
 
 export default class IconLayer extends AbstractLayer {
-  constructor(layout) {
-    super('Icon', { ...IconLayer.DEFAULT_LAYOUT, ...layout });
+  constructor(style) {
+    super('Icon', {
+      ...style,
+      default: {
+        ...IconLayer.DEFAULT_STYLE,
+        ...style.default,
+      },
+    });
     this._dataItemList = [];
     this._geometryRenderList = [];
     this._collisionList = [];
@@ -47,7 +53,7 @@ export default class IconLayer extends AbstractLayer {
     if (this._renderer) {
       const collisionMng = this._renderer.getCollisionMng();
       collisionMng.remove(this.getCollisionData());
-      if (this.listenerIdx !== undefined) collisionMng.getWorkerPool().unlisten(this._renderer._mapId, this.listenerIdx);
+      if (this.listenerIdx !== undefined) collisionMng.getWorkerPool().unListen(this._renderer._mapId, this.listenerIdx);
     }
     super.unbind();
   }
@@ -239,7 +245,7 @@ export default class IconLayer extends AbstractLayer {
     return leftBottom[0] <= point.x && point.x <= rightTop[0] &&
       leftBottom[1] <= point.y && point.y <= rightTop[1];
   }
-  static get DEFAULT_LAYOUT() {
+  static get DEFAULT_STYLE() {
     return {
       visible: true,
       base: 0,

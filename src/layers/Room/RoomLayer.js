@@ -3,8 +3,14 @@ import RoomBuffer from "./RoomBuffer";
 import { polygonsContain } from "../../utils/common";
 
 export default class RoomLayer extends AbstractLayer {
-    constructor(layout) {
-        super('Room', { ...RoomLayer.DEFAULT_LAYOUT, ...layout });
+    constructor(style) {
+        super('Room', {
+            ...style,
+            default: {
+                ...RoomLayer.DEFAULT_STYLE,
+                ...style.default,
+            },
+        });
         this._geometryRenderList = [];
     }
     clear() {
@@ -62,12 +68,11 @@ export default class RoomLayer extends AbstractLayer {
             'fillColor', 'outlineColor', 'height', 'base',
         ]
     }
-    static get DEFAULT_LAYOUT() {
+    static get DEFAULT_STYLE() {
         return {
             visible: true,
             fillColor: '#666666',
             outlineColor: '#333333',
-            enableOutline: true,
             base: 0,
             opacity: 1,
             height: 0,

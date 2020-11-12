@@ -1,4 +1,3 @@
-//  不同类型的layer给不同类型的shader
 import frameVertex from './frameVertex.glsl';
 import frameFragment from './frameFragment.glsl';
 import roomVertex from './roomVertex.glsl';

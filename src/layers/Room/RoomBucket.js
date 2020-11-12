@@ -36,7 +36,7 @@ export default class RoomBucket extends AbstractBucket {
         }
     }
     _update(feature) {
-        const geometry = feature.geometry, properties = feature.properties;
+        const { geometry, properties } = feature;
         const visible = getStyle(this._layout, 'visible', properties);
         if (visible) {
             if (geometry.type === 'Polygon') {
@@ -58,7 +58,6 @@ export default class RoomBucket extends AbstractBucket {
         const outlineIndices = [];
         const normals = [];
         const topNormals = [];
-        const enableOutline = getStyle(this._layout, 'enableOutline', properties);
         const height = getStyle(this._layout, 'height', properties);
         for (let i = 0; i < polygon.length; i += 1) {
             const face = polygon[i];
@@ -67,10 +66,8 @@ export default class RoomBucket extends AbstractBucket {
                 const curY = face[j][1] + offset[1];
                 const sideCount = sideVertices.length / 2;
                 if (j < face.length - 1) {
-                    if (enableOutline) {
-                        const verticesCount = vertices.length / 2;
-                        outlineIndices.push(verticesCount, verticesCount + 1);
-                    }
+                    const verticesCount = vertices.length / 2;
+                    outlineIndices.push(verticesCount, verticesCount + 1);
                     const normalVector = new Vector2(face[j], face[j + 1]).normal();
                     normals.push(normalVector.x, normalVector.y, 0);
                     normals.push(normalVector.x, normalVector.y, 1);

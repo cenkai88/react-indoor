@@ -124,9 +124,9 @@ export default class MapView extends Base {
     this._layers.push(layer);
   }
   _drawRoom(features, floorId) {
-    if (!this._styleMng) return { text: [], extra: [] };
+    if (!this._styleMng) return { text: [] };
     const roomStyle = this._styleMng.getStyle('room');
-    if (!roomStyle) return { text: [], extra: [] };
+    if (!roomStyle) return { text: [] };
     const roomFeatures = [];
     const roomIconFeatures = [];
     for (let i = 0; i < features.length; i += 1) {

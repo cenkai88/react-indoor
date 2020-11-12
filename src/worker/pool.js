@@ -14,7 +14,7 @@ export default class WebWorkerPool {
       this._freeIdxList.push(i);
       this._workerPool[i].addEventListener('message', ({ data }) => {
         if (this._taskDataList.length > 0) {
-          const data = this._dataList.shift();
+          const data = this._taskDataList.shift();
           this._postToWorker(data);
         }
         this._onWorkerMessage(data);

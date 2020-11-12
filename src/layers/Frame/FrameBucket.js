@@ -44,15 +44,12 @@ export default class FrameBucket extends AbstractBucket {
         const vertices = [];
         const holes = [];
         const outlineIndices = [];
-        const enableOutline = getStyle(this._layout, 'enableOutline', properties);
         for (let i = 0; i < polygon.length; i += 1) {
             const face = polygon[i];
             for (let j = 0; j < face.length; j += 1) {
-                if (enableOutline) {
-                    const verticesCount = vertices.length / 2;
-                    if (j < face.length - 1) {
-                        outlineIndices.push(verticesCount, verticesCount + 1);
-                    }
+                const verticesCount = vertices.length / 2;
+                if (j < face.length - 1) {
+                    outlineIndices.push(verticesCount, verticesCount + 1);
                 }
                 vertices.push(face[j][0] + offset[0], face[j][1] + offset[1]);
             }

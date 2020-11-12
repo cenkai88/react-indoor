@@ -9,8 +9,14 @@ import FrameBuffer from './FrameBuffer';
 import { polygonsContain } from '../../utils/common';
 
 export default class FrameLayer extends AbstractLayer {
-    constructor(layout) {
-        super('Frame', { ...FrameLayer.DEFAULT_LAYOUT, ...layout });
+    constructor(style) {
+        super('Frame', {
+            ...style,
+            default: {
+                ...FrameLayer.DEFAULT_STYLE,
+                ...style.default,
+            },
+        });
         this._geometryRenderList = [];
     }
     clear() {
@@ -63,12 +69,11 @@ export default class FrameLayer extends AbstractLayer {
     static get GEOMETRY_KEYS() {
         return ['fillColor', 'outlineColor', 'base']
     }
-    static get DEFAULT_LAYOUT() {
+    static get DEFAULT_STYLE() {
         return {
             visible: true,
             fillColor: '#666666',
             outlineColor: '#333333',
-            enableOutline: true,
             base: 0,
             opacity: 1,
         }

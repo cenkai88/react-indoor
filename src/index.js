@@ -156,7 +156,6 @@ export default ({
   }, [floorId]);
 
   useEffect(() => {
-    console.log(floorData, buildingData)
     if (mapIns) mapIns.destroy();
     if (domReady) mapIns.init({ floorData, buildingData });
   }, [floorData, buildingData]);
