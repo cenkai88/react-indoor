@@ -70,9 +70,9 @@ export default class Renderer extends Base {
       animateDuration: 300,
       collisionDuration: 600,
       mapId,
-      workerPool: window.indoorWorkerPool
+      workerPool: window.indoorWorkerPool,
     });
-    this._collisionMng._workerPool.listen(mapId, this._onCollisionChange.bind(this));
+    this._collisionMng.getWorkerPool().listen(mapId, this._onCollisionChange.bind(this));
     this._textureMng = new TextureManager(this._gl, textureCanvas);
     this._glyphMng = new GlyphManager(this._gl, {
       fontWeight: options.fontWeight,
@@ -442,9 +442,8 @@ export default class Renderer extends Base {
   }
   destroy() {
     this._canvas.remove();
+    this._collisionMng.clear();
     window.indoorWorkerPool.destroy(this._mapId);
-    // this._collisionMng.off('change', this._onCollisionChange.bind(this));
-    // this._collisionMng.destroy();
   }
   getCamera() {
     return this._camera;

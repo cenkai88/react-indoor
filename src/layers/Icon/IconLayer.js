@@ -41,13 +41,13 @@ export default class IconLayer extends AbstractLayer {
     super.onAdd(renderer);
     const collisionMng = renderer.getCollisionMng();
     collisionMng.add(this.getCollisionData());
-    collisionMng._workerPool.listen(this._renderer._mapId, this._onCollisionChange.bind(this));
+    this.listenerIdx = collisionMng.getWorkerPool().listen(this._renderer._mapId, this._onCollisionChange.bind(this));
   }
   unbind() {
     if (this._renderer) {
       const collisionMng = this._renderer.getCollisionMng();
       collisionMng.remove(this.getCollisionData());
-      // collisionMng.off('change', this._onCollisionChange.bind(this));
+      if (this.listenerIdx !== undefined) collisionMng.getWorkerPool().unlisten(this._renderer._mapId, this.listenerIdx);
     }
     super.unbind();
   }

@@ -67,7 +67,7 @@ export default class CollisionManager {
         const offset = this._camera.getOffset();
         const collisionData = {
             type: 'collision',
-            mapId: this._options.mapId,
+            id: this._options.mapId,
             taskId: GlobalIdGenerator.getId('task'),
             isForce,
             zoom: this._camera.getZoom(),
@@ -81,13 +81,11 @@ export default class CollisionManager {
         };
         this._workerPool.addTask(collisionData);
     }
-    destroy() {
-        // this._worker.terminate();
-        // this.clear();
-        // this.clearListeners();
-    }
     resize(width, height) {
         this._options.viewWidth = width;
         this._options.viewHeight = height;
+    }
+    getWorkerPool() {
+        return this._workerPool
     }
 }

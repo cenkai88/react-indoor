@@ -22,25 +22,16 @@ export default class WebWorkerPool {
       });
     }
   }
-  addMapInsId(id){
+  addMapInsId(id) {
     this._mapInsIdSet.add(id);
   }
   addTask(data) {
-    if (data.type==='collision') {
-      // for collision use mapId as key
-      const map = this._taskMap.get(data.mapId);
-      if (map) {
-        map.push(data.taskId);
-      } else {
-        this._taskMap.set(data.mapId, [data.taskId]);
-      }
+    // for collision use mapId as key, layers' are layerId
+    const item = this._taskMap.get(data.id);
+    if (item) {
+      item.push(data.taskId);
     } else {
-      const layer = this._taskMap.get(data.id);
-      if (layer) {
-        layer.push(data.taskId);
-      } else {
-        this._taskMap.set(data.id, [data.taskId]);
-      }
+      this._taskMap.set(data.id, [data.taskId]);
     }
 
     if (this._freeIdxList.length > 0) {
@@ -67,7 +58,7 @@ export default class WebWorkerPool {
       this._taskMap.delete(data.id);
     }
     let result = data;
-    if (data.result && data.result.type=== 'collisionResult') {
+    if (data.result && data.result.type === 'collisionResult') {
       result = data.result
     } else {
       if (data.type === 'icon') {
@@ -92,17 +83,18 @@ export default class WebWorkerPool {
     this._workerPool[index].postMessage(data);
   }
   listen(id, listener) {
-    this._listenerMap.set(id, [...(this._listenerMap.get(id)||[]), listener]);
+    this._listenerMap.set(id, [...(this._listenerMap.get(id) || []), listener]);
+    return this._listenerMap.size - 1;
   }
   unListen(id) {
     this._listenerMap.delete(id);
   }
   destroy(id) {
     this._mapInsIdSet.delete(id);
-    if (this._mapInsIdSet.size===0) {
-      this._taskDataList.length = 0;
-      this._taskMap.clear();
-      this._listenerMap.clear();
+    this._taskMap.delete(id);
+    this._listenerMap.delete(id);
+    this._taskDataList = this._taskDataList.filter(item => item.id !== id);
+    if (this._mapInsIdSet.size === 0) {
       for (const worker of this._workerPool) {
         worker.terminate();
       }

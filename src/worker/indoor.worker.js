@@ -4,7 +4,7 @@ import Collision from "./Collision";
 let collision;
 onmessage = function (t) {
     const { data } = t;
-    const { type, view, viewMatrix, projectionMatrix, zoom, z, center, onePixelToWorld, isForce, list, taskId, mapId } = data;
+    const { type, view, viewMatrix, projectionMatrix, zoom, z, center, onePixelToWorld, isForce, list, taskId, id } = data;
     if (type === 'collision') {
         const params = {
             view,
@@ -20,7 +20,7 @@ onmessage = function (t) {
         } else {
             collision = new Collision(params);
         }
-        const i = { type: "collisionResult", id: mapId, taskId, ...collision.calculate(list), isForce };
+        const i = { type: "collisionResult", id, taskId, ...collision.calculate(list), isForce };
         postMessage(i);
     } else {
         const result = (new BucketFactor).calculate(data);
