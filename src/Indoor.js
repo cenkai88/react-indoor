@@ -53,7 +53,7 @@ export default class Indoor extends MapView {
 
     const currentFloorData = floorData.find(item => item.id===floorId);
     super.init(currentFloorData, style);
-    this.currentFloorId = currentFloorData.id;
+    this.setCurrentFloorId(currentFloorData.id);
     // draw the floor
     this._status = 'RENDERED';
     this.fire('rendered')
@@ -218,13 +218,15 @@ export default class Indoor extends MapView {
   }
 
   getFloorData() {
-    return this.currentFloorData;
+    return this._currentFloorData;
   }
 
-  set currentFloorId(floorId) {
-    this.currentFloorData = this._floorDataMap.get(floorId);
+  setCurrentFloorId(floorId) {
+    this._currentFloorData = this._floorDataMap.get(floorId);
     this.fire('changeFloor', floorId);
-    this._drawFloor(this.currentFloorData);
+    if (this._currentFloorId) this._resetCamera(this._currentFloorData, true);
+    this._currentFloorId = floorId;
+    this._drawFloor(this._currentFloorData);
   }
 
   set maxZoom(maxZoom) {

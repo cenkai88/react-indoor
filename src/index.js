@@ -152,7 +152,7 @@ export default ({
   }, []);
 
   useEffect(() => {
-    if (mapIns) mapIns.currentFloorId = floorId;
+    if (mapIns) mapIns.setCurrentFloorId(floorId);
   }, [floorId]);
 
   useEffect(() => {

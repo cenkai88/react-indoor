@@ -12,7 +12,6 @@ import RoomLayer from '../layers/Room/RoomLayer';
 import IconLayer from '../layers/Icon/IconLayer';
 import { createFeaturePoint, step } from '../utils/common';
 import { MAX_ROOM_PER_RENDER } from '../utils/constants';
-import floor from '../../data/floor';
 
 export default class MapView extends Base {
   constructor(options) {
@@ -32,8 +31,8 @@ export default class MapView extends Base {
     // gesture
     this._gestureManager = new GestureManager(this);
   }
-  init(currentFloorData, style) {
-    this.currentFloorData = currentFloorData;
+  init(floorData, style) {
+    this._currentFloorData = floorData;
     this._renderer = new Renderer(
       this._canvasContainer,
       {
@@ -53,13 +52,13 @@ export default class MapView extends Base {
     });
     this._renderer.getCamera().set({ center: this._options.center });
     // set camera
-    this._initCamera(currentFloorData);
+    this._resetCamera(floorData);
   }
 
   _onMoveEnd() {
     if (this._renderer) this._renderer.updateCollision();
   }
-  _initCamera(currentFloor) {
+  _resetCamera(currentFloor, force) {
     if (!this._renderer) return;
     const camera = this._renderer.getCamera();
     const [x, y] = currentFloor.frame.features[0].center;
@@ -69,7 +68,7 @@ export default class MapView extends Base {
       bottomRight: { x: bounds[1][0], y: bounds[0][1] },
     });
     this._renderer.setOffset(-x, -y);
-    if (!this._options.center) camera.set({ center: { x, y } });
+    if (!this._options.center || force) camera.set({ center: { x, y } });
   }
   _update(floorDataMap) {
     if (!this._renderer) return;
@@ -93,7 +92,7 @@ export default class MapView extends Base {
     this._renderer.updateCollision();
   }
   _processLayer(layer, layerMap) {
-    const floorId = this.currentFloorData.id;
+    const floorId = this._currentFloorData.id;
     layer.setGroupId(floorId);
     const item = layerMap.get(floorId);
     if (item) item.push(layer);
@@ -200,8 +199,8 @@ export default class MapView extends Base {
     }
   }
   _checkIsNeedAdd(layer) {
-    if (!this.currentFloorData) return false;
-    return layer.getFloorId() === this.currentFloorData.id || layer.getAlwaysShow();
+    if (!this._currentFloorData) return false;
+    return layer.getFloorId() === this._currentFloorData.id || layer.getAlwaysShow();
   }
   screenToWorldCoordinate(screenX, screenY) {
     if (!this._renderer) return new Point(0, 0);
