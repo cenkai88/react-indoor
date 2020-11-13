@@ -36,7 +36,7 @@ export default class Collision {
             for (let j = 0; j < floor.data.length; j += 1) {
                 const { zoomRange, point } = floor.data[j];
                 if (this._checkZoomRange(zoomRange) && this._checkCenter(point)) {
-                    const floorData = idDataMapping.get(floor.floorId);
+                    const floorData = idDataMapping.get(floor.id);
                     const newData = {
                         id: floor.id,
                         index: j,
@@ -45,7 +45,7 @@ export default class Collision {
                     if (floorData) {
                         floorData.push(newData)
                     } else {
-                        idDataMapping.set(floor.floorId, [newData])
+                        idDataMapping.set(floor.id, [newData])
                     }
                 }
             }

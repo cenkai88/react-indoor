@@ -84,10 +84,12 @@ export default class WebWorkerPool {
   }
   listen(id, listener) {
     this._listenerMap.set(id, [...(this._listenerMap.get(id) || []), listener]);
-    return this._listenerMap.size - 1;
+    return this._listenerMap.get(id).length - 1;
   }
-  unListen(id) {
-    this._listenerMap.delete(id);
+  unListen(id, listenerIdx) {
+    const listeners = this._listenerMap.get(id).filter((item, idx) => idx !== listenerIdx);
+    this._listenerMap.set(id, listeners);
+    if (this._listenerMap.size === 0) this._listenerMap.delete(id);
   }
   destroy(id) {
     this._mapInsIdSet.delete(id);

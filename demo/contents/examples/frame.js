@@ -1,15 +1,13 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
-import buildingData from '../../../data/building';
 import floorFrame from '../../../data/floorFrame';
 
 import ReactIndoor from '../../../src/index.js';
 
 const codeStr = `<ReactIndoor
   floorData={floorFrame}
-  buildingData={buildingData}
-  buildingId="RJ00201010001"
+  floorId="RJ00201010001"
   options={{
     maxZoom: 23,
     minZoom: 16,
@@ -33,15 +31,14 @@ export default () => {
         Indoor map with just frame layer
       </div>
       <div className="content-item-description">
-        Load the building data and floor frame data, and set the initial zoom, zotate, pitch value.
+        Load the floor frame data, and set the initial zoom, zotate, pitch value.
       </div>
       <div className="content-item-map">
         <div className="content-item-map-row">
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorFrame}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
+              floorId="RJ00201010001"
               options={{
                 maxZoom: 23,
                 minZoom: 16,

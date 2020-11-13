@@ -24,7 +24,7 @@ export default class StyleManager {
     this._styleLayout = {
       frame,
       room,
-      property: facility,
+      facility,
       roomIcon,
     };
   }
@@ -34,7 +34,7 @@ export default class StyleManager {
   }
   static checkStyleDiff(oldStyle, newStyle) {
     if (!oldStyle) {
-      return ['frame', 'room', 'roomIcon', 'property'];
+      return ['frame', 'room', 'roomIcon', 'facility'];
     }
     const arr = [];
     if (!equalObject(oldStyle.frame, newStyle.frame)) {
@@ -46,8 +46,8 @@ export default class StyleManager {
     if (!equalObject(oldStyle.roomIcon, newStyle.roomIcon)) {
       arr.push('roomIcon');
     }
-    if (!equalObject(oldStyle.property, newStyle.property)) {
-      arr.push('property');
+    if (!equalObject(oldStyle.facility, newStyle.facility)) {
+      arr.push('facility');
     }
     return arr;
   }

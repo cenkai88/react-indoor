@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
-import buildingData from '../../../data/building';
 import floorData from '../../../data/floor';
 
 import ReactIndoor from '../../../src/index.js';
 
 const codeStr = `<ReactIndoor
   floorData={floorData}
-  buildingData={buildingData}
-  buildingId="{currentFloor}"
+  floorId="{currentFloor}"
   options={{
     maxZoom: 23,
     minZoom: 16,
@@ -59,8 +57,6 @@ export default () => {
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
               floorId={currentFloor}
               options={{
                 maxZoom: 23,

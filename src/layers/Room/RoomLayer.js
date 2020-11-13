@@ -5,11 +5,8 @@ import { polygonsContain } from "../../utils/common";
 export default class RoomLayer extends AbstractLayer {
     constructor(style) {
         super('Room', {
+            ...RoomLayer.DEFAULT_STYLE,
             ...style,
-            default: {
-                ...RoomLayer.DEFAULT_STYLE,
-                ...style.default,
-            },
         });
         this._geometryRenderList = [];
     }

@@ -28,7 +28,6 @@ const defaultOption = {
 export default ({
   floorId,
   floorData,
-  buildingData,
   heatmapData,
   lineData,
   markerData,
@@ -65,16 +64,16 @@ export default ({
     } else {
       heatmap = heatmapLayer;
     }
-    heatmap.setFloorId(mapIns.currentFloor.floorId);
-    const { bounds } = mapIns.currentFloor;
-    const deltaX = bounds[1][0] - bounds[0][0];
-    const deltaY = bounds[1][1] - bounds[0][1];
+    heatmap.setFloorId(mapIns.getFloorData().id);
+    const { bbox } = mapIns.getFloorData().frame.features[0];
+    const deltaX = bbox[1][0] - bbox[0][0];
+    const deltaY = bbox[1][1] - bbox[0][1];
 
     const features = data.map(item => ({
       type: 'Feature',
       geometry: {
         type: 'Point',
-        coordinates: convertPercentToWorld(item, bounds, deltaX, deltaY),
+        coordinates: convertPercentToWorld(item, bbox, deltaX, deltaY),
       },
     }));
     heatmap.setFeatures(features);
@@ -86,7 +85,8 @@ export default ({
     let line
     if (!lineLayer) {
       line = new LineLayer({
-        lineWidth: 10,
+        lineWidth: 8,
+        lineImage: 'https://static.yingxuys.com/indoor_sdk/facility/ic_line.png',
         lineColor: '#0548A0',
       });
       setLineLayer(line);
@@ -94,16 +94,16 @@ export default ({
     } else {
       line = LineLayer;
     }
-    line.setFloorId(mapIns.currentFloor.floorId);
-    const { bounds } = mapIns.currentFloor;
-    const deltaX = bounds[1][0] - bounds[0][0];
-    const deltaY = bounds[1][1] - bounds[0][1];
+    line.setFloorId(mapIns.getFloorData().id);
+    const { bbox } = mapIns.getFloorData().frame.features[0];
+    const deltaX = bbox[1][0] - bbox[0][0];
+    const deltaY = bbox[1][1] - bbox[0][1];
 
     const features = [{
       type: 'Feature',
       geometry: {
         type: 'LineString',
-        coordinates: data.map(item => convertPercentToWorld(item, bounds, deltaX, deltaY)),
+        coordinates: data.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY)),
       },
     }];
     line.setFeatures(features);
@@ -114,12 +114,12 @@ export default ({
     if (!mapIns) return
     if (markersOverlay) markersOverlay.forEach(item => item.remove());
 
-    const { bounds } = mapIns.currentFloor;
-    const deltaX = bounds[1][0] - bounds[0][0];
-    const deltaY = bounds[1][1] - bounds[0][1];
+    const { bbox } = mapIns.getFloorData().frame.features[0];
+    const deltaX = bbox[1][0] - bbox[0][0];
+    const deltaY = bbox[1][1] - bbox[0][1];
 
     const markers = data.map(item => {
-      const [x, y] = convertPercentToWorld(item, bounds, deltaX, deltaY);
+      const [x, y] = convertPercentToWorld(item, bbox, deltaX, deltaY);
       return new Marker({
         iconImage: item.iconUrl,
         iconAnchor: 'bottom',
@@ -127,7 +127,7 @@ export default ({
         x,
         y,
         text: item.text,
-      }, mapIns.currentFloor.floorId)
+      }, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));
     setMarkersOverlay(markers);
@@ -157,8 +157,8 @@ export default ({
 
   useEffect(() => {
     if (mapIns) mapIns.destroy();
-    if (domReady) mapIns.init({ floorData, buildingData });
-  }, [floorData, buildingData]);
+    if (domReady) mapIns.init({ floorData, floorId });
+  }, [floorData]);
 
   useEffect(() => {
     if (mapIns && domReady) updateHeatmap(heatmapData);
@@ -170,7 +170,7 @@ export default ({
 
   useEffect(() => {
     if (domReady) {
-      mapIns.init({ floorData, buildingData });
+      mapIns.init({ floorData, floorId });
       if (typeof onInit === 'function') onInit();
       if (heatmapData) updateHeatmap(heatmapData)
       if (markerData) updateMarkers(markerData)

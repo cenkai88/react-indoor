@@ -12,6 +12,7 @@ import RoomLayer from '../layers/Room/RoomLayer';
 import IconLayer from '../layers/Icon/IconLayer';
 import { createFeaturePoint, step } from '../utils/common';
 import { MAX_ROOM_PER_RENDER } from '../utils/constants';
+import floor from '../../data/floor';
 
 export default class MapView extends Base {
   constructor(options) {
@@ -31,7 +32,8 @@ export default class MapView extends Base {
     // gesture
     this._gestureManager = new GestureManager(this);
   }
-  init(currentFloor, style) {
+  init(currentFloorData, style) {
+    this.currentFloorData = currentFloorData;
     this._renderer = new Renderer(
       this._canvasContainer,
       {
@@ -40,18 +42,18 @@ export default class MapView extends Base {
         glyphCanvas: this._glyphCanvas,
         textureCanvas: this._textureCanvas,
       }, {
-        zoom: this._options.zoom,
-        rotate: this._options.rotate,
-        pitch: this._options.pitch,
-        lightPos: this._options.lightPos,
-        localFontFamily: this._options.localFontFamily,
-        fontWeight: this._options.fontWeight,
-        maxTextSize: this._options.maxTextSize,
-        textSplit: this._options.textSplit,
+      zoom: this._options.zoom,
+      rotate: this._options.rotate,
+      pitch: this._options.pitch,
+      lightPos: this._options.lightPos,
+      localFontFamily: this._options.localFontFamily,
+      fontWeight: this._options.fontWeight,
+      maxTextSize: this._options.maxTextSize,
+      textSplit: this._options.textSplit,
     });
     this._renderer.getCamera().set({ center: this._options.center });
     // set camera
-    this._initCamera(currentFloor);
+    this._initCamera(currentFloorData);
   }
 
   _onMoveEnd() {
@@ -60,8 +62,8 @@ export default class MapView extends Base {
   _initCamera(currentFloor) {
     if (!this._renderer) return;
     const camera = this._renderer.getCamera();
-    const [x, y] = currentFloor.center.coordinates;
-    const { bounds } = currentFloor;
+    const [x, y] = currentFloor.frame.features[0].center;
+    const bounds = currentFloor.frame.features[0].bbox;
     camera.setMaxBounds(bounds && {
       topLeft: { x: bounds[0][0], y: bounds[1][1] },
       bottomRight: { x: bounds[1][0], y: bounds[0][1] },
@@ -69,12 +71,12 @@ export default class MapView extends Base {
     this._renderer.setOffset(-x, -y);
     if (!this._options.center) camera.set({ center: { x, y } });
   }
-  _update(floors) {
+  _update(floorDataMap) {
     if (!this._renderer) return;
     this._renderer.clear();
     const layerMap = new Map();
-    for (let i = 0; i < floors.length; i += 1) {
-      layerMap.set(floors[i].floorId, []);
+    for (let floorId of floorDataMap.keys()) {
+      layerMap.set(floorId, []);
     }
     for (let i = 0; i < this._layers.length; i += 1) {
       if (this._checkIsNeedAdd(this._layers[i])) {
@@ -91,28 +93,26 @@ export default class MapView extends Base {
     this._renderer.updateCollision();
   }
   _processLayer(layer, layerMap) {
-    let groupId = this.currentFloor.floorId;
-    layer.setGroupId(groupId);
-    const item = layerMap.get(groupId);
+    const floorId = this.currentFloorData.id;
+    layer.setGroupId(floorId);
+    const item = layerMap.get(floorId);
     if (item) item.push(layer);
   }
   async _drawFloor(floorData) {
     if (!this._styleMng) return
-    if (this._hasDrawFloorId.has(floorData.id)) {
-      this._update(this._floors);
-      return;
+    if (!this._hasDrawFloorId.has(floorData.id)) {
+      this._drawFloorLayers(floorData);
     }
-    this._drawFloorLayers(floorData);
-    this._update(this._floors);
+    this._update(this._floorDataMap);
   }
   _drawFloorLayers(floorData) {
-    const { id: floorId } = floorData;
-    if (this._hasDrawFloorId.has(floorId)) return;
-    const { frame, property, room } = floorData;
-    this._drawFrame(frame.features, floorId);
-    const { text } = this._drawRoom(room.features, floorId);
-    this._drawIcon(text, floorId);
-    this._hasDrawFloorId.add(floorId);
+    const { id } = floorData;
+    if (this._hasDrawFloorId.has(id)) return;
+    const { frame, facility, room } = floorData;
+    this._drawFrame(frame.features, id);
+    const { text } = this._drawRoom(room.features, id);
+    this._drawIcon(text, id);
+    this._hasDrawFloorId.add(id);
   }
   _drawFrame(features, floorId) {
     // just add the layer into this._layers
@@ -135,7 +135,6 @@ export default class MapView extends Base {
       const point = properties && (properties.labelpoint || properties.center);
       if (point) roomIconFeatures.push(createFeaturePoint(point, properties));
     }
-
     if (roomFeatures.length !== 0) {
       step(roomFeatures, MAX_ROOM_PER_RENDER, item => {
         const layer = new RoomLayer(roomStyle);
@@ -153,7 +152,6 @@ export default class MapView extends Base {
     layer.setFeatures(features).setName('icon').setFloorId(floorId);
     this._layers.push(layer);
   }
-  
 
   _fireEvent(params, suffix) {
     const {
@@ -202,8 +200,8 @@ export default class MapView extends Base {
     }
   }
   _checkIsNeedAdd(layer) {
-    if (!this.currentFloor) return false;
-    return layer.getFloorId() === this.currentFloor.floorId || layer.getAlwaysShow();
+    if (!this.currentFloorData) return false;
+    return layer.getFloorId() === this.currentFloorData.id || layer.getAlwaysShow();
   }
   screenToWorldCoordinate(screenX, screenY) {
     if (!this._renderer) return new Point(0, 0);

@@ -35,13 +35,13 @@ export const parseColor = color => {
     }
 }
 
-export const getStyle = (styleData, name, properties) => {
-    const { default: defaultValue, styleKey, styleMap = {} } = styleData;
+export const getStyle = (styleData, name, properties={}) => {
+    const { styleKey, styleMap = {} } = styleData;
     const keyValue = properties[styleKey];
     if (keyValue && styleMap[keyValue]) {
-        return styleMap[keyValue][name] || defaultValue[name]
+        return styleMap[keyValue][name] || styleData[name]
     } else {
-        return defaultValue[name]
+        return styleData[name]
     }
 }
 

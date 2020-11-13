@@ -1,7 +1,6 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
-import buildingData from '../../../data/building';
 import floorData from '../../../data/floor';
 
 import ReactIndoor from '../../../src/index.js';
@@ -36,8 +35,7 @@ const dataStr = `const heatmapData = [
 
 const codeStr = `<ReactIndoor
   floorData={floorData}
-  buildingData={buildingData}
-  buildingId="RJ00201010001"
+  floorId="RJ00201010001"
   heatmapData={heatmapData}
   options={{
     maxZoom: 23,
@@ -54,8 +52,7 @@ const codeStr = `<ReactIndoor
 
 const codeStrRadius = `<ReactIndoor
 floorData={floorData}
-buildingData={buildingData}
-buildingId="RJ00201010001"
+floorId="RJ00201010001"
 heatmapData={heatmapData}
 options={{
   maxZoom: 23,
@@ -93,8 +90,7 @@ export default () => {
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
+              floorId="RJ00201010001"
               heatmapData={heatmapData}
               options={{
                 maxZoom: 23,
@@ -128,8 +124,7 @@ export default () => {
         <div className="content-item-map-component">
           <ReactIndoor
             floorData={floorData}
-            buildingData={buildingData}
-            buildingId="RJ00201010001"
+            floorId="RJ00201010001"
             heatmapData={heatmapData}
             options={{
               maxZoom: 23,

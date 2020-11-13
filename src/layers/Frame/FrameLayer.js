@@ -11,11 +11,8 @@ import { polygonsContain } from '../../utils/common';
 export default class FrameLayer extends AbstractLayer {
     constructor(style) {
         super('Frame', {
+            ...FrameLayer.DEFAULT_STYLE,
             ...style,
-            default: {
-                ...FrameLayer.DEFAULT_STYLE,
-                ...style.default,
-            },
         });
         this._geometryRenderList = [];
     }

@@ -31,7 +31,7 @@ export default class CollisionManager {
         if (!this._updateTimer) {
             this._frameUpdate();
             const interval = Math.max(this._options.collisionDuration, this._options.animateDuration);
-            this._updateTimer = window.setInterval(this._frameUpdate.bind(this), interval);
+            this._updateTimer = setInterval(this._frameUpdate.bind(this), interval);
         }
     }
     _stopFrameUpdate() {

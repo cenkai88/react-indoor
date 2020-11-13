@@ -1,18 +1,14 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
-import buildingData from '../../../data/building';
 import floorData from '../../../data/floor';
 import styleData from '../../../data/style';
 
 import ReactIndoor from '../../../src/index.js';
 
-console.log(buildingData)
-
 const codeStr = `<ReactIndoor
   floorData={floorFrame}
-  buildingData={buildingData}
-  buildingId="RJ00201010001"
+  floorId="RJ00201010001"
   options={{
     maxZoom: 23,
     minZoom: 16,
@@ -29,8 +25,7 @@ const codeStr = `<ReactIndoor
 
 const codeStrWithStyle = `<ReactIndoor
   floorData={floorFrame}
-  buildingData={buildingData}
-  buildingId="RJ00201010001"
+  floorId="RJ00201010001"
   styleData={defaultStyle}
   options={{
     maxZoom: 23,
@@ -47,8 +42,7 @@ const codeStrWithStyle = `<ReactIndoor
 
 export default () => {
   const defaultStyle = JSON.parse(JSON.stringify(styleData));
-  defaultStyle.roomIcon.default.visible = false;
-  console.log(buildingData)
+  defaultStyle.roomIcon.visible = false;
 
   return <div className="content-body">
     <div className="content-body-title" >
@@ -59,15 +53,14 @@ export default () => {
         Indoor map with just Frame and Room layer
       </div>
       <div className="content-item-description">
-        Load the building data and floor data, and set the initial zoom, zotate, pitch value.
+        Load the floor data, and set the initial zoom, zotate, pitch value.
       </div>
       <div className="content-item-map">
         <div className="content-item-map-row">
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
+              floorId="RJ00201010001"
               options={{
                 maxZoom: 23,
                 minZoom: 16,
@@ -99,15 +92,14 @@ export default () => {
       <div className="content-item-map">
         <div className="content-item-map-js">
           <SyntaxHighlighter language="javascript" showLineNumbers>
-            defaultStyle.roomIcon.default.visible = false;
+            defaultStyle.roomIcon.visible = false;
           </SyntaxHighlighter>
         </div>
         <div className="content-item-map-row">
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
+              floorId="RJ00201010001"
               styleData={defaultStyle}
               options={{
                 maxZoom: 23,

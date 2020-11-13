@@ -4,7 +4,7 @@ export default [{
     "type": "FeatureCollection",
     "features": [],
   },
-  "property": {
+  "facility": {
     "type": "FeatureCollection",
     "features": [],
   },
@@ -13,6 +13,8 @@ export default [{
     "features": [{
       "featureid": "RJ00202010301",
       "type": "Feature",
+      "bbox": [[1165.7057589583742, 75.92669991819075], [1315.3470083480227, 183.7035993932884]],
+      "center": [1254.8271713616468, 117.50345301174438],
       "properties": { "id": "RJ00201010001", "name": "F1" },
       "geometry": {
         "type": "MultiPolygon",

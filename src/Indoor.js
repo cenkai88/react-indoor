@@ -33,33 +33,28 @@ export default class Indoor extends MapView {
     this.center = options.center;
     // status enum: INITIATED RENDERERING ERROR RENDERED
     this._status = 'INITIATED';
-    this._floors = [];
-    this._floorMap = new Map();
     this._floorDataMap = new Map();
     window.addEventListener('resize', event => {
       if (event.isTrusted) this.resize();
     });
   }
-  async init({ floorData = [], buildingData = [] }, style = {}) {
-    if (!Array.isArray(floorData) || !Array.isArray(buildingData) || !buildingData.find(item => item.defaultFloor)) {
+  async init({ floorData = [], floorId = [] }, style = {}) {
+    if (!Array.isArray(floorData) || !floorData.find(item => item.id === floorId)) {
       this._status = 'ERROR';
       this.fire('error');
+      console.error('Map Instance initiation error!')
       return
     }
     this._status = 'RENDERERING';
     this.fire('render');
-    this._floors = [...buildingData];
-    buildingData.forEach(item => {
-      this._floorMap.set(item.floorId, item)
-    });
     floorData.forEach(item => {
       this._floorDataMap.set(item.id, item)
     });
 
-    const currentFloor = buildingData.find(item => item.defaultFloor);
-    super.init(currentFloor, style);
+    const currentFloorData = floorData.find(item => item.id===floorId);
+    super.init(currentFloorData, style);
+    this.currentFloorId = currentFloorData.id;
     // draw the floor
-    this.currentFloorId = currentFloor.floorId;
     this._status = 'RENDERED';
     this.fire('rendered')
   }
@@ -222,8 +217,11 @@ export default class Indoor extends MapView {
     }
   }
 
+  getFloorData() {
+    return this.currentFloorData;
+  }
+
   set currentFloorId(floorId) {
-    this.currentFloor = this._floorMap.get(floorId);
     this.currentFloorData = this._floorDataMap.get(floorId);
     this.fire('changeFloor', floorId);
     this._drawFloor(this.currentFloorData);
@@ -283,8 +281,6 @@ export default class Indoor extends MapView {
 
   _reset() {
     this._layers.length = 0;
-    this._floors.length = 0;
-    this._floorMap.clear();
     this._floorDataMap.clear();
     this._hasDrawFloorId.clear();
   }

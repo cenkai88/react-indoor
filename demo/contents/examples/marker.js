@@ -1,7 +1,6 @@
 import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
-import buildingData from '../../../data/building';
 import floorData from '../../../data/floor';
 import styleData from '../../../data/style';
 
@@ -9,8 +8,7 @@ import ReactIndoor from '../../../src/index.js';
 
 const codeStr = `<ReactIndoor
 floorData={floorData}
-buildingData={buildingData}
-buildingId="RJ00201010001"
+floorId="RJ00201010001"
 styleData={defaultStyle}
 markerData={markerData}
 options={{
@@ -26,7 +24,7 @@ options={{
 }}
 />`;
 
-const jsStr = `defaultStyle.roomIcon.default.visible = false;
+const jsStr = `defaultStyle.roomIcon.visible = false;
 const markerData = [
   { x: 0.1, y: 0.1, iconUrl: '/icons/A.png', text: 'testA' },
   { x: 0.7, y: 0.7, iconUrl: '/icons/C.png', text: 'testB' },
@@ -34,7 +32,7 @@ const markerData = [
 
 export default () => {
   const defaultStyle = JSON.parse(JSON.stringify(styleData));
-  defaultStyle.roomIcon.default.visible = false;
+  defaultStyle.roomIcon.visible = false;
   const markerData = [
     { x: 0.1, y: 0.1, iconUrl: '/icons/A.png', text: 'testA' },
     { x: 0.7, y: 0.7, iconUrl: '/icons/C.png', text: 'testB' },
@@ -60,8 +58,7 @@ export default () => {
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
-              buildingData={buildingData}
-              buildingId="RJ00201010001"
+              floorId="RJ00201010001"
               styleData={defaultStyle}
               markerData={markerData}
               options={{

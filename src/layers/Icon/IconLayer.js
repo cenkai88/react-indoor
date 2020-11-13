@@ -6,11 +6,8 @@ import { createScreenBounds } from '../../utils/common';
 export default class IconLayer extends AbstractLayer {
   constructor(style) {
     super('Icon', {
+      ...IconLayer.DEFAULT_STYLE,
       ...style,
-      default: {
-        ...IconLayer.DEFAULT_STYLE,
-        ...style.default,
-      },
     });
     this._dataItemList = [];
     this._geometryRenderList = [];

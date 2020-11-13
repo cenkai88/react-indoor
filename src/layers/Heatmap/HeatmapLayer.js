@@ -6,11 +6,8 @@ import Vector2 from '../../geometry/Vector2';
 export default class HeatmapLayer extends AbstractLayer {
   constructor(style) {
     super('Heatmap', {
+      ...HeatmapLayer.DEFAULT_STYLE,
       ...style,
-      default: {
-        ...HeatmapLayer.DEFAULT_STYLE,
-        ...style.default,
-      },
     });
     this._geometryRenderList = [];
   }

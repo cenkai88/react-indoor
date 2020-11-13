@@ -7,11 +7,8 @@ import { getStyle } from '../../utils/style';
 export default class LineLayer extends AbstractLayer {
   constructor(style) {
     super('Line', {
+      ...LineLayer.DEFAULT_STYLE,
       ...style,
-      default: {
-        ...LineLayer.DEFAULT_STYLE,
-        ...style.default,
-      },
     });
     this._geometryRenderList = [];
     this._loadPromiseSet = new Set();
