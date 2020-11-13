@@ -444,6 +444,7 @@ export default class Renderer extends Base {
     this._canvas.remove();
     this._collisionMng.clear();
     window.indoorWorkerPool.destroy(this._mapId);
+    this._glContext.destroy();
   }
   getCamera() {
     return this._camera;

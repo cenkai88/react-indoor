@@ -79,6 +79,9 @@ export default class GLContext {
         }
         this._gl.clear(this._gl.DEPTH_BUFFER_BIT | this._gl.COLOR_BUFFER_BIT);
     }
+    destroy(){
+        this._gl.getExtension('WEBGL_lose_context').loseContext();
+    }
     enableAlpha() {
         if (!this._isEnableAlpha) this._gl.enable(this._gl.BLEND);
         this._isEnableAlpha = true;

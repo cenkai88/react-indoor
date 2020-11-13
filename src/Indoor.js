@@ -45,7 +45,7 @@ export default class Indoor extends MapView {
       console.error('Map Instance initiation error!')
       return
     }
-    this._status = 'RENDERERING';
+    this._status = 'RENDERING';
     this.fire('render');
     floorData.forEach(item => {
       this._floorDataMap.set(item.id, item)
