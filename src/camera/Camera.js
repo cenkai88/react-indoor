@@ -137,6 +137,15 @@ export default class Camera {
         this._center.set(x, y);
         this._calcViewMatrix();
     }
+    getPointWithInertia(coordinate, offset){
+        const a = this.screenToWorldCoordinate(offset.x, offset.y);
+        const x = coordinate.x - (a.x - this._center.x);
+        const y = coordinate.y - (a.y - this._center.y);
+        return {
+            x,
+            y,
+        }
+    }
     getCenter() {
         return this._center.clone();
     }
