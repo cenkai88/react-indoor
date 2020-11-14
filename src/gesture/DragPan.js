@@ -157,7 +157,7 @@ export default class DragPan extends AbstractGesture {
             this._mapView.fire('gestureEnd', e);
             return;
         }
-        const offset = panInertia.offset, duration = panInertia.duration;
+        const { offset, duration } = panInertia;
         this._moveInertia(offset, duration * 1000, e);
         this._inertias = [];
     }
@@ -165,9 +165,15 @@ export default class DragPan extends AbstractGesture {
         const renderer = this._mapView.getRenderer();
         if (!renderer) return;
         const camera = renderer.getCamera();
+        const end = camera.getCenter();
+        const { x: constrainedX, y: constrainedY } = camera.getConstrainedPoint(end);
+        if (end.x !== constrainedX || end.y !== constrainedY) {
+            end.set(constrainedX, constrainedY);
+            offset.x = 0;
+            offset.y = 0;
+        }
         const pointAtOffset = camera.centerPoint.add(offset);
         const locationAtOffset = camera.screenToWorldCoordinate(pointAtOffset.x, pointAtOffset.y);
-        const end = camera.getCenter();
         const from = locationAtOffset.clone();
         const centerDelta = end.clone().subtract(from);
         const transitor = new Transitor().init(0, 1, duration);

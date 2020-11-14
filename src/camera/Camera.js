@@ -66,6 +66,19 @@ export default class Camera {
     getNear() {
         return this._near;
     }
+    getConstrainedPoint(point, constrainRatio = 0.6) {
+        if (!this._maxBounds) return point;
+        const w = this._width / 2 * this._onePixelToWorld;
+        const h = this._height / 2 * this._onePixelToWorld;
+        const minX = this._maxBounds.topLeft.x - w*constrainRatio;
+        const maxX = this._maxBounds.bottomRight.x + w*constrainRatio;
+        const minY = this._maxBounds.bottomRight.y - h*constrainRatio;
+        const maxY = this._maxBounds.topLeft.y + h*constrainRatio;
+        return {
+            x: getFit(point.x, minX, maxX), 
+            y: getFit(point.y, minY, maxY)
+        }
+    }
     _setFar(far) {
         this._far = far;
         this._projectionMatrix.setPerspective(this._fov, this._width / this._height, this._near, this._far);
