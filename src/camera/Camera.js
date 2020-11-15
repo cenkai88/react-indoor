@@ -76,7 +76,7 @@ export default class Camera {
         const maxY = this._maxBounds.topLeft.y + h*constrainRatio;
         return {
             x: getFit(point.x, minX, maxX), 
-            y: getFit(point.y, minY, maxY)
+            y: getFit(point.y, minY, maxY),
         }
     }
     _setFar(far) {

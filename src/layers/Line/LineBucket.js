@@ -12,6 +12,7 @@ export default class LineBucket extends AbstractBucket {
     for (let i = 0; i < this._features.length; i += 1) {
       const { properties, geometry } = this._features[i];
       const visible = getStyle(this._layout, 'visible', properties);
+      // TODO
       if (visible) {
         if (geometry.type === 'LineString') {
           this._calcPolyline(geometry.coordinates, properties);

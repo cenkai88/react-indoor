@@ -162,22 +162,26 @@ export default class DragPan extends AbstractGesture {
         this._inertias = [];
     }
     _moveInertia(offset, duration, event) {
-        console.log(duration)
         const renderer = this._mapView.getRenderer();
         if (!renderer) return;
         const camera = renderer.getCamera();
         const end = camera.getCenter();
         let pointAtOffset = camera.centerPoint.add(offset);
         const endWithInertia = camera.getPointWithInertia(end, pointAtOffset);
-        const { x: constrainedX, y: constrainedY } = camera.getConstrainedPoint(endWithInertia);
-        if (endWithInertia.x !== constrainedX || endWithInertia.y !== constrainedY) {
-            // TODO change offset instead of end point
+        const { x: constrainedX, y: constrainedY } = camera.getConstrainedPoint(end);
+        const { x: constrainedInertiaX, y: constrainedInertiaY } = camera.getConstrainedPoint(endWithInertia);
+        // TODO set offset to the contrained value instead of 0
+        if (end.x !== constrainedX || end.y !== constrainedY) {
             end.set(constrainedX, constrainedY);
-            offset.x = 0;
-            offset.y = 0;
-            pointAtOffset = camera.centerPoint.add(offset);
-            duration = 400;
         }
+        if (endWithInertia.x !== constrainedInertiaX) {
+            offset.x = 0;
+        }
+        if (endWithInertia.y !== constrainedInertiaY) {
+            offset.y = 0;
+        }
+        pointAtOffset = camera.centerPoint.add(offset);
+
         const locationAtOffset = camera.screenToWorldCoordinate(pointAtOffset.x, pointAtOffset.y);
         const from = locationAtOffset.clone();
         const centerDelta = end.clone().subtract(from);

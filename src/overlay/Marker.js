@@ -13,7 +13,10 @@ export default class Marker {
         this._layer = new IconLayer(Marker.getLayoutFromOptions(options));
         if (this._options.draggable) this._layer.on('mousedown', this._onmousedown.bind(this));
         const { x, y } = this._options;
-        if (x && y) this.setPosition(floorId, { x, y });
+        // TODO
+        if (x !== undefined && y !== undefined) {
+            this.setPosition(floorId, { x, y });
+        }
     }
     setProperties(properties) {
         this._properties = properties;
