@@ -13,7 +13,6 @@ export default class Marker {
         this._layer = new IconLayer(Marker.getLayoutFromOptions(options));
         if (this._options.draggable) this._layer.on('mousedown', this._onmousedown.bind(this));
         const { x, y } = this._options;
-        // TODO
         if (x !== undefined && y !== undefined) {
             this.setPosition(floorId, { x, y });
         }
@@ -54,7 +53,7 @@ export default class Marker {
                 type: 'Point',
                 coordinates: [coordinate.x, coordinate.y],
             },
-            properties: {},
+            properties: this._layer._layout.properties
         }]);
         this._mapView.updateLayer(this._layer);
     }

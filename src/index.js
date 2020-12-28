@@ -126,7 +126,9 @@ export default ({
         iconSize: 0.1,
         x,
         y,
-        text: item.text,
+        properties: {
+          name: item.text
+        } 
       }, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));

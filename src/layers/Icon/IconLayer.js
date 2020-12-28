@@ -251,13 +251,14 @@ export default class IconLayer extends AbstractLayer {
       margin: 0,
       iconAnchor: 'center',
       iconSize: 1,
-      iconOffset: [0, 0],
+      iconOffset: [0, 6],
       iconZHeight: 0,
-      textColor: '#666666',
+      textColor: '#111111',
       textAnchor: 'center',
-      textSize: 16,
+      textSize: 12,
       textOffset: [0, 0],
       textZHeight: 0,
+      textField: 'name'
     }
   }
   static get TEXTURE_PARAMS() {
