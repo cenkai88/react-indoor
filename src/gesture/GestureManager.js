@@ -12,6 +12,9 @@ import DragRotate from './DragRotate';
 import ScrollZoom from './ScrollZoom';
 import TouchZoomRotate from './TouchZoomRotate';
 import MapEvent from './MapEvent';
+import RoomLayer from '../layers/Room/RoomLayer';
+
+import { polygonsContain } from '../utils/common';
 
 export default class GestureManager {
   constructor(mapView) {
@@ -34,6 +37,8 @@ export default class GestureManager {
     this._dom.addEventListener('touchend', this._onTouchend.bind(this));
     this._dom.addEventListener('contextmenu', this._onContextmenu.bind(this));
     this._dom.addEventListener('wheel', this._onWheel.bind(this));
+    this._dom.addEventListener('dragover', e => e.preventDefault());
+    this._dom.addEventListener('drop', this._onDrop.bind(this));
   }
   _onWheel(e) {
     GestureManager.stopOriginEvent(e);
@@ -45,6 +50,15 @@ export default class GestureManager {
   _onClick(e) {
     GestureManager.stopOriginEvent(e);
     this._fireClick(e);
+  }
+  _onDrop(e) {
+    GestureManager.stopOriginEvent(e);
+    const renderer = this._mapView.getRenderer();
+    if (!renderer) return
+    const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
+    const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
+    const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
+    console.log(rooms[0].properties.name);
   }
   _fireClick(e) {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);
