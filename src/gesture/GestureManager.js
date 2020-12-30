@@ -58,7 +58,14 @@ export default class GestureManager {
     const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
     const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
     const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
-    console.log(rooms[0].properties.name);
+    let room;
+    if (rooms.length > 0) {
+      room = rooms[0];
+    }
+    this._mapView.fire('drop', {
+      point,
+      room
+    });
   }
   _fireClick(e) {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);

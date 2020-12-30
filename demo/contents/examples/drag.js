@@ -55,6 +55,7 @@ export default () => {
       <div className="content-item-description">
         Load the floor data, and set the initial zoom, zotate, pitch value.
       </div>
+      <p draggable="true">拖动我!</p>
       <div className="content-item-map">
         <div className="content-item-map-row">
           <div className="content-item-map-component">

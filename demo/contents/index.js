@@ -7,6 +7,7 @@ import ExampleHeatmap from './examples/heatmap';
 import ExampleChangeFloor from './examples/changeFloor';
 import ExampleMarker from './examples/marker';
 import ExampleLine from './examples/line';
+import ExampleDrag from './examples/drag';
 
 import './index.scss'
 
@@ -19,6 +20,7 @@ const CONTENT_MAPPING = {
     <ExampleChangeFloor />,
     <ExampleMarker />,
     <ExampleLine />,
+    <ExampleDrag />,
   ],
 };
 

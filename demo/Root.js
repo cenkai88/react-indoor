@@ -27,6 +27,9 @@ const MENU_DATA = {
     {
       name: 'Map with Line',
     },
+    {
+      name: 'Drag Event of Map',
+    },
   ],
 }
 

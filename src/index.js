@@ -128,7 +128,7 @@ export default ({
         y,
         properties: {
           name: item.text
-        } 
+        }
       }, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));
@@ -177,6 +177,7 @@ export default ({
       if (heatmapData) updateHeatmap(heatmapData)
       if (markerData) updateMarkers(markerData)
       if (lineData) updateLine(lineData)
+      mapIns.on('drop', e => console.log(e));
     }
   }, [domReady]);
 
