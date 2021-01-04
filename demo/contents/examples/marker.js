@@ -26,16 +26,16 @@ options={{
 
 const jsStr = `defaultStyle.roomIcon.visible = false;
 const markerData = [
-  { x: 0.1, y: 0.1, iconUrl: '/icons/A.png', properties: {name: 'testA'} },
-  { x: 0.7, y: 0.7, iconUrl: '/icons/C.png', textOffset: [0, -16], properties: {name: 'testB'} },
+  { x: 0.1, y: 0.1, iconUrl: 'https://static.yingxuys.com/icons/A.png', properties: {name: 'testA'} },
+  { x: 0.7, y: 0.7, iconUrl: 'https://static.yingxuys.com/icons/C.png', textOffset: [0, -16], properties: {name: 'testB'} },
 ];`
 
 export default () => {
   const defaultStyle = JSON.parse(JSON.stringify(styleData));
   defaultStyle.roomIcon.visible = false;
   const markerData = [
-    { x: 0.1, y: 0.1, iconUrl: '/icons/A.png', iconSize: 0.1, properties: { name: 'testA' } },
-    { x: 0.7, y: 0.7, iconUrl: '/icons/C.png', iconSize: 0.1, textOffset: [0, -16], properties: { name: 'testB' } },
+    { x: 0.1, y: 0.1, iconUrl: 'https://static.yingxuys.com/icons/A.png', iconSize: 0.1, properties: { name: 'testA' } },
+    { x: 0.7, y: 0.7, iconUrl: 'https://static.yingxuys.com/icons/C.png', iconSize: 0.1, textOffset: [0, -16], properties: { name: 'testB' } },
   ];
   return <div className="content-body">
     <div className="content-body-title" >

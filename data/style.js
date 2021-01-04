@@ -50,7 +50,7 @@ export default {
           17,
           22
         ],
-        "iconUrl": "/icons/office.png"
+        "iconUrl": "https://static.yingxuys.com/icons/office.png"
       },
       "d8d8e1": {
         "weight": 15,
@@ -58,7 +58,7 @@ export default {
           17,
           22
         ],
-        "iconUrl": "/icons/door.png"
+        "iconUrl": "https://static.yingxuys.com/icons/door.png"
       }
     }
   },

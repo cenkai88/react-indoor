@@ -50,7 +50,7 @@ export default () => {
   const [markerData, setMarkerData] = useState([]);
   const formatDropText = e => `x: ${e.point.x}, y: ${e.point.y}, room name: ${get(e, 'room.properties.name')},  room id: ${get(e, 'room.properties.id')}, `
   const placeDot = e => {
-    setMarkerData([{ x: e.point.x, y: e.point.y, iconUrl: '/icons/C.png', textOffset: [0, -16], iconSize: 0.1, properties: { name: 'testIcon' } }])
+    setMarkerData([{ x: e.point.x, y: e.point.y, iconUrl: 'https://static.yingxuys.com/icons/C.png', textOffset: [0, -16], iconSize: 0.1, properties: { name: 'testIcon' } }])
   }
 
   return <div className="content-body">
@@ -65,7 +65,7 @@ export default () => {
         Try to drag the dot into map
       </div>
       <div>
-        <img className="dragImage" draggable="true" src="/icons/A.png" />
+        <img className="dragImage" draggable="true" src="https://static.yingxuys.com/icons/A.png" />
         <p style={{ fontSize: 13, marginLeft: 8 }}>{text}</p>
       </div>
       <div className="content-item-map">
@@ -105,7 +105,7 @@ export default () => {
         Try to drag the dot into map
       </div>
       <p>
-        <img className="dragImage" draggable="true" src="/icons/C.png" />
+        <img className="dragImage" draggable="true" src="https://static.yingxuys.com/icons/C.png" />
         testIcon
       </p>
       <div className="content-item-map">
