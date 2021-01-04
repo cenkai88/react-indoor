@@ -34,6 +34,7 @@ export default ({
   styleData = defaultstyleData,
   options,
   onInit,
+  onDrop
 }) => {
 
   const container = useRef();
@@ -177,7 +178,7 @@ export default ({
       if (heatmapData) updateHeatmap(heatmapData)
       if (markerData) updateMarkers(markerData)
       if (lineData) updateLine(lineData)
-      mapIns.on('drop', e => console.log(e));
+      if (typeof onDrop === 'function') mapIns.on('drop', e => onDrop(e));
     }
   }, [domReady]);
 

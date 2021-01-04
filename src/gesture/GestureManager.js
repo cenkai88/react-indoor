@@ -4,7 +4,7 @@ GestureManager 用于管理用户的交互行为，封装为MapEvent发出
 
 */
 
-import { getFit } from '../utils/common';
+import { convertWorldToPercent, getFit } from '../utils/common';
 import Transitor from '../transition/Transitor';
 import Point from '../geometry/Point';
 import DragPan from './DragPan';
@@ -56,14 +56,20 @@ export default class GestureManager {
     const renderer = this._mapView.getRenderer();
     if (!renderer) return
     const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
+
+    const { bbox } = this._mapView.getFloorData().frame.features[0];
+    const deltaX = bbox[1][0] - bbox[0][0];
+    const deltaY = bbox[1][1] - bbox[0][1];
+
     const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
     const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
     let room;
     if (rooms.length > 0) {
       room = rooms[0];
     }
+    const [ x, y ] = convertWorldToPercent(point, bbox, deltaX, deltaY);
     this._mapView.fire('drop', {
-      point,
+      point: { x, y },
       room
     });
   }

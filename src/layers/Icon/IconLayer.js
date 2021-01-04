@@ -251,12 +251,12 @@ export default class IconLayer extends AbstractLayer {
       margin: 0,
       iconAnchor: 'center',
       iconSize: 1,
-      iconOffset: [0, 6],
+      iconOffset: [0, 0],
       iconZHeight: 0,
       textColor: '#111111',
       textAnchor: 'center',
       textSize: 12,
-      textOffset: [0, 0],
+      textOffset: [0, -8],
       textZHeight: 0,
       textField: 'name'
     }

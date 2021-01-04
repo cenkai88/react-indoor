@@ -287,6 +287,11 @@ export function containedInContour(contour, pointList) {
 export function convertPercentToWorld({ x, y }, bounds, deltaX, deltaY) {
   return [bounds[0][0] + x * deltaX, bounds[1][1] - y * deltaY];
 }
+
+export function convertWorldToPercent({ x, y }, bounds, deltaX, deltaY) {
+  return [(x - bounds[0][0]) / deltaX, (bounds[1][1] - y) / deltaY];
+}
+
 export class GlobalIdGenerator {
   static getId(prefix = 'react-indoor') {
     GlobalIdGenerator.id += 1;

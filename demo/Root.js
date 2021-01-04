@@ -37,7 +37,7 @@ const MENU_DATA = {
 export default () => {
 
   const [app, setApp] = useState('EXAMPLE');
-  const [activeMenuIdx, setActiveMenuIdx] = useState(1);
+  const [activeMenuIdx, setActiveMenuIdx] = useState(7);
 
   return <>
     <Header app={app} onSetApp={setApp}></Header>

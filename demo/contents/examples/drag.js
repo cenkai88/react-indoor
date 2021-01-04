@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { get } from 'dot-prop';
 
 import floorData from '../../../data/floor';
 import styleData from '../../../data/style';
@@ -9,6 +10,7 @@ import ReactIndoor from '../../../src/index.js';
 const codeStr = `<ReactIndoor
   floorData={floorFrame}
   floorId="RJ00201010001"
+  onDrop={e => setText(formatDropText(e))}
   options={{
     maxZoom: 23,
     minZoom: 16,
@@ -22,11 +24,11 @@ const codeStr = `<ReactIndoor
   }}
 />`;
 
-
-const codeStrWithStyle = `<ReactIndoor
+const codeDotStr = `<ReactIndoor
   floorData={floorFrame}
   floorId="RJ00201010001"
-  styleData={defaultStyle}
+  markerData={markerData}
+  onDrop={e => setText(formatDropText(e))}
   options={{
     maxZoom: 23,
     minZoom: 16,
@@ -44,24 +46,35 @@ export default () => {
   const defaultStyle = JSON.parse(JSON.stringify(styleData));
   defaultStyle.roomIcon.visible = false;
 
+  const [text, setText] = useState('');
+  const [markerData, setMarkerData] = useState([]);
+  const formatDropText = e => `x: ${e.point.x}, y: ${e.point.y}, room name: ${get(e, 'room.properties.name')},  room id: ${get(e, 'room.properties.id')}, `
+  const placeDot = e => {
+    setMarkerData([{ x: e.point.x, y: e.point.y, iconUrl: '/icons/C.png', text: 'testIcon', iconOffset: [0,20] }])
+  }
+
   return <div className="content-body">
     <div className="content-body-title" >
-      Basic Map with Room
+      Map with drop event
     </div>
     <div className="content-item">
       <div className="content-item-title">
-        Indoor map with just Frame and Room layer
+        Catch the drop event
       </div>
       <div className="content-item-description">
-        Load the floor data, and set the initial zoom, zotate, pitch value.
+        Try to drag the dot into map
       </div>
-      <p draggable="true">拖动我!</p>
+      <p>
+        <img className="dragImage" draggable="true" src="/icons/A.png" />
+        <div style={{ fontSize: 13, marginLeft: 8 }}>{text}</div>
+      </p>
       <div className="content-item-map">
         <div className="content-item-map-row">
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
               floorId="RJ00201010001"
+              onDrop={e => setText(formatDropText(e))}
               options={{
                 maxZoom: 23,
                 minZoom: 16,
@@ -83,25 +96,26 @@ export default () => {
         </div>
       </div>
     </div>
+
     <div className="content-item">
       <div className="content-item-title">
-        Hide room icon for room layer
+        Place the dot into map
       </div>
       <div className="content-item-description">
-        Set visible as false in style data to hide room icon
+        Try to drag the dot into map
       </div>
+      <p>
+        <img className="dragImage" draggable="true" src="/icons/C.png" />
+        testIcon
+      </p>
       <div className="content-item-map">
-        <div className="content-item-map-js">
-          <SyntaxHighlighter language="javascript" showLineNumbers>
-            defaultStyle.roomIcon.visible = false;
-          </SyntaxHighlighter>
-        </div>
         <div className="content-item-map-row">
           <div className="content-item-map-component">
             <ReactIndoor
               floorData={floorData}
               floorId="RJ00201010001"
-              styleData={defaultStyle}
+              markerData={markerData}
+              onDrop={e => placeDot(e)}
               options={{
                 maxZoom: 23,
                 minZoom: 16,
@@ -117,7 +131,7 @@ export default () => {
           </div>
           <div className="content-item-map-code">
             <SyntaxHighlighter language="jsx" showLineNumbers>
-              {codeStrWithStyle}
+              {codeDotStr}
             </SyntaxHighlighter>
           </div>
         </div>
