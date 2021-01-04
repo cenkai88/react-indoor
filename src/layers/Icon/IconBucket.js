@@ -69,7 +69,7 @@ export default class IconBucket extends AbstractBucket {
     }
     _calcImage(point, item, base, opacity) {
         if (!item.iconSize) return;
-        const iconUrl = getStyle(this._layout, 'iconImage', item.properties);
+        const iconUrl = getStyle(this._layout, 'iconUrl', item.properties);
         const anchor = getStyle(this._layout, 'iconAnchor', item.properties);
         const offset = getStyle(this._layout, 'iconOffset', item.properties);
         const iconSize = getStyle(this._layout, 'iconSize', item.properties);

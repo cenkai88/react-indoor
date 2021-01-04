@@ -206,7 +206,7 @@ export default class IconLayer extends AbstractLayer {
     if (!this._renderer) return;
     const glyphMng = this._renderer.getGlyphMng();
     const textureMng = this._renderer.getTextureMng();
-    const iconUrl = getStyle(this._layout, 'iconImage', feature.properties);
+    const iconUrl = getStyle(this._layout, 'iconUrl', feature.properties);
     let tempTexture;
     if (iconUrl) {
       tempTexture = textureMng.getTexture(iconUrl, IconLayer.TEXTURE_PARAMS);
@@ -256,7 +256,7 @@ export default class IconLayer extends AbstractLayer {
       textColor: '#111111',
       textAnchor: 'center',
       textSize: 12,
-      textOffset: [0, -8],
+      textOffset: [0, 0],
       textZHeight: 0,
       textField: 'name'
     }

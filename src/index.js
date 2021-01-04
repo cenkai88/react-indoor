@@ -121,16 +121,7 @@ export default ({
 
     const markers = data.map(item => {
       const [x, y] = convertPercentToWorld(item, bbox, deltaX, deltaY);
-      return new Marker({
-        iconImage: item.iconUrl,
-        iconAnchor: 'bottom',
-        iconSize: 0.1,
-        x,
-        y,
-        properties: {
-          name: item.text
-        }
-      }, mapIns.getFloorData().id)
+      return new Marker({...item, x, y}, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));
     setMarkersOverlay(markers);

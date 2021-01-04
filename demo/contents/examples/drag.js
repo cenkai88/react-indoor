@@ -50,7 +50,7 @@ export default () => {
   const [markerData, setMarkerData] = useState([]);
   const formatDropText = e => `x: ${e.point.x}, y: ${e.point.y}, room name: ${get(e, 'room.properties.name')},  room id: ${get(e, 'room.properties.id')}, `
   const placeDot = e => {
-    setMarkerData([{ x: e.point.x, y: e.point.y, iconUrl: '/icons/C.png', text: 'testIcon', iconOffset: [0,20] }])
+    setMarkerData([{ x: e.point.x, y: e.point.y, iconUrl: '/icons/C.png', textOffset: [0, -16], iconSize: 0.1, properties: { name: 'testIcon' } }])
   }
 
   return <div className="content-body">
@@ -64,10 +64,10 @@ export default () => {
       <div className="content-item-description">
         Try to drag the dot into map
       </div>
-      <p>
+      <div>
         <img className="dragImage" draggable="true" src="/icons/A.png" />
-        <div style={{ fontSize: 13, marginLeft: 8 }}>{text}</div>
-      </p>
+        <p style={{ fontSize: 13, marginLeft: 8 }}>{text}</p>
+      </div>
       <div className="content-item-map">
         <div className="content-item-map-row">
           <div className="content-item-map-component">

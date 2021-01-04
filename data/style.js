@@ -50,7 +50,7 @@ export default {
           17,
           22
         ],
-        "iconImage": "/icons/office.png"
+        "iconUrl": "/icons/office.png"
       },
       "d8d8e1": {
         "weight": 15,
@@ -58,7 +58,7 @@ export default {
           17,
           22
         ],
-        "iconImage": "/icons/door.png"
+        "iconUrl": "/icons/door.png"
       }
     }
   },
