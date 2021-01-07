@@ -34,7 +34,7 @@ export default ({
   styleData = defaultstyleData,
   options,
   onInit,
-  onDrop
+  onDrop,
 }) => {
 
   const container = useRef();

@@ -1,11 +1,12 @@
 {
-  "name": "react-indoor",
+  "name": "@ingsh/react-indoor",
   "version": "0.0.1",
   "description": "a react component for indoor map rendering",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config ./webpack.dev.js",
+    "buildDemo": "cross-env webpack --config ./webpack.prod.demo.js",
     "build": "cross-env webpack --config ./webpack.prod.js"
   },
   "keywords": [

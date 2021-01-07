@@ -1,0 +1,13 @@
+{
+  "name": "@ingsh/react-indoor",
+  "version": "0.0.1",
+  "description": "a react component for indoor map rendering",
+  "main": "index.js",
+  "keywords": [
+    "react",
+    "indoor",
+    "indoormap",
+    "webgl"
+  ],
+  "author": ""
+}
