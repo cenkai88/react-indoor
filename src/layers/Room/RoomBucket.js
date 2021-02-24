@@ -10,6 +10,8 @@ export default class RoomBucket extends AbstractBucket {
     constructor(data) {
         super(data);
         this._geometryMap = {};
+        this._enableRoomHover = data.enableRoomHover;
+        this._hoveredRoomId = data.hoveredRoomId;
     }
     init() {
         for (let i = 0; i < this._features.length; i += 1) {
@@ -50,6 +52,8 @@ export default class RoomBucket extends AbstractBucket {
         }
     }
     _calcPolygon(polygon, properties) {
+        // set hovered room styleValue as "HOVERED"
+        if (this._enableRoomHover && properties.id === this._hoveredRoomId) properties[this._layout.styleKey] = "HOVERED";
         const offset = this._offset;
         const vertices = [];
         const sideVertices = [];
@@ -132,7 +136,7 @@ export default class RoomBucket extends AbstractBucket {
         const arr = [];
         for (let i = 0; i < RoomBucket.GEOMETRY_KEYS.length; i += 1) {
             const style = getStyle(this._layout, RoomBucket.GEOMETRY_KEYS[i], properties);
-            style !== undefined && arr.push(style);
+            if (style !== undefined) arr.push(style);
         }
         return arr.join('-');
     }

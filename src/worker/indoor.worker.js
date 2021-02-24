@@ -20,8 +20,8 @@ onmessage = function (t) {
         } else {
             collision = new Collision(params);
         }
-        const i = { type: "collisionResult", id, taskId, ...collision.calculate(list), isForce };
-        postMessage(i);
+        const result = { type: "collisionResult", id, taskId, ...collision.calculate(list), isForce };
+        postMessage(result);
     } else {
         const result = (new BucketFactor).calculate(data);
         if (result) postMessage(result)

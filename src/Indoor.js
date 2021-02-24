@@ -17,6 +17,7 @@ const defaultOptions = {
   zoom: 19,
   minZoom: 10,
   maxZoom: 30,
+  enableRoomHover: false
 };
 
 export default class Indoor extends MapView {

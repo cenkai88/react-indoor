@@ -3,11 +3,12 @@ import RoomBuffer from "./RoomBuffer";
 import { polygonsContain } from "../../utils/common";
 
 export default class RoomLayer extends AbstractLayer {
-    constructor(style) {
+    constructor(style, enableRoomHover) {
         super('Room', {
             ...RoomLayer.DEFAULT_STYLE,
             ...style,
         });
+        this._enableRoomHover = enableRoomHover;
         this._geometryRenderList = [];
     }
     clear() {
@@ -49,6 +50,8 @@ export default class RoomLayer extends AbstractLayer {
         const workerPool = this._renderer.getWorkerPool();
         workerPool.addTask({
             type: 'room',
+            enableRoomHover: this._enableRoomHover,
+            hoveredRoomId: this._renderer.getHoveredRoomId(),
             layout: this._layout,
             offset: this._renderer.getOffset(),
             features: this._features,

@@ -30,7 +30,7 @@ export default class Renderer extends Base {
     textureCanvas,
   }, options) {
     super();
-    this._mapId=mapId;
+    this._mapId = mapId;
     this._layers = [];
     this._lightPos = [1, -1, 1];
     this._ambientColor = [0.8, 0.8, 0.8];
@@ -294,7 +294,7 @@ export default class Renderer extends Base {
       this._gl.uniform1i(u_drawLine, 1);
       buffer.bindIndices('outline');
       this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0);
-      this._gl.uniform4fv(u_color, fillColor);
+      this._gl.uniform4fv(u_color, this._hoveredRoomId === '0' ? '#111' : fillColor);
       this._gl.uniform1i(u_drawLine, 0);
       buffer.bindIndices('fill');
       this._gl.drawElements(this._gl.TRIANGLES, buffer.fillIndicesNum, this._gl.UNSIGNED_SHORT, 0);
@@ -508,5 +508,11 @@ export default class Renderer extends Base {
     const u_viewMatrix = program.getUniformLocation('u_viewMatrix');
     this._gl.uniformMatrix4fv(u_projectionMatrix, false, this._camera.projectionMatrix);
     this._gl.uniformMatrix4fv(u_viewMatrix, false, this._camera.viewMatrix);
+  }
+  setHoveredRoomId(id) {
+    this._hoveredRoomId = id;
+  }
+  getHoveredRoomId() {
+    return this._hoveredRoomId
   }
 }
