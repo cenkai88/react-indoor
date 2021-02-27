@@ -34,7 +34,8 @@ export default ({
   styleData = defaultstyleData,
   options,
   onInit,
-  onDrop
+  onDrop,
+  onClick
 }) => {
 
   const container = useRef();
@@ -170,6 +171,7 @@ export default ({
       if (markerData) updateMarkers(markerData)
       if (lineData) updateLine(lineData)
       if (typeof onDrop === 'function') mapIns.on('drop', e => onDrop(e));
+      if (typeof onClick === 'function') mapIns.on('click', e => onClick(e));
     }
   }, [domReady]);
 

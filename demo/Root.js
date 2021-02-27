@@ -33,6 +33,9 @@ const MENU_DATA = {
     {
       name: 'Hover Room',
     },
+    {
+      name: 'Room Maintainance',
+    },
   ],
 }
 

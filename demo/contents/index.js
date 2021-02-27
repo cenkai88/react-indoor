@@ -9,6 +9,7 @@ import ExampleMarker from './examples/marker';
 import ExampleLine from './examples/line';
 import ExampleDrag from './examples/drag';
 import ExampleHover from './examples/hover';
+import ExampleMaintaince from './examples/click';
 
 
 import './index.scss'
@@ -23,7 +24,8 @@ const CONTENT_MAPPING = {
     <ExampleMarker />,
     <ExampleLine />,
     <ExampleDrag />,
-    <ExampleHover />
+    <ExampleHover />,
+    <ExampleMaintaince />
   ],
 };
 

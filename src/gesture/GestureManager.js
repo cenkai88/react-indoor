@@ -78,7 +78,15 @@ export default class GestureManager {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);
     if (this._startPos && pos.distanceTo(this._startPos) < 1) {
       const renderer = this._mapView.getRenderer();
-      const event = new MapEvent(e, this._mapView);
+      const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
+      const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
+      const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
+      let room;
+      if (rooms.length > 0) {
+        room = rooms[0];
+      }
+      const event = new MapEvent(e, { ...this._mapView });
+      event._room = room;
       if (renderer) renderer.fire('click', event);
       if (!event.isCancel()) this._mapView.fire('click', event);
     }
