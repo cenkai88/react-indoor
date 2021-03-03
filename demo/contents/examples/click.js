@@ -11,20 +11,21 @@ const onClick = ({ _room }) => {
 }`;
 
 const codeStr = `<ReactIndoor
-  floorData={floorData}
-  floorId="RJ00201010001"
-  lineData={lineData}
-  options={{
-    maxZoom: 23,
-    minZoom: 16,
-    zoom: 17,
-    rotate: 0,
-    pitch: 60,
-    center: {
-      x: 1250.8271713616455,
-      y: 117.50345301174428,
-    },
-  }}
+floorData={floorData}
+floorId="RJ00201010001"
+onClick={onClick}
+options={{
+  enableRoomHover: true,
+  maxZoom: 23,
+  minZoom: 16,
+  zoom: 17,
+  rotate: 0,
+  pitch: 60,
+  center: {
+    x: 1250.8271713616455,
+    y: 117.50345301174428,
+  },
+}}
 />`;
 
 export default () => {
