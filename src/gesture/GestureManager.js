@@ -3,6 +3,7 @@
 GestureManager 用于管理用户的交互行为，封装为MapEvent发出
 
 */
+import { get } from 'dot-prop';
 
 import { convertWorldToPercent, getFit } from '../utils/common';
 import Transitor from '../transition/Transitor';
@@ -67,7 +68,7 @@ export default class GestureManager {
     if (rooms.length > 0) {
       room = rooms[0];
     }
-    const [ x, y ] = convertWorldToPercent(point, bbox, deltaX, deltaY);
+    const [x, y] = convertWorldToPercent(point, bbox, deltaX, deltaY);
     this._mapView.fire('drop', {
       point: { x, y },
       room
@@ -77,7 +78,15 @@ export default class GestureManager {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);
     if (this._startPos && pos.distanceTo(this._startPos) < 1) {
       const renderer = this._mapView.getRenderer();
-      const event = new MapEvent(e, this._mapView);
+      const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
+      const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
+      const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
+      let room;
+      if (rooms.length > 0) {
+        room = rooms[0];
+      }
+      const event = new MapEvent(e, { ...this._mapView });
+      event._room = room;
       if (renderer) renderer.fire('click', event);
       if (!event.isCancel()) this._mapView.fire('click', event);
     }
@@ -120,7 +129,19 @@ export default class GestureManager {
       this._mapView.fire('gestureEnd');
       delete this._transitor;
     }).start();
-  };
+  }
+  _hoverRoomHandler(point) {
+    const renderer = this._mapView.getRenderer();
+    const camera = renderer.getCamera();
+    const worldCoordinate = camera.screenToWorldCoordinate(point.x, point.y);
+    const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
+    const room = polygonsContain(layer.getLayout(), this._mapView._currentFloorData.room.features, worldCoordinate);
+    const roomId = get(room, '0.properties.id');
+    if (renderer.getHoveredRoomId() !== roomId) {
+      renderer.setHoveredRoomId(roomId);
+      layer.resetLayout();
+    }
+  }
   _fireEvent(params, suffix) {
     const { rotate, pitch, zoom } = params;
     this._mapView.fire("move" + suffix);
@@ -144,7 +165,10 @@ export default class GestureManager {
     this._dragRotate.onMousemove(e);
     const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    renderer && renderer.fire('mousemove', event);
+    if (renderer) {
+      this._hoverRoomHandler({ x: e.offsetX, y: e.offsetY });
+      renderer.fire('mousemove', event);
+    }
     !event.isCancel() && this._mapView.fire('mousemove', event);
   }
   _onMouseup(e) {

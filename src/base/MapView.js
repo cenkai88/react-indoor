@@ -136,7 +136,7 @@ export default class MapView extends Base {
     }
     if (roomFeatures.length !== 0) {
       step(roomFeatures, MAX_ROOM_PER_RENDER, item => {
-        const layer = new RoomLayer(roomStyle);
+        const layer = new RoomLayer(roomStyle, this._options.enableRoomHover);
         layer.setFeatures(item).setName('room').setFloorId(floorId);
         this._layers.push(layer);
       });

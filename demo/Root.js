@@ -30,6 +30,12 @@ const MENU_DATA = {
     {
       name: 'Drag Event of Map',
     },
+    {
+      name: 'Hover Room',
+    },
+    {
+      name: 'Room Maintainance',
+    },
   ],
 }
 

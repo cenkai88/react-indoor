@@ -39,7 +39,7 @@ export default class WebWorkerPool {
     } else if (data.sync) {
       // sync为true且没有空闲线程，用主线程跑
       const result = this._factor.calculate(data);
-      if (result) this._onMessage(result);
+      if (result) this._onWorkerMessage(result);
     } else {
       // 加入待处理中
       const index = this._taskDataList.findIndex(item => item.id === data.id);

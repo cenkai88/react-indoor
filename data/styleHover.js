@@ -13,6 +13,11 @@ export default {
     "outlineColor": "#111111",
     "styleKey": "iconId",
     "styleMap": {
+      "HOVERED": {
+        "height": 2,
+        "fillColor": "#ff0000",
+        "outlineColor": "#111111"
+      },
       "d8d8e0": {
         "height": 1,
         "fillColor": "#ffbf80"
