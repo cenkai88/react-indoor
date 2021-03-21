@@ -11,7 +11,7 @@ export default {
     "height": 1,
     "fillColor": "#ffffff",
     "outlineColor": "#111111",
-    "styleKey": "iconId",
+    "styleKey": "colorId",
     "styleMap": {
       "d8d8e0": {
         "height": 1,
@@ -42,9 +42,9 @@ export default {
       20
     ],
     "iconSize": 0.13,
-    "styleKey": "iconId",
+    "styleKey": "icon",
     "styleMap": {
-      "d8d8e0": {
+      "office": {
         "weight": 15,
         "zoomRange": [
           17,
@@ -52,7 +52,7 @@ export default {
         ],
         "iconUrl": "https://static.yingxuys.com/icons/office.png"
       },
-      "d8d8e1": {
+      "door": {
         "weight": 15,
         "zoomRange": [
           17,

@@ -137,7 +137,9 @@ export default class GestureManager {
     const worldCoordinate = camera.screenToWorldCoordinate(point.x, point.y);
     // Check Marker
     const markerLayer = renderer.getLayers().filter(layer => layer instanceof IconLayer && layer._layout.subType === 'Marker');
-    const hoveredMarker = markerLayer.find(item => {
+    let markerIndex;
+    const hoveredMarker = markerLayer.find((item, index) => {
+      if (item._dataItemList.length === 0) return
       const centerInScreen = camera.worldToScreenCoordinate(...item._dataItemList[0].geometry.coordinates);
       const iconSizeRadius = item._dataItemList[0].iconSize.map(jtem => jtem * item._layout.iconSize / 2);
       const coordinates = [[
@@ -146,12 +148,14 @@ export default class GestureManager {
         [centerInScreen.x - iconSizeRadius[0], centerInScreen.y - iconSizeRadius[1]],
         [centerInScreen.x - iconSizeRadius[0], centerInScreen.y + iconSizeRadius[1]],
       ]];
-      return contain(coordinates, [point.x, point.y]);
+      const res = contain(coordinates, [point.x, point.y]);
+      if (res) markerIndex = index;
+      return res
     });
     if (hoveredMarker) {
       const centerInScreen = camera.worldToScreenCoordinate(...hoveredMarker._dataItemList[0].geometry.coordinates);
       if (renderer.getHoveredMarkerId() !== hoveredMarker.id) {
-        this._mapView.fire("enterMarker", { id: hoveredMarker.id, point: centerInScreen });
+        this._mapView.fire("enterMarker", { id: hoveredMarker.id, point: centerInScreen, index: markerIndex });
         renderer.setHoveredMarkerId(hoveredMarker.id);
         renderer.setHoveredRoomId();
       }
