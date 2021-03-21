@@ -1,16 +1,17 @@
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const cleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     main: './index.js',
   },
-  devServer: {
-    publicPath: '/',
-    compress: true,
-    // contentBase: path.join(__dirname, 'src'),
-    port: 9002,
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: './static/[name]_[contentHash:10].js',
+    publicPath: '/react-indoor/',
   },
   module: {
     rules: [
@@ -24,7 +25,7 @@ module.exports = {
         loader: 'worker-loader',
         options: {
           inline: 'no-fallback',
-        }
+        },
       },
       {
         test: /\.css$/,
@@ -58,6 +59,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new cleanWebpackPlugin(['dist'], { root: __dirname, verbose: true }),
     new HtmlWebpackPlugin({
       template: './public/index.ejs',
       filename: 'index.html',

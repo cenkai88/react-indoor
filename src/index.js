@@ -145,7 +145,7 @@ export default ({
     setMapIns(map);
     setDomReady(true);
     return () => {
-      map.destroy();
+      if (map) map.destroy();
     }
   }, []);
 
