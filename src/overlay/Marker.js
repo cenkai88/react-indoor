@@ -140,7 +140,7 @@ export default class Marker {
         delete this._dragEvent;
     }
     static getLayoutFromOptions(options) {
-        const layout = { ...options };
+        const layout = { ...options, subType: 'Marker' };
         delete layout.draggable;
         return layout;
     }

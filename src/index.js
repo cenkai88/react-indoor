@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect'
 import Indoor from './Indoor';
 
 import defaultstyleData from '../data/style';
@@ -27,15 +28,17 @@ const defaultOption = {
 
 export default ({
   floorId,
-  floorData,
-  heatmapData,
-  lineData,
-  markerData,
+  floorData = [],
+  heatmapData = [],
+  lineData =[],
+  markerData = [],
   styleData = defaultstyleData,
   options,
   onInit,
   onDrop,
-  onClick
+  onClick,
+  onEnterMarker,
+  onLeaveMarker,
 }) => {
 
   const container = useRef();
@@ -122,7 +125,7 @@ export default ({
 
     const markers = data.map(item => {
       const [x, y] = convertPercentToWorld(item, bbox, deltaX, deltaY);
-      return new Marker({...item, x, y}, mapIns.getFloorData().id)
+      return new Marker({ ...item, x, y }, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));
     setMarkersOverlay(markers);
@@ -150,16 +153,16 @@ export default ({
     if (mapIns) mapIns.setCurrentFloorId(floorId);
   }, [floorId]);
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     if (mapIns) mapIns.destroy();
     if (domReady) mapIns.init({ floorData, floorId });
   }, [floorData]);
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     if (mapIns && domReady) updateHeatmap(heatmapData);
   }, [heatmapData]);
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     if (mapIns && domReady) updateMarkers(markerData);
   }, [markerData]);
 
@@ -172,6 +175,8 @@ export default ({
       if (lineData) updateLine(lineData)
       if (typeof onDrop === 'function') mapIns.on('drop', e => onDrop(e));
       if (typeof onClick === 'function') mapIns.on('click', e => onClick(e));
+      if (typeof onEnterMarker === 'function') mapIns.on('enterMarker', e => onEnterMarker(e));
+      if (typeof onLeaveMarker === 'function') mapIns.on('leaveMarker', e => onLeaveMarker(e));
     }
   }, [domReady]);
 

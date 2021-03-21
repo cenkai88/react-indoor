@@ -513,6 +513,12 @@ export default class Renderer extends Base {
     this._hoveredRoomId = id;
   }
   getHoveredRoomId() {
-    return this._hoveredRoomId
+    return this._hoveredRoomId;
+  }
+  setHoveredMarkerId(id) {
+    this._hoveredMarkerId = id;
+  }
+  getHoveredMarkerId() {
+    return this._hoveredMarkerId;
   }
 }

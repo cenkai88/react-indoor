@@ -65,7 +65,7 @@ export default class IconBucket extends AbstractBucket {
             collision.data.push(iconText.collision);
             arr.push(iconText.geometry);
         }
-        this._geometryInfo.push({ data: arr, isCollision: isCollision, collision: collision });
+        this._geometryInfo.push({ data: arr, isCollision, collision });
     }
     _calcImage(point, item, base, opacity) {
         if (!item.iconSize) return;

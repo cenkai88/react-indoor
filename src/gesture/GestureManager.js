@@ -15,7 +15,8 @@ import TouchZoomRotate from './TouchZoomRotate';
 import MapEvent from './MapEvent';
 import RoomLayer from '../layers/Room/RoomLayer';
 
-import { polygonsContain } from '../utils/common';
+import { polygonsContain, contain } from '../utils/common';
+import IconLayer from '../layers/Icon/IconLayer';
 
 export default class GestureManager {
   constructor(mapView) {
@@ -130,16 +131,42 @@ export default class GestureManager {
       delete this._transitor;
     }).start();
   }
-  _hoverRoomHandler(point) {
+  _hoverHandler(point) {
     const renderer = this._mapView.getRenderer();
     const camera = renderer.getCamera();
     const worldCoordinate = camera.screenToWorldCoordinate(point.x, point.y);
-    const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
-    const room = polygonsContain(layer.getLayout(), this._mapView._currentFloorData.room.features, worldCoordinate);
-    const roomId = get(room, '0.properties.id');
-    if (renderer.getHoveredRoomId() !== roomId) {
-      renderer.setHoveredRoomId(roomId);
-      layer.resetLayout();
+    // Check Marker
+    const markerLayer = renderer.getLayers().filter(layer => layer instanceof IconLayer && layer._layout.subType === 'Marker');
+    const hoveredMarker = markerLayer.find(item => {
+      const centerInScreen = camera.worldToScreenCoordinate(...item._dataItemList[0].geometry.coordinates);
+      const iconSizeRadius = item._dataItemList[0].iconSize.map(jtem => jtem * item._layout.iconSize / 2);
+      const coordinates = [[
+        [centerInScreen.x + iconSizeRadius[0], centerInScreen.y + iconSizeRadius[1]],
+        [centerInScreen.x + iconSizeRadius[0], centerInScreen.y - iconSizeRadius[1]],
+        [centerInScreen.x - iconSizeRadius[0], centerInScreen.y - iconSizeRadius[1]],
+        [centerInScreen.x - iconSizeRadius[0], centerInScreen.y + iconSizeRadius[1]],
+      ]];
+      return contain(coordinates, [point.x, point.y]);
+    });
+    if (hoveredMarker) {
+      const centerInScreen = camera.worldToScreenCoordinate(...hoveredMarker._dataItemList[0].geometry.coordinates);
+      if (renderer.getHoveredMarkerId() !== hoveredMarker.id) {
+        this._mapView.fire("enterMarker", { id: hoveredMarker.id, point: centerInScreen });
+        renderer.setHoveredMarkerId(hoveredMarker.id);
+        renderer.setHoveredRoomId();
+      }
+    }
+    // Check Room
+    else {
+      if (renderer.getHoveredMarkerId()) this._mapView.fire("leaveMarker", { id: renderer.getHoveredMarkerId() });
+      renderer.setHoveredMarkerId();
+      const roomLayer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
+      const room = polygonsContain(roomLayer.getLayout(), this._mapView._currentFloorData.room.features, worldCoordinate);
+      const roomId = get(room, '0.properties.id');
+      if (renderer.getHoveredRoomId() !== roomId) {
+        renderer.setHoveredRoomId(roomId);
+        roomLayer.resetLayout();
+      }
     }
   }
   _fireEvent(params, suffix) {
@@ -166,7 +193,7 @@ export default class GestureManager {
     const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
     if (renderer) {
-      this._hoverRoomHandler({ x: e.offsetX, y: e.offsetY });
+      this._hoverHandler({ x: e.offsetX, y: e.offsetY });
       renderer.fire('mousemove', event);
     }
     !event.isCancel() && this._mapView.fire('mousemove', event);
