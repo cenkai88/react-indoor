@@ -127,7 +127,6 @@ export default class MapView extends Base {
     const { label: labelStyle } = this._styleMng.getStyle('frame');
     if (!labelStyle) return;
     const layer = new IconLayer(labelStyle);
-    console.log(layer)
     layer.setFeatures(features).setName('icon').setFloorId(floorId);
     this._layers.push(layer);
   }

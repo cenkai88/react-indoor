@@ -83,7 +83,7 @@ export default class FrameLayer extends AbstractLayer {
                 }))
             }).flat();
         } catch (err) {
-            console.log('Frame remark not in JSON', err)
+            console.warn('Frame remark not in JSON', err)
         }
     }
     static get GEOMETRY_KEYS() {

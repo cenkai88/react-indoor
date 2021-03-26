@@ -1,6 +1,6 @@
 {
   "name": "@ingsh/react-indoor",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "a react component for indoor map rendering",
   "main": "index.js",
   "scripts": {
