@@ -123,7 +123,7 @@ export default class MapView extends Base {
     this._drawFrameLabel(layer.getLabelsProperties(), floorId);
   }
   _drawFrameLabel(features, floorId) {
-    if (!this._styleMng || features.length === 0) return;
+    if (!this._styleMng || features?.length === 0) return;
     const { label: labelStyle } = this._styleMng.getStyle('frame');
     if (!labelStyle) return;
     const layer = new IconLayer(labelStyle);
