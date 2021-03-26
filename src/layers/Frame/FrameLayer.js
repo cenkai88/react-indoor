@@ -63,6 +63,29 @@ export default class FrameLayer extends AbstractLayer {
     getGeometryRenderList() {
         return this._geometryRenderList;
     }
+    getLabelsProperties() {
+        try {
+            return this._features.map(item => {
+                const floorId = item?.properties?.id;
+                if (!item.remark || !floorId) return []
+                const data = JSON.parse(item.remark);
+                return data.map(label => ({
+                    type: "Feature",
+                    properties: {
+                        floorId,
+                        name: label.name,
+                        center: label.point,
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: label.point
+                    }
+                }))
+            }).flat();
+        } catch (err) {
+            console.log('Frame remark not in JSON', err)
+        }
+    }
     static get GEOMETRY_KEYS() {
         return ['fillColor', 'outlineColor', 'base']
     }

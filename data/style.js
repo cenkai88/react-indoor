@@ -4,7 +4,24 @@ export default {
     "height": 0,
     "fillColor": "#eeeeee",
     "outlineColor": "#000",
-    "opacity": 1
+    "opacity": 1,
+    "label": {
+      "visible": true,
+      "alwaysShow": true,
+      "textField": "name",
+      "textSize": 12,
+      "textColor": "#000000",
+      "textAnchor": "center",
+      "weight": 5,
+      "margin": 0,
+      "collision": false,
+      "textZHeight": 10,
+      "zoomRange": [
+        10,
+        null
+      ],
+      "iconSize": 0,
+    },
   },
   "room": {
     "visible": true,

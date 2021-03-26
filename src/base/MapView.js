@@ -114,12 +114,21 @@ export default class MapView extends Base {
     this._hasDrawFloorId.add(id);
   }
   _drawFrame(features, floorId) {
-    // just add the layer into this._layers
     if (!this._styleMng) return;
     const frameStyle = this._styleMng.getStyle('frame');
     if (!frameStyle) return;
     const layer = new FrameLayer(frameStyle);
     layer.setFeatures(features).setFloorId(floorId).setName('frame');
+    this._layers.push(layer);
+    this._drawFrameLabel(layer.getLabelsProperties(), floorId);
+  }
+  _drawFrameLabel(features, floorId) {
+    if (!this._styleMng || features.length === 0) return;
+    const { label: labelStyle } = this._styleMng.getStyle('frame');
+    if (!labelStyle) return;
+    const layer = new IconLayer(labelStyle);
+    console.log(layer)
+    layer.setFeatures(features).setName('icon').setFloorId(floorId);
     this._layers.push(layer);
   }
   _drawRoom(features, floorId) {
@@ -151,7 +160,6 @@ export default class MapView extends Base {
     layer.setFeatures(features).setName('icon').setFloorId(floorId);
     this._layers.push(layer);
   }
-
   _fireEvent(params, suffix) {
     const {
       zoom,

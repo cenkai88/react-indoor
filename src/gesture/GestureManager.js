@@ -165,11 +165,13 @@ export default class GestureManager {
       if (renderer.getHoveredMarkerId()) this._mapView.fire("leaveMarker", { id: renderer.getHoveredMarkerId() });
       renderer.setHoveredMarkerId();
       const roomLayer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
-      const room = polygonsContain(roomLayer.getLayout(), this._mapView._currentFloorData.room.features, worldCoordinate);
-      const roomId = get(room, '0.properties.id');
-      if (renderer.getHoveredRoomId() !== roomId) {
-        renderer.setHoveredRoomId(roomId);
-        roomLayer.resetLayout();
+      if (roomLayer) {
+        const room = polygonsContain(roomLayer.getLayout(), this._mapView._currentFloorData.room.features, worldCoordinate);
+        const roomId = get(room, '0.properties.id');
+        if (renderer.getHoveredRoomId() !== roomId) {
+          renderer.setHoveredRoomId(roomId);
+          roomLayer.resetLayout();
+        }
       }
     }
   }
