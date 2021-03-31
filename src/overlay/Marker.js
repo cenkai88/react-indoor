@@ -78,11 +78,11 @@ export default class Marker {
     addTo(mapView) {
         if (this._mapView) return;
         this._mapView = mapView;
-        this._mapView.addLayer(this._layer);
         const floorId = this._layer.getFloorId();
         if (floorId && this._coordinate) {
             this.setPosition(floorId, this._coordinate);
         }
+        return this._layer._loadPromiseSet;
     }
     remove() {
         if (!this._mapView) return;

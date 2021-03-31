@@ -5,7 +5,7 @@ export default class WebWorkerPool {
     this._mapInsIdSet = new Set([mapInsId]);
     this._workerPool = [];
     this._freeIdxList = [];
-    this._taskMap = new Map();
+    this._taskMap = { [mapInsId]: new Map() };
     this._taskDataList = [];
     this._listenerMap = new Map();
     const concurrency = navigator.hardwareConcurrency || 4;
@@ -24,14 +24,17 @@ export default class WebWorkerPool {
   }
   addMapInsId(id) {
     this._mapInsIdSet.add(id);
+    this._taskMap[id] = new Map();
   }
   addTask(data) {
+    const { mapInsId } = data;
+    if (!mapInsId) return;
     // for collision use mapId as key, layers' are layerId
-    const item = this._taskMap.get(data.id);
+    const item = this._taskMap[mapInsId].get(data.id);
     if (item) {
       item.push(data.taskId);
     } else {
-      this._taskMap.set(data.id, [data.taskId]);
+      this._taskMap[mapInsId].set(data.id, [data.taskId]);
     }
 
     if (this._freeIdxList.length > 0) {
@@ -39,7 +42,10 @@ export default class WebWorkerPool {
     } else if (data.sync) {
       // sync为true且没有空闲线程，用主线程跑
       const result = this._factor.calculate(data);
-      if (result) this._onWorkerMessage(result);
+      if (result) {
+        result.mapInsId = mapInsId;
+        this._onWorkerMessage(result);
+      }
     } else {
       // 加入待处理中
       const index = this._taskDataList.findIndex(item => item.id === data.id);
@@ -51,25 +57,28 @@ export default class WebWorkerPool {
     }
   }
   _onWorkerMessage(data) {
-    const item = this._taskMap.get(data.id);
+    const { mapInsId } = data;
+    if (!mapInsId) return
+    const item = this._taskMap[mapInsId].get(data.id);
     if (!item) return;
     const index = item.indexOf(data.taskId);
     if (index === item.length - 1) {
-      this._taskMap.delete(data.id);
+      this._taskMap[mapInsId].delete(data.id);
     }
     let result = data;
     if (data.result && data.result.type === 'collisionResult') {
       result = data.result
     } else {
+      const updateCollisionKey = `${mapInsId}_isNeedUpdateCollision`;
       if (data.type === 'icon') {
-        this._isNeedUpdateCollision = true;
+        this[updateCollisionKey] = true;
       }
-      data.isRender = this._taskMap.size === 0;
-      if (this._taskMap.size === 0) {
-        if (this._isNeedUpdateCollision) {
+      data.isRender = this._taskMap[mapInsId].size === 0;
+      if (this._taskMap[mapInsId].size === 0) {
+        if (this[updateCollisionKey]) {
           data.isUpdateCollision = true;
         }
-        this._isNeedUpdateCollision = false;
+        this[updateCollisionKey] = false;
       }
     }
     const listenerList = this._listenerMap.get(data.id) || [];
@@ -93,7 +102,7 @@ export default class WebWorkerPool {
   }
   destroy(id) {
     this._mapInsIdSet.delete(id);
-    this._taskMap.delete(id);
+    this._taskMap[id].clear();
     this._listenerMap.delete(id);
     this._taskDataList = this._taskDataList.filter(item => item.id !== id);
     if (this._mapInsIdSet.size === 0) {

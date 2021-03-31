@@ -14,7 +14,7 @@ export default {
       "textAnchor": "center",
       "weight": 5,
       "margin": 0,
-      "collision": false,
+      "collision": true,
       "textZHeight": 10,
       "zoomRange": [
         10,

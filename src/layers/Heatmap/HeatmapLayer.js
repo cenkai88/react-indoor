@@ -49,6 +49,7 @@ export default class HeatmapLayer extends AbstractLayer {
     if (!this._renderer) return;
     const data = {
       id: this.id,
+      mapInsId:  this._renderer.getMapId(),
       features: this._features,
       type: 'heatmap',
       offset: this._renderer.getOffset(),

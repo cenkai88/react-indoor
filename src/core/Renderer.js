@@ -89,6 +89,9 @@ export default class Renderer extends Base {
   getWorkerPool() {
     return this._workerPool;
   }
+  getMapId() {
+    return this._mapId
+  }
   getCollisionMng() {
     return this._collisionMng;
   }

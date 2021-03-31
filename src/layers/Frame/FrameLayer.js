@@ -53,6 +53,7 @@ export default class FrameLayer extends AbstractLayer {
         workerPool.addTask({
             type: 'frame',
             id: this.id,
+            mapInsId: this._renderer.getMapId(),
             layout: this._layout,
             features: this._features,
             offset: this._renderer.getOffset(),

@@ -56,6 +56,7 @@ export default class RoomLayer extends AbstractLayer {
             offset: this._renderer.getOffset(),
             features: this._features,
             id: this.id,
+            mapInsId: this._renderer.getMapId(),
             taskId: this._getTaskId(),
             sync: this.getSync(),
         });

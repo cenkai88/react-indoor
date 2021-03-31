@@ -69,6 +69,7 @@ export default class CollisionManager {
             type: 'collision',
             id: this._options.mapId,
             taskId: GlobalIdGenerator.getId('task'),
+            mapInsId: this._options.mapId,
             isForce,
             zoom: this._camera.getZoom(),
             z: this._camera.getZ(),

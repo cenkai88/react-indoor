@@ -73,6 +73,7 @@ export default class LineLayer extends AbstractLayer {
     const workerPool = this._renderer.getWorkerPool();
     const data = {
       id: this.id,
+      mapInsId:  this._renderer.getMapId(),
       type: 'line',
       features: this._features,
       layout: this._layout,

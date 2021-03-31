@@ -185,6 +185,7 @@ export default class IconLayer extends AbstractLayer {
       offset: this._renderer.getOffset(),
       baseTextSize: this._renderer.getGlyphMng().getBaseSize(),
       id: this.id,
+      mapInsId:  this._renderer.getMapId(),
       taskId: this._getTaskId(),
       sync: this.getSync(),
     };
