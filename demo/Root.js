@@ -25,7 +25,7 @@ const MENU_DATA = {
       name: 'Map with Marker',
     },
     {
-      name: 'Map with Line',
+      name: 'Map with Line & Polygon',
     },
     {
       name: 'Drag Event of Map',

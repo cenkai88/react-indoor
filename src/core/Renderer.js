@@ -234,7 +234,37 @@ export default class Renderer extends Base {
         case "Line":
           this._drawLine(this._layers[i]);
           break
+        case "Polygon":
+          this._drawPolygon(this._layers[i]);
+          break
       }
+    }
+  }
+  _drawPolygon(frame) {
+    this._glContext.use(frame.getShaderName());
+    this._glContext.disableDepthTest();
+    this._glContext.enableAlpha();
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
+    const geometryRenderList = frame.getGeometryRenderList();
+    const program = this._glContext.getActiveProgram();
+    if (!program) return;
+    this._initViewProjectionMatrix(program);
+    const a_position = program.getAttribLocation('a_position');
+    const u_color = program.getUniformLocation('u_color');
+    const u_base = program.getUniformLocation('u_base');
+    const u_opacity = program.getUniformLocation('u_opacity');
+    for (let i = 0; i < geometryRenderList.length; i += 1) {
+      const { outlineColor, fillColor, buffer, base, opacity, outlineOpacity } = geometryRenderList[i];
+      buffer.bindData(a_position);
+      this._gl.uniform1f(u_base, base);
+      this._gl.uniform1f(u_opacity, opacity);
+      this._gl.uniform4fv(u_color, fillColor);
+      buffer.bindIndices('fill');
+      this._gl.drawElements(this._gl.TRIANGLES, buffer.fillIndicesNum, this._gl.UNSIGNED_SHORT, 0);
+      this._gl.uniform1f(u_opacity, outlineOpacity);
+      this._gl.uniform4fv(u_color, outlineColor);
+      buffer.bindIndices('outline');
+      this._gl.drawElements(this._gl.LINES, buffer.outlineIndicesNum, this._gl.UNSIGNED_SHORT, 0);
     }
   }
   _drawFrame(frame) {

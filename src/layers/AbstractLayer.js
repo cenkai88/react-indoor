@@ -11,8 +11,9 @@ const config = {
   Frame: { order: 1, shaderName: 'frame' },
   Line: { order: 2, shaderName: 'line' },
   Room: { order: 3, shaderName: 'room' },
-  Icon: { order: 6, shaderName: 'icon' },
+  Polygon: { order: 4, shaderName: 'polygon' },
   Heatmap: { order: 5, shaderName: 'heatmap' },
+  Icon: { order: 6, shaderName: 'icon' },
 };
 
 export default class AbstractLayer extends Base {

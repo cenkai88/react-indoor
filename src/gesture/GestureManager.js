@@ -28,8 +28,8 @@ export default class GestureManager {
     this._scrollZoom = new ScrollZoom(mapView);
     this._dragRotate = new DragRotate(mapView);
     this._dom = this._mapView.getCanvasContainer();
-    this._dom.addEventListener('click', this._onClick.bind(this));
-    this._dom.addEventListener('mousedown', this._onMousedown.bind(this));
+    // this._dom.addEventListener('click', this._onClick.bind(this));
+    // this._dom.addEventListener('mousedown', this._onMousedown.bind(this));
     this._dom.addEventListener('mousemove', this._onMousemove.bind(this));
     this._dom.addEventListener('mouseup', this._onMouseup.bind(this));
     this._dom.addEventListener('mouseleave', this._onMouseleave.bind(this));
@@ -40,7 +40,7 @@ export default class GestureManager {
     this._dom.addEventListener('contextmenu', this._onContextmenu.bind(this));
     this._dom.addEventListener('wheel', this._onWheel.bind(this));
     this._dom.addEventListener('dragover', e => e.preventDefault());
-    this._dom.addEventListener('drop', this._onDrop.bind(this));
+    // this._dom.addEventListener('drop', this._onDrop.bind(this));
   }
   _onWheel(e) {
     GestureManager.stopOriginEvent(e);
@@ -49,11 +49,11 @@ export default class GestureManager {
   _onContextmenu(e) {
     GestureManager.stopOriginEvent(e);
   }
-  _onClick(e) {
+  _onClick(e, cb) {
     GestureManager.stopOriginEvent(e);
-    this._fireClick(e);
+    this._fireClick(e, cb);
   }
-  _onDrop(e) {
+  _onDrop(e, cb) {
     GestureManager.stopOriginEvent(e);
     const renderer = this._mapView.getRenderer();
     if (!renderer) return
@@ -70,26 +70,34 @@ export default class GestureManager {
       room = rooms[0];
     }
     const [x, y] = convertWorldToPercent(point, bbox, deltaX, deltaY);
-    this._mapView.fire('drop', {
+    const eventData = {
       point: { x, y },
       room
-    });
+    };
+    this._mapView.fire('drop', eventData);
+    if (typeof cb === 'function') cb(eventData);
   }
-  _fireClick(e) {
+  _fireClick(e, cb) {
     const pos = e instanceof MouseEvent ? new Point(e.clientX, e.clientY) : new Point(e.touches[0].clientX, e.touches[0].clientY);
     if (this._startPos && pos.distanceTo(this._startPos) < 1) {
       const renderer = this._mapView.getRenderer();
       const layer = renderer.getLayers().find(layer => layer instanceof RoomLayer);
       const point = renderer.getCamera().screenToWorldCoordinate(e.offsetX, e.offsetY);
       const rooms = polygonsContain(layer.getLayout(), layer.getFeatures(), point);
+      const { bbox } = this._mapView.getFloorData().frame.features[0];
+      const deltaX = bbox[1][0] - bbox[0][0];
+      const deltaY = bbox[1][1] - bbox[0][1];
+      const [x, y] = convertWorldToPercent(point, bbox, deltaX, deltaY);
       let room;
       if (rooms.length > 0) {
         room = rooms[0];
       }
       const event = new MapEvent(e, { ...this._mapView });
       event._room = room;
+      event._percent = { x, y };
       if (renderer) renderer.fire('click', event);
       if (!event.isCancel()) this._mapView.fire('click', event);
+      if (typeof cb === 'function') cb(event);
     }
   }
   _onDbClick(e) {
@@ -182,15 +190,16 @@ export default class GestureManager {
     typeof pitch === 'number' && this._mapView.fire("pitch" + suffix);
     typeof zoom === 'number' && this._mapView.fire("zoom" + suffix);
   }
-  _onMousedown(e) {
+  _onMousedown(e, cb) {
     GestureManager.stopOriginEvent(e);
     this._startPos = new Point(e.clientX, e.clientY);
     this._dragPan.onMousedown(e);
     this._dragRotate.onMousedown(e);
     const renderer = this._mapView.getRenderer();
     const event = new MapEvent(e, this._mapView);
-    renderer && renderer.fire('mousedown', event);
-    !event.isCancel() && this._mapView.fire('mousedown', event);
+    if (renderer) renderer.fire('mousedown', event);
+    if (!event.isCancel()) this._mapView.fire('mousedown', event);
+    if (typeof cb === 'function') cb(event);
   }
   _onMousemove(e) {
     GestureManager.stopOriginEvent(e);

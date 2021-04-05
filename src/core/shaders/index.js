@@ -10,6 +10,8 @@ import heatmapTextureVertex from './heatmapTextureVertex.glsl';
 import heatmapTextureFragment from './heatmapTextureFragment.glsl';
 import lineVertex from './lineVertex.glsl';
 import lineFragment from './lineFragment.glsl';
+import polygonVertex from './polygonVertex.glsl';
+import polygonFragment from './polygonFragment.glsl';
 
 export const ShaderSource = {
     frame: { vertex: frameVertex, fragment: frameFragment },
@@ -18,4 +20,5 @@ export const ShaderSource = {
     heatmap: { vertex: heatmapVertex, fragment: heatmapFragment },
     heatmapTexture: { vertex: heatmapTextureVertex, fragment: heatmapTextureFragment },
     line: { vertex: lineVertex, fragment: lineFragment },
+    polygon: { vertex: polygonVertex, fragment: polygonFragment },
 };

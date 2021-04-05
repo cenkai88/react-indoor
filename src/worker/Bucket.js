@@ -3,6 +3,7 @@ import RoomBucket from '../layers/Room/RoomBucket';
 import IconBucket from '../layers/Icon/IconBucket';
 import HeatmapBucket from '../layers/Heatmap/HeatmapBucket';
 import LineBucket from '../layers/Line/LineBucket';
+import PolygonBucket from '../layers/Polygon/PolygonBucket';
 
 
 export default class BucketFactor {
@@ -22,6 +23,9 @@ export default class BucketFactor {
         }
         else if (data.type === 'line') {
             bucket = new LineBucket(data);
+        }
+        else if (data.type === 'polygon') {
+            bucket = new PolygonBucket(data);
         }
         if (bucket) {
             bucket.init();
