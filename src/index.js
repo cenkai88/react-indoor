@@ -92,14 +92,11 @@ export default ({
 
   const updateLine = (data) => {
     if (!mapIns) return
-    let line
-    if (!lineLayer) {
-      line = new LineLayer(mergedOptions.line);
-      setLineLayer(line);
-      mapIns.addLayer(line);
-    } else {
-      line = lineLayer;
+    if (lineLayer) {
+      mapIns.removeLayer(lineLayer)
     }
+    const line = new LineLayer(mergedOptions.line);
+    setLineLayer(line);
     line.setFloorId(mapIns.getFloorData().id);
     const { bbox } = mapIns.getFloorData().frame.features[0];
     const deltaX = bbox[1][0] - bbox[0][0];
@@ -108,12 +105,13 @@ export default ({
     const features = [{
       type: 'Feature',
       geometry: {
-        type: 'LineString',
-        coordinates: data.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY)),
+        type: Array.isArray(data[0]) ? 'MultiLineString' : 'LineString',
+        coordinates: Array.isArray(data[0]) ? data.map(line => line.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY))) : data.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY)),
       },
     }];
     line.setFeatures(features);
     mapIns.updateLayer(line);
+    mapIns.addLayer(line);
   }
 
   const updatePolygon = data => {
