@@ -5,7 +5,7 @@ import floorData from '../../../data/floor';
 
 import ReactIndoor from '../../../src/index.js';
 
-const lineData = [
+const lineData = [[
   { x: 0.5, y: 0.95 },
   { x: 0.47, y: 0.6 },
   { x: 0.48, y: 0.3 },
@@ -16,7 +16,7 @@ const lineData = [
   { x: 0.66, y: 0.24 },
   { x: 0.6, y: 0.235 },
   { x: 0.6, y: 0.96 },
-];
+]];
 
 const polygonData = [[
   { x: 0.5, y: 0.95 },
@@ -32,7 +32,7 @@ const polygonData = [[
   { x: 0.5, y: 0.95 },
 ]];
 
-const dataStr = `const lineData = lineData = [
+const dataStr = `const lineData = [[
   { x: 0.5, y: 0.95 },
   { x: 0.47, y: 0.6 },
   { x: 0.48, y: 0.3 },
@@ -43,7 +43,7 @@ const dataStr = `const lineData = lineData = [
   { x: 0.66, y: 0.24 },
   { x: 0.6, y: 0.235 },
   { x: 0.6, y: 0.96 },
-]`;
+]]`;
 
 const dataStr2 = `const polygonData = [[
   { x: 0.5, y: 0.95 },

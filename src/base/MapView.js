@@ -139,7 +139,7 @@ export default class MapView extends Base {
     for (let i = 0; i < features.length; i += 1) {
       const { properties } = features[i];
       roomFeatures.push(features[i]);
-      const point = properties && (properties.labelpoint || properties.center);
+      const point = properties?.labelpoint || properties?.center;
       if (point) roomIconFeatures.push(createFeaturePoint(point, properties));
     }
     if (roomFeatures.length !== 0) {
@@ -201,7 +201,7 @@ export default class MapView extends Base {
       isNeedUpdate = true;
     }
     if (isNeedUpdate) {
-      this._renderer.render();
+      this._renderer.render(true);
       if (layer.getType() === 'Icon' && layer.getCollisionRenderList().length > 0) this._renderer.updateCollision();
     }
   }

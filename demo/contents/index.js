@@ -25,7 +25,7 @@ const CONTENT_MAPPING = {
     <ExampleLine />,
     <ExampleDrag />,
     <ExampleHover />,
-    <ExampleMaintaince />
+    <ExampleMaintaince />,
   ],
 };
 

@@ -36,7 +36,8 @@ export default class LineBucket extends AbstractBucket {
     const base = getStyle(this._layout, 'base', properties);
     const opacity = getStyle(this._layout, 'opacity', properties);
     const width = getStyle(this._layout, 'lineWidth', properties);
-    const color = parseColor(getStyle(this._layout, 'lineColor', properties));
+    const lineColorConfig = getStyle(this._layout, 'lineColor', properties);
+    const color = parseColor(lineColorConfig);
     const iconUrl = getStyle(this._layout, 'lineImage', properties);
     const vertices = [];
     const normals = [];

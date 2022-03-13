@@ -15,7 +15,8 @@ export default class Program {
             throw new Error('gl: createProgram failed');
         }
         this._program = program;
-        const vertex = shaderSource.vertex, fragment = shaderSource.fragment;
+        const vertex = shaderSource.vertex;
+        const fragment = shaderSource.fragment;
         this._initShader(this._gl.VERTEX_SHADER, vertex);
         this._initShader(this._gl.FRAGMENT_SHADER, fragment);
         this._gl.linkProgram(this._program);
