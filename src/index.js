@@ -79,6 +79,7 @@ export default ({
     const deltaX = bbox[1][0] - bbox[0][0];
     const deltaY = bbox[1][1] - bbox[0][1];
 
+
     const features = data.map(item => ({
       type: 'Feature',
       geometry: {
@@ -101,7 +102,7 @@ export default ({
     const { bbox } = mapIns.getFloorData().frame.features[0];
     const deltaX = bbox[1][0] - bbox[0][0];
     const deltaY = bbox[1][1] - bbox[0][1];
-
+    console.log(bbox);
     const features = [{
       type: 'Feature',
       geometry: {

@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: './static/[name]_[contentHash:10].js',
-    publicPath: '/react-indoor/',
+    publicPath: '/react-indoor-pvg/',
   },
   module: {
     rules: [

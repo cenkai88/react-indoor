@@ -52,7 +52,7 @@ export default () => {
     <Content mode={app} activeIdx={activeMenuIdx}></Content>
   </div>;
   return <>
-    <Header app={app} onSetApp={setApp}></Header>
+    {/* <Header app={app} onSetApp={setApp}></Header> */}
     {(app === 'EXAMPLE') ? exampleDom : null }
     {(app === 'HOME') ? <HomeDom /> : null }
   </>

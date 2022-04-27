@@ -8,7 +8,7 @@ export default {
     "label": {
       "visible": true,
       "alwaysShow": true,
-      "textField": "FT_NAME_DP",
+      "textField": "name",
       "textSize": 12,
       "textColor": "#000000",
       "textAnchor": "center",
@@ -30,40 +30,66 @@ export default {
     "outlineColor": "#111111",
     "styleKey": "colorid",
     "styleMap": {
+      // 航站楼
       "000000": {
         "height": 70,
         "fillColor": "#0548A0",
-        "opacity": 0.9,
+        "opacity": 0.8,
       },
+      // 停机坪
       "000001": {
         "height": 0.2,
         "fillColor": "#E9F3FE",
       },
+      // 跑道
       "000002": {
         "fillColor": "#b9c1ce",
+        "base": 1,
       },
+      // 货物堆放区
       "000003": {
         "fillColor": "#FFB81C",
         "opacity": 0.5,
+        "base": 0.03,
       },
+      // 廊桥
       "000004": {
         "height": 20,
         "opacity": 0.7,
         "fillColor": "#2BB56F",
       },
+      // 道口
       "000005": {
         "height": 10,
         "fillColor": "#F64F2E",
       },
+      // 车行道
+      "000006": {
+        "base": 0.1,
+      },
+      // 标志建筑物
       "000007": {
-        opacity: 0.8,
+        opacity: 1,
+        height: 20,
+        "fillColor": "#FFB81C",
+      },
+      // 塔台
+      "000007-1": {
+        opacity: 1,
+        height: 200,
+        "fillColor": "#FFB81C",
+      },
+      // 滑行道
+      "000009": {
+        base: 0.05,
+        opacity: 0.8, 
         "fillColor": "#b9c1ce",
       },
     },
   },
   "roomIcon": {
     "visible": true,
-    "textField": "FT_NAME_CN",
+    "textField": "name",
     "textSize": 12,
     "textColor": "#666666",
     "textAnchor": "center",
@@ -84,6 +110,9 @@ export default {
     "styleMap": {
       "000000": {
         "textColor": "#FFB81C",
+        "collision": false,
+        "weight": 10,
+        "alwaysShow": true,
       },
       "000003": {
         "visible": false,

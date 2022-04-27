@@ -18,7 +18,7 @@ export default ({ app, onSetApp }) => {
         <div className={`header-info-item ${app === 'DOC' ? 'header-info-item-selected' : ''}`} onClick={() => onTapApp('DOC')}>Documents</div>
         <div className="header-info-github header-info-item">
           <img className="header-info-icon" src={githubIcon} />
-          <span>Github</span>
+          {/* <span>Github</span> */}
         </div>
       </div>
     </div>
