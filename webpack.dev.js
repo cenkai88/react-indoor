@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -58,6 +59,11 @@ module.exports = {
     ],
   },
   plugins: [
+    new DefinePlugin({
+      pageTitle: JSON.stringify('react-indoor DEMO'),
+      HTTP_BASE: JSON.stringify('http://47.92.31.84/op'),
+      AAA_BASE: JSON.stringify('http://47.92.31.84/aaa'),
+    }),
     new HtmlWebpackPlugin({
       template: './public/index.ejs',
       filename: 'index.html',

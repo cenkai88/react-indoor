@@ -284,8 +284,10 @@ export function containedInContour(contour, pointList) {
   return false;
 }
 
-export function convertPercentToWorld({ x, y }, bounds, deltaX, deltaY) {
-  return [bounds[0][0] + x * deltaX, bounds[1][1] - y * deltaY];
+export function convertPercentToWorld({ x, y }, bbox) {
+  const deltaX = bbox[1][0] - bbox[0][0];
+  const deltaY = bbox[1][1] - bbox[0][1];
+  return [bbox[0][0] + x * deltaX, bbox[1][1] - y * deltaY];
 }
 
 export function convertWorldToPercent({ x, y }, bounds, deltaX, deltaY) {

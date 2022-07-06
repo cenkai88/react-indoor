@@ -1,0 +1,25 @@
+.path1 {
+    transform: translate(1px, 1px);
+    fill: black;
+    fill-opacity: 0.3;
+}
+
+.dots {
+    width: 140px;
+    bottom: 24px;
+    position: absolute;
+    height: 3px;
+    display: flex;
+    justify-content: space-between;
+    i {
+        transform-origin: 50% 50% 0px;
+        transform: matrix3d(1, 0, 0, 0, -1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        width: 5px;
+        height: 3px;
+        flex: 1;
+        display: block;
+        margin-left: 7px;
+        transition: filter 0.2s;
+    }
+}
+

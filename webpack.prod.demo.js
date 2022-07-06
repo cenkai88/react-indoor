@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const cleanWebpackPlugin = require('clean-webpack-plugin');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
   mode: 'production',
@@ -11,7 +12,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: './static/[name]_[contentHash:10].js',
-    publicPath: '/react-indoor-pvg/',
+    publicPath: '/pvg-map-dashboard/',
   },
   module: {
     rules: [
@@ -59,6 +60,11 @@ module.exports = {
     ],
   },
   plugins: [
+    new DefinePlugin({
+      pageTitle: JSON.stringify('事件大屏'),
+      HTTP_BASE: JSON.stringify('http://gw.asocapi.com/api/ingsh/op'),
+      AAA_BASE: JSON.stringify('http://gw.asocapi.com/api/ingsh/auth'),
+    }),
     new cleanWebpackPlugin(['dist'], { root: __dirname, verbose: true }),
     new HtmlWebpackPlugin({
       template: './public/index.ejs',

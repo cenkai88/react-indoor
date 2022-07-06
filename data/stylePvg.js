@@ -4,7 +4,7 @@ export default {
     "height": 0,
     "fillColor": "#eeeeee",
     "outlineColor": "#000",
-    "opacity": 1,
+    "opacity": 0.9,
     "label": {
       "visible": true,
       "alwaysShow": true,
@@ -30,6 +30,10 @@ export default {
     "outlineColor": "#111111",
     "styleKey": "colorid",
     "styleMap": {
+      "HOVERED": {
+        "height": 1,
+        "fillColor": "#ffde8a",
+      },
       // 航站楼
       "000000": {
         "height": 70,
@@ -41,6 +45,26 @@ export default {
         "height": 0.2,
         "fillColor": "#E9F3FE",
       },
+      "000001-CX": {
+        "height": 0.2,
+        "fillColor": "#60ccff",
+      },
+      "000001-DV": {
+        "height": 0.2,
+        "fillColor": "#ecff6d",
+      },
+      "000001-NI": {
+        "height": 0.2,
+        "fillColor": "#ffa48c",
+      },
+      "000001-RS": {
+        "height": 0.2,
+        "fillColor": "#f4ceff",
+      },
+      "000001-XF": {
+        "height": 0.2,
+        "fillColor": "#f4ceff",
+      },
       // 跑道
       "000002": {
         "fillColor": "#b9c1ce",
@@ -50,7 +74,7 @@ export default {
       "000003": {
         "fillColor": "#FFB81C",
         "opacity": 0.5,
-        "base": 0.03,
+        "base": 0.4,
       },
       // 廊桥
       "000004": {
@@ -65,7 +89,7 @@ export default {
       },
       // 车行道
       "000006": {
-        "base": 0.1,
+        "base": 0.15,
       },
       // 标志建筑物
       "000007": {
@@ -80,9 +104,15 @@ export default {
         "fillColor": "#FFB81C",
       },
       // 滑行道
+      "000008": {
+        base: -10,
+        opacity: 0.8,
+        "fillColor": "#b9c1ce",
+      },
+      // 围界
       "000009": {
         base: 0.05,
-        opacity: 0.8, 
+        height: 10,
         "fillColor": "#b9c1ce",
       },
     },
@@ -114,9 +144,27 @@ export default {
         "weight": 10,
         "alwaysShow": true,
       },
+      "000001": {
+        "textColor": "#000000",
+      },
+      "000001-CX": {
+        "textColor": "#ffffff",
+      },
+      "000001-DV": {
+        "textColor": "#ffffff",
+      },
+      "000001-NI": {
+        "textColor": "#ffffff",
+      },
+      "000001-RS": {
+        "textColor": "#ffffff",
+      },
+      "000001-XF": {
+        "textColor": "#ffffff",
+      },
       "000003": {
         "visible": false,
-         // "fillColor": "#FFB81C",
+        // "fillColor": "#FFB81C",
         // "opacity": 0.5,
         "iconUrl": `https://static.yingxuys.com/icons/lift.png`
       },

@@ -1,3 +1,56 @@
 .item:hover {
   background: #eee;
 }
+
+.bg {
+  height: 100vh;
+  min-width: 100vw;
+  background: rgba(25, 30, 50)
+}
+
+.event:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.event-list{
+  /* animation: scroll 32s linear infinite normal; */
+  box-sizing: border-box;
+}
+
+.event-list-container::-webkit-scrollbar{
+  width: 0!important;
+}
+
+.event-list:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.emer {
+  white-space: nowrap;
+}
+
+.emer:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.emer-list{
+  width: fit-content;
+  display: flex;
+  animation: scroll-v 32s linear infinite normal;
+}
+
+.emer-list:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-v {
+  100% {
+    transform: translateX(-50%);
+  }
+}

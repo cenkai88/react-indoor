@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const cleanWebpackPlugin = require('clean-webpack-plugin');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
   mode: 'production',

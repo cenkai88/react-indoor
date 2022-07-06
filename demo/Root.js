@@ -43,7 +43,6 @@ const MENU_DATA = {
 
 
 export default () => {
-
   const [app, setApp] = useState('HOME');
   const [activeMenuIdx, setActiveMenuIdx] = useState(0);
 

@@ -32,10 +32,9 @@ export default () => {
   const [currentFloor, setCurrentFloor] = useState("RJ00201010001");
 
   useEffect(() => {
-    return clearTimeout(setTimeout(() => {
-      changeFloorTicket = setCurrentFloor("RJ00201020001");
-    }, 5e3));
-
+    return setTimeout(() => {
+      setCurrentFloor("RJ00201020001");
+    }, 5e3);
   }, [])
   return <div className="content-body">
     <div className="content-body-title" >

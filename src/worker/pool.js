@@ -87,7 +87,10 @@ export default class WebWorkerPool {
     })
   }
   _postToWorker(data) {
-    if (this._freeIdxList.length === 0) return;
+    if (this._freeIdxList.length === 0) {
+      this._taskDataList.push(data);
+      return;
+    }
     const index = this._freeIdxList.pop();
     this._workerPool[index].postMessage(data);
   }
