@@ -111,9 +111,79 @@ export default {
       },
       // 围界
       "000009": {
-        base: 0.05,
-        height: 10,
+        base: -0.05,
+        height: 6,
         "fillColor": "#b9c1ce",
+      },
+      "000009-#3f9229": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#3f9229",
+      },
+      "000009-#699353": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#699353",
+      },
+      "000009-#71fbfd": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#71fbfd",
+      },
+      "000009-#ed5027": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#ed5027",
+      },
+      "000009-#fffe54": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#fffe54",
+      },
+      "000009-#71fbfd": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#71fbfd",
+      },
+      "000009-#f08533": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#f08533",
+      },
+      "000009-#001af5": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#001af5",
+      },
+      "000009-#eb3bf7": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#eb3bf7",
+      },
+      "000009-#000000": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#000000",
+      },
+      "000009-#71fbc3": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#71fbc3",
+      },
+      "000009-#f6c188": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#f6c188",
+      },
+      "000009-#67178f": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#67178f",
+      },
+      "000009-#71fa4c": {
+        base: -0.05,
+        height: 6,
+        "fillColor": "#71fa4c",
       },
     },
   },

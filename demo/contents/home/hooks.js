@@ -8,21 +8,28 @@ export const useAccessToken = (refreshToken) => {
     return accessToken
 }
 
-export const useFloorData = (pvgData, token) => {
+export const useFloorData = (pvgData, token, selectedLine) => {
     const { data: {
         mapping: apronMap,
-        lastUpdateTs
+        // lastUpdateTs
     } = {}, error } = useSWR(['/map/apron/v1', token], fetchApronMap, { refreshInterval: 60 * 1e3 });
     const apronRoomIdList = [];
-    if (!apronMap) return { data: pvgData }
+    // if (!apronMap) return { data: pvgData, lastUpdateTs: Date.now(), }
     pvgData[0]?.room?.features.forEach(item => {
-        if (!apronMap[item?.properties?.name] || item?.properties?.colorid.slice(0, prefix.length) !== prefix) return
+        if (item?.properties?.colorid.slice(0, prefix.length) === '000009') {
+            if (selectedLine && item?.properties?.name === selectedLine?.name) {
+                item.properties.colorid = `000009-${selectedLine.color}`;
+            } else {
+                item.properties.colorid = `000009`;
+            }
+        }
+        if (!apronMap || !apronMap[item?.properties?.name] || item?.properties?.colorid.slice(0, prefix.length) !== prefix) return
         item.properties.colorid = `${prefix}-${apronMap[item?.properties?.name]}`;
         apronRoomIdList.push(item.properties.id);
     });
     return {
         data: pvgData,
-        lastUpdateTs,
+        lastUpdateTs: Date.now(),
         apronRoomIdList
     }
 }

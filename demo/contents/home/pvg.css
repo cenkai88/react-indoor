@@ -21,6 +21,10 @@
   width: 0!important;
 }
 
+.detail-container::-webkit-scrollbar{
+  width: 0!important;
+}
+
 .event-list:hover {
   animation-play-state: paused;
 }

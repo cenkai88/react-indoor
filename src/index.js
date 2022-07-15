@@ -29,6 +29,7 @@ const defaultOption = {
 };
 
 export default ({
+  lastUpdateTs,
   floorId,
   floorData = [],
   heatmapData = [],
@@ -40,8 +41,11 @@ export default ({
   onInit,
   onDrop,
   onClick,
+  onContextMenu,
   onEnterMarker,
   onLeaveMarker,
+  onHoverRoom,
+  onLeaveRoom,
   onMouseDown
 }) => {
 
@@ -84,7 +88,7 @@ export default ({
       type: 'Feature',
       geometry: {
         type: 'Point',
-        coordinates: convertPercentToWorld(item, bbox, deltaX, deltaY),
+        coordinates: convertPercentToWorld(item, bbox),
       },
     }));
     heatmap.setFeatures(features);
@@ -102,12 +106,11 @@ export default ({
     const { bbox } = mapIns.getFloorData().frame.features[0];
     const deltaX = bbox[1][0] - bbox[0][0];
     const deltaY = bbox[1][1] - bbox[0][1];
-    console.log(bbox);
     const features = [{
       type: 'Feature',
       geometry: {
         type: Array.isArray(data[0]) ? 'MultiLineString' : 'LineString',
-        coordinates: Array.isArray(data[0]) ? data.map(line => line.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY))) : data.map(item => convertPercentToWorld(item, bbox, deltaX, deltaY)),
+        coordinates: Array.isArray(data[0]) ? data.map(line => line.map(item => convertPercentToWorld(item, bbox))) : data.map(item => convertPercentToWorld(item, bbox)),
       },
     }];
     line.setFeatures(features);
@@ -134,7 +137,7 @@ export default ({
       type: 'Feature',
       geometry: {
         type: 'Polygon',
-        coordinates: data.map(item => item.map(jtem => convertPercentToWorld(jtem, bbox, deltaX, deltaY))),
+        coordinates: data.map(item => item.map(jtem => convertPercentToWorld(jtem, bbox))),
       },
     }];
     polygon.setFeatures(features);
@@ -150,7 +153,7 @@ export default ({
     const deltaY = bbox[1][1] - bbox[0][1];
 
     const markers = data.map(item => {
-      const [x, y] = convertPercentToWorld(item, bbox, deltaX, deltaY);
+      const [x, y] = convertPercentToWorld(item, bbox);
       return new Marker({ ...item, x, y }, mapIns.getFloorData().id)
     });
     markers.forEach(item => item.addTo(mapIns));
@@ -174,6 +177,10 @@ export default ({
       if (map) map.destroy();
     }
   }, []);
+
+  useDeepCompareEffect(() => {
+    if (mapIns && options.zoom && options.center) mapIns.easeTo({ zoom: options.zoom, center: options.center });
+  }, [options]);
 
   useEffect(() => {
     if (mapIns) mapIns.setCurrentFloorId(floorId);
@@ -201,6 +208,12 @@ export default ({
   }, [polygonData]);
 
   useEffect(() => {
+    if (mapIns) {
+      mapIns.refreshMapData(floorData);
+    }
+  }, [lastUpdateTs])
+
+  useEffect(() => {
     if (domReady) {
       mapIns.init({ floorData, floorId });
       if (typeof onInit === 'function') onInit();
@@ -210,6 +223,8 @@ export default ({
       if (polygonData && polygonData.length) updatePolygon(polygonData)
       if (typeof onEnterMarker === 'function') mapIns.on('enterMarker', onEnterMarker);
       if (typeof onLeaveMarker === 'function') mapIns.on('leaveMarker', onLeaveMarker);
+      if (typeof onHoverRoom === 'function') mapIns.on('enterRoom', onHoverRoom);
+      if (typeof onLeaveRoom === 'function') mapIns.on('leaveRoom', onLeaveRoom);
     }
   }, [domReady]);
 

@@ -56,6 +56,10 @@ module.exports = {
         test: /\.glsl$/,
         loader: 'raw-loader',
       },
+      {
+        test: /\.mp4$/,
+        loader: 'file-loader',
+      },
     ],
   },
   plugins: [

@@ -7,6 +7,7 @@
 import MapView from './base/MapView';
 import Camera from './camera/Camera';
 import Point from './geometry/Point';
+import RoomLayer from './layers/Room/RoomLayer';
 import Transitor from './transition/Transitor';
 import { getFit } from './utils/common';
 import timgingFns from './utils/timgingFns';
@@ -17,7 +18,7 @@ const defaultOptions = {
   zoom: 19,
   minZoom: 10,
   maxZoom: 30,
-  enableRoomHover: false
+  enableRoomHover: false,
 };
 
 export default class Indoor extends MapView {
@@ -39,7 +40,7 @@ export default class Indoor extends MapView {
       if (event.isTrusted) this.resize();
     });
   }
-  async init({ floorData = [], floorId = [] }, style = {}) {
+  async init({ floorData = [], floorId = '' }, style = {}) {
     if (!Array.isArray(floorData) || !floorData.find(item => item.id === floorId)) {
       this._status = 'ERROR';
       this.fire('error');
@@ -52,7 +53,7 @@ export default class Indoor extends MapView {
       this._floorDataMap.set(item.id, item)
     });
 
-    const currentFloorData = floorData.find(item => item.id===floorId);
+    const currentFloorData = floorData.find(item => item.id === floorId);
     super.init(currentFloorData, style);
     this.setCurrentFloorId(currentFloorData.id);
     // draw the floor
@@ -105,7 +106,7 @@ export default class Indoor extends MapView {
     const startZoom = camera.getZoom();
     const startRotate = camera.getRotate();
     const startPitch = camera.getPitch();
-    if (this._transitor) this.transitor.stop();
+    if (this._transitor) this._transitor.stop();
     let {
       center,
       zoom = startZoom,
@@ -228,6 +229,17 @@ export default class Indoor extends MapView {
     if (this._currentFloorId) this._resetCamera(this._currentFloorData, true);
     this._currentFloorId = floorId;
     this._drawFloor(this._currentFloorData);
+    const { bbox } = this._currentFloorData.frame.features[0];
+    this.fitBounds({ topLeft: { x: bbox[0][0], y: bbox[0][1] }, bottomRight: { x: bbox[1][0], y: bbox[1][1] } })
+  }
+
+  refreshMapData(floorData) {
+    if (!this._renderer) return
+    floorData.forEach(item => {
+      this._floorDataMap.set(item.id, item)
+    });
+    const roomLayer = this._renderer.getLayers().find(layer => layer instanceof RoomLayer);
+    roomLayer._update();
   }
 
   set maxZoom(maxZoom) {

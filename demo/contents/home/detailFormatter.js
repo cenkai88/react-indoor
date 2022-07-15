@@ -24,9 +24,13 @@ export const formatVehicleDetail = item => `载具设备id：${item.id}
 所属部门：${item?.ownerDepartment?.name || '无'}
 使用部门：${item?.userDepartment?.name || '无'}
 载具负责人：${item?.owner?.name || '无'}
+线路号：${item?.routeNum || '无'}
+班组：${item?.groupName || '无'}
+车型：${item?.model || '无'}
 驾驶员：${item?.driver || '无'}
-工作状态：${item?.workStatus || '无'}
+工作状态：${item?.workStatus === "ALERT" ? "出警" : "巡逻" || '无'}
 车牌：${item?.plateNum || '无'}
+上岗时间：${item?.startTime || '无'}
 上次定位时间：${item?.lastDetectedTime || '无'}
 `;
 

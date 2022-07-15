@@ -3,7 +3,7 @@ import './header.scss'
 import tempIcon from "../../../assets/icons/temp.svg"
 import rainIcon from "../../../assets/icons/rain.svg"
 import windIcon from "../../../assets/icons/wind.svg"
-import logo from "../../../assets/logo.png"
+import logo from "../../../assets/logo.jpg"
 
 let intervalTicket;
 
@@ -30,8 +30,8 @@ export default () => {
                 {timeStr}
             </div>
             <nav className="header-nav">
-                <a href="#"><img style={{ width: 28 }} src={tempIcon} />小雨</a>
-                <a href="#"><img style={{ width: 24, marginRight: 4 }} src={rainIcon} />20-29度</a>
+                <a href="#"><img style={{ width: 28 }} src={rainIcon} />小雨</a>
+                <a href="#"><img style={{ width: 24, marginRight: 4 }} src={tempIcon} />20-29度</a>
                 <a href="#"><img style={{ width: 18, marginRight: 10 }} src={windIcon} />东北风2级</a>
             </nav>
             <div className="header-title">
