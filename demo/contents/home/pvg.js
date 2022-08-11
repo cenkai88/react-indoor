@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
-import qs from 'qs';
+import uuid from 'uuid';
+import ReactPlayer from 'react-player'
 
-import { fetchApronDetail, fetchEventList, fetchCaseList, fetchPropertyList, fetchEmergenceList } from '../../apis/pvg';
+import { fetchApronDetail, fetchEventList, fetchCaseList, fetchPropertyList, fetchEmergenceList, fetchVideoUrl, stopVideoPlay } from '../../apis/pvg';
 
 import pvgData from '../../../data/pvg6';
 import pvgLines from '../../../data/pvgLines';
@@ -21,13 +22,36 @@ import ReactIndoor from '../../../src/index.js';
 
 import Header from './components/header';
 import Panel from './components/panel';
-import { useAccessToken, useDictData, useFloorData } from './hooks';
+import { useDictData, useFloorData } from './hooks';
 import { formatArponDetail, formatArponTooltip, formatCaseDetail, formatCaseTooltip, formatEventDetail, formatEventTooltip, formatIndividualDetail, formatIndividualTooltip, formatVehicleDetail, formatVehicleTooltip } from './detailFormatter';
 import { convertPercentToWorld, convertWorldToPercent } from '../../../src/utils/common';
 
 const bbox = [[31099.661621093754, -13321.040588378906], [35210.447021484375, -8313.3369140625]];
 const deltaX = bbox[1][0] - bbox[0][0];
 const deltaY = bbox[1][1] - bbox[0][1];
+
+// const items = [
+//   [30319.17644173383, -7483.986579481384],
+//   [30303.816535588503, -7436.726273361093],
+//   [30338.77787626419, -7400.3423682180755],
+//   [30303.5180963191, -7435.70930713672],
+//   [30323.447941256185, -7353.553211045136],
+//   [30307.309481764096, -7304.011132989264],
+//   [30292.38419173277, -7258.614451430149]
+// ];
+
+// const demoPoints = items.map(item => {
+//   const [x, y] = convertWorldToPercent({ x: item[0], y: item[1] }, bbox, deltaX, deltaY);
+//   return {
+//     typeIdx: 0,
+//     iconUrl: eventPng,
+//     iconSize: 0.1,
+//     data: {},
+//     properties: {},
+//     x,
+//     y
+//   }
+// });
 
 const getCorrectedTooltipY = (e, tooltipRef) => {
   if (!tooltipRef?.current) return e.point.y
@@ -78,21 +102,10 @@ const layerOptions = [
 
 export default () => {
   const defaultStyle = JSON.parse(JSON.stringify(stylePvg));
-  const [refreshToken, setRefreshToken] = useState('');
+  const videoRef = useRef(null);
 
-  useEffect(() => {
-    if (localStorage.getItem('refreshToken')) {
-      setRefreshToken(localStorage.getItem('refreshToken'));
-      history.replaceState({}, null, location.origin + location.pathname);
-      return
-    }
-    const { refreshToken } = qs.parse(location.search.slice(1));
-    setRefreshToken(refreshToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    history.replaceState({}, null, location.origin + location.pathname);
-  }, []);
-
-  const accessToken = useAccessToken(refreshToken);
+  const storedKey = localStorage.getItem('AUTH_LOCAL_KEY');
+  const accessToken = storedKey ? JSON.parse(storedKey)?.accessToken : '';
 
   const [center, setCenter] = useState({ x: 31865, y: -9946, });
   const [zoom, setZoom] = useState(13.5);
@@ -112,6 +125,8 @@ export default () => {
   const [hoveredApronId, setHoveredApronId] = useState();
   const [hoveredApronData, setHoveredApronData] = useState({});
 
+  const [cameraName, setCameraName] = useState();
+  const [cameraUuid, setCameraUuid] = useState();
 
   const selectedLine = lineOptions[lineIdx];
   const selectedMarker = markerOptions[markerIdx];
@@ -127,11 +142,12 @@ export default () => {
   const { data: pvgDataWithApron, lastUpdateTs, apronRoomIdList = [] } = useFloorData(pvgData, accessToken, selectedLine);
   const { eventCategoryMapping, caseCategoryMapping, sourceCategoryMapping } = useDictData(accessToken);
   const { data: apronDetailData = {} } = useSWR([`/map/apron/v1/${selectedApronName}`, selectedApronName, accessToken], fetchApronDetail, { refreshInterval: 60 * 1e3 });
-  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true', accessToken], fetchEventList, { refreshInterval: 60 * 1e3 });
-  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true', accessToken], fetchCaseList, { refreshInterval: 60 * 1e3 });
+  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true&count=99999', accessToken], fetchEventList, { refreshInterval: 60 * 1e3 });
+  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true&count=99999', accessToken], fetchCaseList, { refreshInterval: 60 * 1e3 });
   const { data: individualData = [] } = useSWR(['/property/property/v1', 'INDIVIDUAL', accessToken], fetchPropertyList, { refreshInterval: 10 * 1e3 });
   const { data: vehicleData = [] } = useSWR(['/property/property/v1', 'VEHICLE', accessToken], fetchPropertyList, { refreshInterval: 10 * 1e3 });
   const { data: emergenceData = [] } = useSWR(['/emergency/record/v1', accessToken], fetchEmergenceList, { refreshInterval: 60 * 1e3 });
+  const { data: videoUrl = '' } = useSWR(['/video/playVideo', cameraName, cameraUuid], fetchVideoUrl, { refreshInterval: 9e9 });
 
   const panelWidth = 0.15 * window.innerWidth;
   const panel1Height = window.innerHeight - 136 - 72;
@@ -235,6 +251,7 @@ export default () => {
 
   const markerList = [
     ...(layerList[0] ? eventData.map(item => ({ ...item?.position, typeIdx: 0, data: item, properties: {}, iconUrl: eventPng, iconSize: 0.1 })) : []),
+    // ...demoPoints,
     ...(layerList[1] ? caseData.map(item => ({ ...item?.position, typeIdx: 1, data: item, properties: {}, iconUrl: casePng, iconSize: 0.1 })) : []),
     ...(layerList[2] ? vehicleData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 2, data: item, properties: {}, iconUrl: item.workStatus === 'ALERT' ? carRedPng : carPng, iconSize: 0.15 })) : []),
     ...(layerList[3] ? individualData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 3, data: item, properties: {}, iconUrl: staffPng, iconSize: 0.15 })) : []),
@@ -257,6 +274,26 @@ export default () => {
       setSelectedApronName(apron?.properties?.name);
     }
   }, [hoveredApronId]);
+
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   if (!video) return
+  //   console.log(video);
+  //   //
+  //   // First check for native browser HLS support
+  //   //
+  //   if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  //     video.src = videoSrc;
+  //     //
+  //     // If no native HLS support, check if HLS.js is supported
+  //     //
+  //   } else if (window.Hls?.isSupported()) {
+  //     console.log('window.Hls', window.Hls);
+  //     var hls = new window.Hls();
+  //     hls.loadSource(videoSrc);
+  //     hls.attachMedia(video);
+  //   }
+  // }, [videoUrl]);
 
   return (
     <div className="bg">
@@ -313,6 +350,7 @@ export default () => {
               setLineDropdownOpen(false)
             }}
             onMouseDown={e => {
+              // right click
               if (e._originEvent.button === 2) {
                 setTooltipType('');
                 setHoveredMarkerIdx();
@@ -320,6 +358,9 @@ export default () => {
                 setHoveredApronData({});
                 setTooltipPos({});
                 setDetailStr('');
+                stopVideoPlay(cameraName, cameraUuid);
+                setCameraName();
+                setCameraUuid();
               }
             }}
             lastUpdateTs={lastUpdateTs}
@@ -380,6 +421,16 @@ export default () => {
               setHoveredMarkerIdx();
               setHoveredApronId();
               setSelectedRes(markerList[hoveredMarkerIdx]?.data);
+              const { relatedResources = [] } = markerList[hoveredMarkerIdx]?.data || {};
+              if (relatedResources[0]?.resourceCategory?.id === 'CAMERA' && cameraName !== relatedResources[0]?.resourceName) {
+                stopVideoPlay(cameraName, cameraUuid);
+                setCameraName(relatedResources[0]?.resourceName);
+                setCameraUuid(uuid());
+              } else if (cameraName !== relatedResources[0]?.resourceName) {
+                stopVideoPlay(cameraName, cameraUuid);
+                setCameraName();
+                setCameraUuid();
+              }
               setDetailStr([formatEventDetail, formatCaseDetail, formatVehicleDetail, formatIndividualDetail][formatterIdx](markerList[hoveredMarkerIdx]?.data, tooltipCategoryMapping, sourceCategoryMapping));
             }} style={{ fontSize: 12, textDecoration: 'underline', cursor: 'pointer' }}>查看</div> : null}
           </div> : null}
@@ -450,9 +501,11 @@ export default () => {
             <div style={{ color: 'white', position: 'absolute', padding: 2, overflow: 'hidden', height: 'calc(100% - 50px)', width: panelWidth, boxSizing: 'border-box' }}>
               <div style={{ fontSize: 14, fontWeight: 500, padding: 12 }}>
                 <div>实时监控</div>
+                <div style={{ color: '#9a9a9a', fontSize: 13 }}>{cameraName}</div>
               </div>
-              <div style={{ width: '100%', height: 'calc(100% - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {selectedRes?.id === 'LSE20220707000126' ? <video style={{ width: '100%' }} autoPlay muted src={demoVideo} /> : null}
+              <div ref={videoRef} style={{ width: '100%', height: 'calc(100% - 120px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {videoUrl ? <ReactPlayer playing muted controls url={videoUrl} />
+                  : null}
               </div>
             </div>
           </Panel>

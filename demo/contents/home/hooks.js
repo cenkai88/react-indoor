@@ -1,12 +1,7 @@
 import useSWR from "swr";
-import { fetchApronMap, fetchCommonDictList, fetchRefreshToken } from "../../apis/pvg";
+import { fetchApronMap, fetchCommonDictList } from "../../apis/pvg";
 
 const prefix = '000001';
-
-export const useAccessToken = (refreshToken) => {
-    const { data: accessToken } = useSWR(refreshToken, fetchRefreshToken, { refreshInterval: 3000 * 1e3 });
-    return accessToken
-}
 
 export const useFloorData = (pvgData, token, selectedLine) => {
     const { data: {

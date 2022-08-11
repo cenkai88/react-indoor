@@ -168,16 +168,17 @@ export default class DragPan extends AbstractGesture {
         const end = camera.getCenter();
         let pointAtOffset = camera.centerPoint.add(offset);
         const endWithInertia = camera.getPointWithInertia(end, pointAtOffset);
-        const { x: constrainedX, y: constrainedY } = camera.getConstrainedPoint(end);
-        const { x: constrainedInertiaX, y: constrainedInertiaY } = camera.getConstrainedPoint(endWithInertia);
-        // TODO set offset to the contrained value instead of 0
-        if (end.x !== constrainedX || end.y !== constrainedY) {
-            end.set(constrainedX, constrainedY);
-        }
-        if (endWithInertia.x !== constrainedInertiaX) {
+        // const { x: constrainedX, y: constrainedY } = camera.getConstrainedPoint(end);
+        // const { x: constrainedInertiaX, y: constrainedInertiaY } = camera.getConstrainedPoint(endWithInertia);
+        // // console.log(endWithInertia, constrainedInertiaX, constrainedInertiaY)
+        // // TODO set offset to the contrained value instead of 0
+        // if (end.x !== constrainedX || end.y !== constrainedY) {
+        //     end.set(constrainedX, constrainedY);
+        // }
+        if (end.x !== endWithInertia.x) {
             offset.x = 0;
         }
-        if (endWithInertia.y !== constrainedInertiaY) {
+        if (end.y !== endWithInertia.y) {
             offset.y = 0;
         }
         pointAtOffset = camera.centerPoint.add(offset);

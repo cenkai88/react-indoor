@@ -1,5 +1,6 @@
 const httpBase = HTTP_BASE;
 const aaaBase = AAA_BASE;
+const videoBase = 'http://10.50.247.17:8099';
 
 const getAuthHeader = accessToken => ({
     Authorization: `Bearer ${accessToken}`
@@ -62,7 +63,7 @@ export const fetchCaseList = async (url, token) => {
 
 export const fetchPropertyList = async (url, category, token) => {
     if (!token || !url) return []
-    const { data } = await (await fetch(`${httpBase}${url}?category=${category}&count=100`, {
+    const { data } = await (await fetch(`${httpBase}${url}?category=${category}&count=99999`, {
         headers: {
             ...getAuthHeader(token),
         }
@@ -72,7 +73,7 @@ export const fetchPropertyList = async (url, category, token) => {
 
 export const fetchEmergenceList = async (url, token) => {
     if (!token || !url) return []
-    const { data } = await (await fetch(`${httpBase}${url}?status=OPEN&count=100`, {
+    const { data } = await (await fetch(`${httpBase}${url}?status=OPEN&count=99999`, {
         headers: {
             ...getAuthHeader(token),
         }
@@ -97,13 +98,21 @@ export const fetchCommonDictList = async (token) => {
     }
 }
 
-export const fetchRefreshToken = async (refreshToken) => {
-    if (!refreshToken) return ''
-    const { data } = await (await fetch(`${aaaBase}/login/refresh_token/v1`, {
+export const fetchVideoUrl = async (url, cameraName, uuid) => {
+    if (!url || !cameraName || !uuid) return ''
+    const { url: videoUrl } = await (await fetch(`${videoBase}${url}`, {
         method: 'POST',
-        body: JSON.stringify({
-            refreshToken
-        })
+        body: `name=${cameraName}&uuid=${uuid}&type=hls&action=play`
     })).json();
-    return data?.accessToken
+    return videoUrl
 }
+
+export const stopVideoPlay = async (cameraName, uuid) => {
+    if (!cameraName || !uuid) return ''
+    const {  url: videoUrl } = await (await fetch(`${videoBase}/video/playVideo`, {
+        method: 'POST',
+        body: `name=${cameraName}&uuid=${uuid}&type=hls&action=pause`
+    })).json();
+    return videoUrl
+}
+

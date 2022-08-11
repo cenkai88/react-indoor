@@ -36,7 +36,7 @@ export default () => {
             </nav>
             <div className="header-title">
                 <img style={{ width: 40, marginRight: 12 }} src={logo} />
-                <div>浦东机场安检飞行区运控中心</div>
+                <div>浦东国际机场安检运行控制中心</div>
             </div>
         </header>
     )

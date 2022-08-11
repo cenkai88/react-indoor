@@ -66,16 +66,16 @@ export default class Camera {
     getNear() {
         return this._near;
     }
-    getConstrainedPoint(point, constrainRatio = 0.6) {
+    getConstrainedPoint(point, constrainRatio = 0.2) {
         if (!this._maxBounds) return point;
-        const w = this._width / 2 * this._onePixelToWorld;
-        const h = this._height / 2 * this._onePixelToWorld;
-        const minX = this._maxBounds.topLeft.x - w*constrainRatio;
-        const maxX = this._maxBounds.bottomRight.x + w*constrainRatio;
-        const minY = this._maxBounds.bottomRight.y - h*constrainRatio;
-        const maxY = this._maxBounds.topLeft.y + h*constrainRatio;
+        const w = (this._maxBounds.bottomRight.x - this._maxBounds.topLeft.x);
+        const h = (this._maxBounds.topLeft.y - this._maxBounds.bottomRight.y);
+        const minX = this._maxBounds.topLeft.x - w * constrainRatio;
+        const maxX = this._maxBounds.bottomRight.x + w * constrainRatio;
+        const minY = this._maxBounds.bottomRight.y - h * constrainRatio;
+        const maxY = this._maxBounds.topLeft.y + h * constrainRatio;
         return {
-            x: getFit(point.x, minX, maxX), 
+            x: getFit(point.x, minX, maxX),
             y: getFit(point.y, minY, maxY),
         }
     }
@@ -137,7 +137,7 @@ export default class Camera {
         this._center.set(x, y);
         this._calcViewMatrix();
     }
-    getPointWithInertia(coordinate, offset){
+    getPointWithInertia(coordinate, offset) {
         const a = this.screenToWorldCoordinate(offset.x, offset.y);
         const x = coordinate.x - (a.x - this._center.x);
         const y = coordinate.y - (a.y - this._center.y);

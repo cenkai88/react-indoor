@@ -104,10 +104,17 @@ export default {
         "fillColor": "#FFB81C",
       },
       // 滑行道
-      "000008": {
+      "000011": {
         base: -10,
         opacity: 0.8,
         "fillColor": "#b9c1ce",
+      },
+      // 瞭望哨
+      "000008": {
+        base: 0.2,
+        opacity: 0.8,
+        height: 10,
+        "fillColor": "#b74ef2",
       },
       // 围界
       "000009": {
