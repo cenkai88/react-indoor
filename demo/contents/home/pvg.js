@@ -16,8 +16,6 @@ import staffPng from '../../assets/icons/staff.png'
 import tickSvg from '../../assets/icons/tick.svg'
 import './pvg.css';
 
-import demoVideo from '../../assets/videos/demo.mp4'
-
 import ReactIndoor from '../../../src/index.js';
 
 import Header from './components/header';
@@ -171,14 +169,28 @@ export default () => {
     }, 1000);
   }
 
-  const formatEventData = item => {
+  const selectCamera = (relatedResources) => {
+    if (relatedResources[0]?.resourceCategory?.id === 'CAMERA' && cameraName !== relatedResources[0]?.resourceName) {
+      stopVideoPlay(cameraName, cameraUuid);
+      setCameraName(relatedResources[0]?.resourceName);
+      setCameraUuid(uuid());
+    } else if (cameraName !== relatedResources[0]?.resourceName) {
+      stopVideoPlay(cameraName, cameraUuid);
+      setCameraName();
+      setCameraUuid();
+    }
+  }
+
+  const formatEventData = (item, idx) => {
     const priorityColor = { HIGH: '#f66464', MEDIUM: 'orange', LOW: 'forestgreen' }[item.priority];
     return (
       <div key={item.id} onClick={() => {
         moveToPoint(item.position);
         resetTooltip();
         setDetailStr(formatEventDetail(item, eventCategoryMapping, sourceCategoryMapping));
-        setSelectedRes(item)
+        setSelectedRes(item);
+        const { relatedResources = [] } = item || {};
+        selectCamera(relatedResources);
       }} className="event" style={{ boxSizing: 'border-box', padding: '4px 12px 4px 12px', cursor: 'pointer' }}>
         <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <div>{item.insertTime}</div>
@@ -196,7 +208,9 @@ export default () => {
         moveToPoint(item?.position);
         resetTooltip();
         setDetailStr(formatCaseDetail(item, caseCategoryMapping, sourceCategoryMapping))
-        setSelectedRes(item)
+        setSelectedRes(item);
+        const { relatedResources = [] } = item || {};
+        selectCamera(relatedResources);
       }} className="event" style={{ boxSizing: 'border-box', padding: '4px 12px 4px 12px', cursor: 'pointer' }}>
         <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <div>{item.insertTime}</div>
@@ -274,26 +288,6 @@ export default () => {
       setSelectedApronName(apron?.properties?.name);
     }
   }, [hoveredApronId]);
-
-  // useEffect(() => {
-  //   const video = videoRef.current;
-  //   if (!video) return
-  //   console.log(video);
-  //   //
-  //   // First check for native browser HLS support
-  //   //
-  //   if (video.canPlayType('application/vnd.apple.mpegurl')) {
-  //     video.src = videoSrc;
-  //     //
-  //     // If no native HLS support, check if HLS.js is supported
-  //     //
-  //   } else if (window.Hls?.isSupported()) {
-  //     console.log('window.Hls', window.Hls);
-  //     var hls = new window.Hls();
-  //     hls.loadSource(videoSrc);
-  //     hls.attachMedia(video);
-  //   }
-  // }, [videoUrl]);
 
   return (
     <div className="bg">
@@ -422,15 +416,7 @@ export default () => {
               setHoveredApronId();
               setSelectedRes(markerList[hoveredMarkerIdx]?.data);
               const { relatedResources = [] } = markerList[hoveredMarkerIdx]?.data || {};
-              if (relatedResources[0]?.resourceCategory?.id === 'CAMERA' && cameraName !== relatedResources[0]?.resourceName) {
-                stopVideoPlay(cameraName, cameraUuid);
-                setCameraName(relatedResources[0]?.resourceName);
-                setCameraUuid(uuid());
-              } else if (cameraName !== relatedResources[0]?.resourceName) {
-                stopVideoPlay(cameraName, cameraUuid);
-                setCameraName();
-                setCameraUuid();
-              }
+              selectCamera(relatedResources);
               setDetailStr([formatEventDetail, formatCaseDetail, formatVehicleDetail, formatIndividualDetail][formatterIdx](markerList[hoveredMarkerIdx]?.data, tooltipCategoryMapping, sourceCategoryMapping));
             }} style={{ fontSize: 12, textDecoration: 'underline', cursor: 'pointer' }}>查看</div> : null}
           </div> : null}
