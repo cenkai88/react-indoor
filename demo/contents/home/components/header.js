@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './header.scss'
-import tempIcon from "../../../assets/icons/temp.svg"
-import rainIcon from "../../../assets/icons/rain.svg"
-import windIcon from "../../../assets/icons/wind.svg"
 import logo from "../../../assets/logo.jpg"
 
 let intervalTicket;
@@ -30,9 +27,10 @@ export default () => {
                 {timeStr}
             </div>
             <nav className="header-nav">
-                <a href="#"><img style={{ width: 28 }} src={rainIcon} />小雨</a>
+            <iframe scrolling="no" src="https://tianqiapi.com/api.php?style=tz&skin=pitaya&color=FFFFFF&city=上海&align=right" frameborder="0" width="400" height="24" allowtransparency="true"></iframe>
+                {/* <a href="#"><img style={{ width: 28 }} src={rainIcon} />小雨</a>
                 <a href="#"><img style={{ width: 24, marginRight: 4 }} src={tempIcon} />20-29度</a>
-                <a href="#"><img style={{ width: 18, marginRight: 10 }} src={windIcon} />东北风2级</a>
+                <a href="#"><img style={{ width: 18, marginRight: 10 }} src={windIcon} />东北风2级</a> */}
             </nav>
             <div className="header-title">
                 <img style={{ width: 40, marginRight: 12 }} src={logo} />

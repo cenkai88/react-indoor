@@ -94,7 +94,7 @@ const layerOptions = [
   { name: '工单' },
   { name: '载具' },
   { name: '单兵' },
-  { name: '摄像头' },
+  // { name: '摄像头' },
   { name: '围界' },
 ];
 
@@ -271,7 +271,7 @@ export default () => {
     ...(layerList[3] ? individualData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 3, data: item, properties: {}, iconUrl: staffPng, iconSize: 0.15 })) : []),
   ];
 
-  const selectedLineData = layerList[5] ? pvgLines[lineIdx] : [];
+  const selectedLineData = layerList[4] ? pvgLines[lineIdx] : [];
 
   const formatterIdx = markerList[hoveredMarkerIdx]?.typeIdx;
   const tooltipFormatter = [formatEventTooltip, formatCaseTooltip, formatVehicleTooltip, formatIndividualTooltip][formatterIdx] || (() => '');
@@ -450,7 +450,7 @@ export default () => {
               </div> : null}
             </div>
           </div>
-          {layerList[5] ? <div style={{ background: 'rgba(0,0,0,.2)', borderRadius: 8, position: 'absolute', right: `calc(${panelWidth}px + 1.6vw)`, top: 64, fontSize: 14, padding: '8px 12px', zIndex: 1 }}>
+          {layerList[4] ? <div style={{ background: 'rgba(0,0,0,.2)', borderRadius: 8, position: 'absolute', right: `calc(${panelWidth}px + 1.6vw)`, top: 64, fontSize: 14, padding: '8px 12px', zIndex: 1 }}>
             <div
               style={{ width: 200, color: 'white' }}
               onMouseEnter={() => setLineDropdownOpen(true)}
@@ -489,8 +489,8 @@ export default () => {
                 <div>实时监控</div>
                 <div style={{ color: '#9a9a9a', fontSize: 13 }}>{cameraName}</div>
               </div>
-              <div ref={videoRef} style={{ width: '100%', height: 'calc(100% - 120px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {videoUrl ? <ReactPlayer playing muted controls url={videoUrl} />
+              <div ref={videoRef} style={{ width: '100%', height: 'calc(100% - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {videoUrl ? <ReactPlayer height="100%" playing muted controls url={videoUrl} />
                   : null}
               </div>
             </div>
