@@ -6,8 +6,8 @@ const getAuthHeader = accessToken => ({
     Authorization: `Bearer ${accessToken}`
 });
 
-export const fetchApronMap = async (url, token) => {
-    if (!token) return { }
+export const fetchApronMap = async (url, token, roleIdsStr) => {
+    if (!token || !roleIdsStr) return { }
     // const data = [
     //     { "stand": "120", "status": "CX" },
     //     { "stand": "121", "status": "DV" },
@@ -18,6 +18,7 @@ export const fetchApronMap = async (url, token) => {
     const { data } = await (await fetch(`${httpBase}${url}`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     const result = {};
@@ -30,64 +31,70 @@ export const fetchApronMap = async (url, token) => {
     }
 }
 
-export const fetchApronDetail = async (url, name, token) => {
-    if (!name || !token) return {}
+export const fetchApronDetail = async (url, name, token, roleIdsStr) => {
+    if (!name || !token || !roleIdsStr) return {}
     // url
     const { data } = await (await fetch(`${httpBase}${url}`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     return data
 }
 
-export const fetchEventList = async (url, token) => {
-    if (!token || !url) return []
+export const fetchEventList = async (url, token, roleIdsStr) => {
+    if (!token || !url || !roleIdsStr) return []
+    console.log('ev', roleIdsStr)
     const { data } = await (await fetch(`${httpBase}${url}`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     return data.objects
 }
 
-export const fetchCaseList = async (url, token) => {
-    if (!token || !url) return []
+export const fetchCaseList = async (url, token, roleIdsStr) => {
+    if (!token || !url || !roleIdsStr) return []
     const { data } = await (await fetch(`${httpBase}${url}`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     return data.objects
 }
 
-export const fetchPropertyList = async (url, category, token) => {
-    if (!token || !url) return []
+export const fetchPropertyList = async (url, category, token, roleIdsStr) => {
+    if (!token || !url || !roleIdsStr) return []
     const { data } = await (await fetch(`${httpBase}${url}?category=${category}&count=99999`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     return data.objects
 }
 
-export const fetchEmergenceList = async (url, token) => {
-    if (!token || !url) return []
+export const fetchEmergenceList = async (url, token, roleIdsStr) => {
+    if (!token || !url || !roleIdsStr) return []
     const { data } = await (await fetch(`${httpBase}${url}?status=OPEN&count=99999`, {
         headers: {
             ...getAuthHeader(token),
+            'x-role-ids': roleIdsStr
         }
     })).json();
     return data.objects
 }
 
-export const fetchCommonDictList = async (token) => {
-    if (!token) return []
+export const fetchCommonDictList = async (token, roleIdsStr) => {
+    if (!token || !roleIdsStr) return []
     const [{ data: eventCategory }, { data: caseCategory }, { data: propertyCategory }, { data: sourceCategory }] = await Promise.all([
-        (await fetch(`${httpBase}/category/event/v1`, { headers: getAuthHeader(token) })).json(),
-        (await fetch(`${httpBase}/category/case/v1`, { headers: getAuthHeader(token) })).json(),
-        (await fetch(`${httpBase}/category/property/v1`, { headers: getAuthHeader(token) })).json(),
-        (await fetch(`${httpBase}/category/source/v1`, { headers: getAuthHeader(token) })).json(),
+        (await fetch(`${httpBase}/category/event/v1`, { headers: getAuthHeader(token), 'x-role-ids': roleIdsStr })).json(),
+        (await fetch(`${httpBase}/category/case/v1`, { headers: getAuthHeader(token), 'x-role-ids': roleIdsStr })).json(),
+        (await fetch(`${httpBase}/category/property/v1`, { headers: getAuthHeader(token), 'x-role-ids': roleIdsStr })).json(),
+        (await fetch(`${httpBase}/category/source/v1`, { headers: getAuthHeader(token), 'x-role-ids': roleIdsStr })).json(),
     ]);
 
     return {

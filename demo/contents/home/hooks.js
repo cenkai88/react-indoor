@@ -3,11 +3,11 @@ import { fetchApronMap, fetchCommonDictList } from "../../apis/pvg";
 
 const prefix = '000001';
 
-export const useFloorData = (pvgData, token, selectedLine) => {
+export const useFloorData = (pvgData, token, roleIdsStr, selectedLine) => {
     const { data: {
         mapping: apronMap,
         // lastUpdateTs
-    } = {}, error } = useSWR(['/map/apron/v1', token], fetchApronMap, { refreshInterval: 60 * 1e3 });
+    } = {}, error } = useSWR(['/map/apron/v1', token, roleIdsStr], fetchApronMap, { refreshInterval: 60 * 1e3 });
     const apronRoomIdList = [];
     // if (!apronMap) return { data: pvgData, lastUpdateTs: Date.now(), }
     pvgData[0]?.room?.features.forEach(item => {
@@ -29,13 +29,13 @@ export const useFloorData = (pvgData, token, selectedLine) => {
     }
 }
 
-export const useDictData = token => {
+export const useDictData = (token, roleIdsStr) => {
     const { data: {
         eventCategoryMapping,
         caseCategoryMapping,
         sourceCategoryMapping,
         propertyCategoryMapping
-    } = {}, error } = useSWR(token, fetchCommonDictList, { refreshInterval: 120 * 1e3 });
+    } = {}, error } = useSWR([token, roleIdsStr], fetchCommonDictList, { refreshInterval: 120 * 1e3 });
     return {
         eventCategoryMapping,
         caseCategoryMapping,

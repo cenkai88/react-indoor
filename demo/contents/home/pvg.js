@@ -16,8 +16,6 @@ import staffPng from '../../assets/icons/staff.png'
 import tickSvg from '../../assets/icons/tick.svg'
 import './pvg.css';
 
-import demoVideo from '../../assets/videos/demo.mp4'
-
 import ReactIndoor from '../../../src/index.js';
 
 import Header from './components/header';
@@ -96,7 +94,7 @@ const layerOptions = [
   { name: '工单' },
   { name: '载具' },
   { name: '单兵' },
-  { name: '摄像头' },
+  // { name: '摄像头' },
   { name: '围界' },
 ];
 
@@ -105,7 +103,9 @@ export default () => {
   const videoRef = useRef(null);
 
   const storedKey = localStorage.getItem('AUTH_LOCAL_KEY');
+  const roleIdListKey = localStorage.getItem('CURRENT_ROLE_LIST_LOCAL_KEY');
   const accessToken = storedKey ? JSON.parse(storedKey)?.accessToken : '';
+  const roleIdsStr = roleIdListKey ? JSON.parse(roleIdListKey).map(item=>item.id).join(',') : '';
 
   const [center, setCenter] = useState({ x: 31865, y: -9946, });
   const [zoom, setZoom] = useState(13.5);
@@ -139,14 +139,15 @@ export default () => {
 
   const tooltipRef = useRef(null);
 
-  const { data: pvgDataWithApron, lastUpdateTs, apronRoomIdList = [] } = useFloorData(pvgData, accessToken, selectedLine);
-  const { eventCategoryMapping, caseCategoryMapping, sourceCategoryMapping } = useDictData(accessToken);
-  const { data: apronDetailData = {} } = useSWR([`/map/apron/v1/${selectedApronName}`, selectedApronName, accessToken], fetchApronDetail, { refreshInterval: 60 * 1e3 });
-  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true&count=99999', accessToken], fetchEventList, { refreshInterval: 60 * 1e3 });
-  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true&count=99999', accessToken], fetchCaseList, { refreshInterval: 60 * 1e3 });
-  const { data: individualData = [] } = useSWR(['/property/property/v1', 'INDIVIDUAL', accessToken], fetchPropertyList, { refreshInterval: 10 * 1e3 });
-  const { data: vehicleData = [] } = useSWR(['/property/property/v1', 'VEHICLE', accessToken], fetchPropertyList, { refreshInterval: 10 * 1e3 });
-  const { data: emergenceData = [] } = useSWR(['/emergency/record/v1', accessToken], fetchEmergenceList, { refreshInterval: 60 * 1e3 });
+  console.log(roleIdsStr)
+  const { data: pvgDataWithApron, lastUpdateTs, apronRoomIdList = [] } = useFloorData(pvgData, accessToken, roleIdsStr, selectedLine);
+  const { eventCategoryMapping, caseCategoryMapping, sourceCategoryMapping } = useDictData(accessToken, roleIdsStr);
+  const { data: apronDetailData = {} } = useSWR([`/map/apron/v1/${selectedApronName}`, selectedApronName, accessToken, roleIdsStr], fetchApronDetail, { refreshInterval: 60 * 1e3 });
+  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true&count=99999', accessToken, roleIdsStr], fetchEventList, { refreshInterval: 60 * 1e3 });
+  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true&count=99999', accessToken, roleIdsStr], fetchCaseList, { refreshInterval: 60 * 1e3 });
+  const { data: individualData = [] } = useSWR(['/property/property/v1', 'INDIVIDUAL', accessToken, roleIdsStr], fetchPropertyList, { refreshInterval: 10 * 1e3 });
+  const { data: vehicleData = [] } = useSWR(['/property/property/v1', 'VEHICLE', accessToken, roleIdsStr], fetchPropertyList, { refreshInterval: 10 * 1e3 });
+  const { data: emergenceData = [] } = useSWR(['/emergency/record/v1', accessToken, roleIdsStr], fetchEmergenceList, { refreshInterval: 60 * 1e3 });
   const { data: videoUrl = '' } = useSWR(['/video/playVideo', cameraName, cameraUuid], fetchVideoUrl, { refreshInterval: 9e9 });
 
   const panelWidth = 0.15 * window.innerWidth;
@@ -257,7 +258,7 @@ export default () => {
     ...(layerList[3] ? individualData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 3, data: item, properties: {}, iconUrl: staffPng, iconSize: 0.15 })) : []),
   ];
 
-  const selectedLineData = layerList[5] ? pvgLines[lineIdx] : [];
+  const selectedLineData = layerList[4] ? pvgLines[lineIdx] : [];
 
   const formatterIdx = markerList[hoveredMarkerIdx]?.typeIdx;
   const tooltipFormatter = [formatEventTooltip, formatCaseTooltip, formatVehicleTooltip, formatIndividualTooltip][formatterIdx] || (() => '');
@@ -464,7 +465,7 @@ export default () => {
               </div> : null}
             </div>
           </div>
-          {layerList[5] ? <div style={{ background: 'rgba(0,0,0,.2)', borderRadius: 8, position: 'absolute', right: `calc(${panelWidth}px + 1.6vw)`, top: 64, fontSize: 14, padding: '8px 12px', zIndex: 1 }}>
+          {layerList[4] ? <div style={{ background: 'rgba(0,0,0,.2)', borderRadius: 8, position: 'absolute', right: `calc(${panelWidth}px + 1.6vw)`, top: 64, fontSize: 14, padding: '8px 12px', zIndex: 1 }}>
             <div
               style={{ width: 200, color: 'white' }}
               onMouseEnter={() => setLineDropdownOpen(true)}

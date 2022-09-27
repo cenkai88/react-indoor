@@ -65,7 +65,7 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       pageTitle: JSON.stringify('react-indoor DEMO'),
-      HTTP_BASE: JSON.stringify('http://gw.asocapi.com/api/ingsh/op'),
+      HTTP_BASE: JSON.stringify('http://gw.pvg-sec.avinex.com/api/ingsh/op'),
       // HTTP_BASE: JSON.stringify('http://47.92.31.84/op'),
       AAA_BASE: JSON.stringify('http://47.92.31.84/aaa'),
     }),

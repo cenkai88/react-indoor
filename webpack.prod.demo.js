@@ -66,8 +66,8 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       pageTitle: JSON.stringify('事件大屏'),
-      HTTP_BASE: JSON.stringify('http://gw.asocapi.com/api/ingsh/op'),
-      AAA_BASE: JSON.stringify('http://gw.asocapi.com/api/ingsh/auth'),
+      HTTP_BASE: JSON.stringify('http://gw.pvg-sec.avinex.com/api/ingsh/op'),
+      AAA_BASE: JSON.stringify('http://gw.pvg-sec.avinex.com/api/ingsh/auth'),
     }),
     new cleanWebpackPlugin(['dist'], { root: __dirname, verbose: true }),
     new HtmlWebpackPlugin({
