@@ -7,7 +7,7 @@ const getAuthHeader = accessToken => ({
 });
 
 export const fetchApronMap = async (url, token, roleIdsStr) => {
-    if (!token || !roleIdsStr) return { }
+    if (!token || !roleIdsStr) return {}
     // const data = [
     //     { "stand": "120", "status": "CX" },
     //     { "stand": "121", "status": "DV" },
@@ -45,7 +45,6 @@ export const fetchApronDetail = async (url, name, token, roleIdsStr) => {
 
 export const fetchEventList = async (url, token, roleIdsStr) => {
     if (!token || !url || !roleIdsStr) return []
-    console.log('ev', roleIdsStr)
     const { data } = await (await fetch(`${httpBase}${url}`, {
         headers: {
             ...getAuthHeader(token),
@@ -68,7 +67,7 @@ export const fetchCaseList = async (url, token, roleIdsStr) => {
 
 export const fetchPropertyList = async (url, category, token, roleIdsStr) => {
     if (!token || !url || !roleIdsStr) return []
-    const { data } = await (await fetch(`${httpBase}${url}?category=${category}&count=99999`, {
+    const { data } = await (await fetch(`${httpBase}${url}?category=${category}&count=1000`, {
         headers: {
             ...getAuthHeader(token),
             'x-role-ids': roleIdsStr
@@ -79,7 +78,7 @@ export const fetchPropertyList = async (url, category, token, roleIdsStr) => {
 
 export const fetchEmergenceList = async (url, token, roleIdsStr) => {
     if (!token || !url || !roleIdsStr) return []
-    const { data } = await (await fetch(`${httpBase}${url}?status=OPEN&count=99999`, {
+    const { data } = await (await fetch(`${httpBase}${url}?status=OPEN&count=1000`, {
         headers: {
             ...getAuthHeader(token),
             'x-role-ids': roleIdsStr
@@ -114,11 +113,20 @@ export const fetchVideoUrl = async (url, cameraName, uuid) => {
     return videoUrl
 }
 
-export const stopVideoPlay = async (cameraName, uuid) => {
-    if (!cameraName || !uuid) return ''
-    const {  url: videoUrl } = await (await fetch(`${videoBase}/video/playVideo`, {
+export const fetchHisVideoUrl = async (url, cameraName, uuid, startTime, endTime) => {
+    if (!url || !cameraName || !uuid || !startTime || !endTime) return ''
+    const { url: videoUrl } = await (await fetch(`${videoBase}${url}`, {
         method: 'POST',
-        body: `name=${cameraName}&uuid=${uuid}&type=hls&action=pause`
+        body: `name=${cameraName}&uuid=${uuid}&type=ws&action=play&starttime=${startTime}&endtime=${endTime}`
+    })).json();
+    return videoUrl
+}
+
+export const stopVideoPlay = async (cameraName, uuid, type = 'hls') => {
+    if (!cameraName || !uuid) return ''
+    const { url: videoUrl } = await (await fetch(`${videoBase}/video/${type === 'hls' ? 'playVideo' : 'playHisVideo'}`, {
+        method: 'POST',
+        body: `name=${cameraName}&uuid=${uuid}&type=${type}&action=pause`
     })).json();
     return videoUrl
 }

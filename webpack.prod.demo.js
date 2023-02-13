@@ -78,5 +78,13 @@ module.exports = {
       from: './demo/assets/icons',
       to: 'icons',
     }]),
+    new CopyWebpackPlugin([{
+      from: './public/hls.min.js',
+      to: 'hls.min.js',
+    }]),
+    new CopyWebpackPlugin([{
+      from: './public/h5player',
+      to: 'h5player',
+    }]),
   ],
 };

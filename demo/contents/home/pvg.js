@@ -1,18 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import uuid from 'uuid';
 import ReactPlayer from 'react-player'
 
-import { fetchApronDetail, fetchEventList, fetchCaseList, fetchPropertyList, fetchEmergenceList, fetchVideoUrl, stopVideoPlay } from '../../apis/pvg';
+import { fetchApronDetail, fetchEventList, fetchCaseList, fetchPropertyList, fetchEmergenceList, fetchVideoUrl, stopVideoPlay, fetchHisVideoUrl } from '../../apis/pvg';
+import { addSeconds, format, parse } from 'date-fns';
 
 import pvgData from '../../../data/pvg6';
 import pvgLines from '../../../data/pvgLines';
 import stylePvg from '../../../data/stylePvg';
 import eventPng from '../../assets/icons/event.png';
+import selectedPng from '../../assets/icons/selected.png';
 import casePng from '../../assets/icons/case.png';
 import carPng from '../../assets/icons/car.png';
 import carRedPng from '../../assets/icons/car-red.png';
 import staffPng from '../../assets/icons/staff.png'
+import staffGrayPng from '../../assets/icons/staff-gray.png'
 import tickSvg from '../../assets/icons/tick.svg'
 import './pvg.css';
 
@@ -28,6 +31,7 @@ const bbox = [[31099.661621093754, -13321.040588378906], [35210.447021484375, -8
 const deltaX = bbox[1][0] - bbox[0][0];
 const deltaY = bbox[1][1] - bbox[0][1];
 
+let player;
 // const items = [
 //   [30319.17644173383, -7483.986579481384],
 //   [30303.816535588503, -7436.726273361093],
@@ -58,6 +62,7 @@ const getCorrectedTooltipY = (e, tooltipRef) => {
 }
 
 const prefix = '000001';
+let globalHisConfig = {};
 
 const lineOptions = [
   { name: 'E', color: '#3f9229', distance: 4400 },
@@ -105,7 +110,7 @@ export default () => {
   const storedKey = localStorage.getItem('AUTH_LOCAL_KEY');
   const roleIdListKey = localStorage.getItem('CURRENT_ROLE_LIST_LOCAL_KEY');
   const accessToken = storedKey ? JSON.parse(storedKey)?.accessToken : '';
-  const roleIdsStr = roleIdListKey ? JSON.parse(roleIdListKey).map(item=>item.id).join(',') : '';
+  const roleIdsStr = roleIdListKey ? JSON.parse(roleIdListKey).map(item => item.id).join(',') : '';
 
   const [center, setCenter] = useState({ x: 31865, y: -9946, });
   const [zoom, setZoom] = useState(13.5);
@@ -127,6 +132,10 @@ export default () => {
 
   const [cameraName, setCameraName] = useState();
   const [cameraUuid, setCameraUuid] = useState();
+  const [cameraHisUuid, setCameraHisUuid] = useState();
+  const [isReplay, setIsReplay] = useState(true);
+  const [replayStartTime, setReplayStartTime] = useState();
+  const [replayEndTime, setReplayEndTime] = useState();
 
   const selectedLine = lineOptions[lineIdx];
   const selectedMarker = markerOptions[markerIdx];
@@ -136,19 +145,21 @@ export default () => {
   const [hoveredMarkerIdx, setHoveredMarkerIdx] = useState();
   const [tooltipType, setTooltipType] = useState('');
   const [tooltipPos, setTooltipPos] = useState({});
+  const [hisUrl, setHisUrl] = useState('');
 
   const tooltipRef = useRef(null);
 
-  console.log(roleIdsStr)
   const { data: pvgDataWithApron, lastUpdateTs, apronRoomIdList = [] } = useFloorData(pvgData, accessToken, roleIdsStr, selectedLine);
   const { eventCategoryMapping, caseCategoryMapping, sourceCategoryMapping } = useDictData(accessToken, roleIdsStr);
   const { data: apronDetailData = {} } = useSWR([`/map/apron/v1/${selectedApronName}`, selectedApronName, accessToken, roleIdsStr], fetchApronDetail, { refreshInterval: 60 * 1e3 });
-  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true&count=99999', accessToken, roleIdsStr], fetchEventList, { refreshInterval: 60 * 1e3 });
-  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true&count=99999', accessToken, roleIdsStr], fetchCaseList, { refreshInterval: 60 * 1e3 });
+  const { data: eventData = [] } = useSWR(['/operation/event/v1?status=PENDING&isTeam=true&count=100', accessToken, roleIdsStr], fetchEventList, { refreshInterval: 60 * 1e3 });
+  const { data: caseData = [] } = useSWR(['/operation/case/v1?status=OPEN&isTeam=true&count=100', accessToken, roleIdsStr], fetchCaseList, { refreshInterval: 60 * 1e3 });
   const { data: individualData = [] } = useSWR(['/property/property/v1', 'INDIVIDUAL', accessToken, roleIdsStr], fetchPropertyList, { refreshInterval: 10 * 1e3 });
   const { data: vehicleData = [] } = useSWR(['/property/property/v1', 'VEHICLE', accessToken, roleIdsStr], fetchPropertyList, { refreshInterval: 10 * 1e3 });
   const { data: emergenceData = [] } = useSWR(['/emergency/record/v1', accessToken, roleIdsStr], fetchEmergenceList, { refreshInterval: 60 * 1e3 });
-  const { data: videoUrl = '' } = useSWR(['/video/playVideo', cameraName, cameraUuid], fetchVideoUrl, { refreshInterval: 9e9 });
+  const { data: videoUrl = '' } = useSWR(['/video/playVideo', cameraName, cameraUuid], fetchVideoUrl);
+  // const { data: hisVideoUrl = '' } = useSWR(['/video/playHisVideo', cameraName, cameraHisUuid, replayStartTime, replayEndTime], fetchHisVideoUrl);
+
 
   const panelWidth = 0.15 * window.innerWidth;
   const panel1Height = window.innerHeight - 136 - 72;
@@ -172,15 +183,37 @@ export default () => {
     }, 1000);
   }
 
-  const selectCamera = (relatedResources) => {
-    if (relatedResources[0]?.resourceCategory?.id === 'CAMERA' && cameraName !== relatedResources[0]?.resourceName) {
+  const selectCamera = async (relatedResources, time) => {
+    const resourceName = relatedResources[0]?.externalName || relatedResources[0]?.resourceName;
+    if (relatedResources[0]?.resourceCategory?.id === 'CAMERA' && cameraName !== resourceName) {
+      const replayStartTime = format(addSeconds(new Date(time), -5), 'yyyy-MM-dd HH:mm:ss');
+      const replayEndTime = format(addSeconds(new Date(time), 10), 'yyyy-MM-dd HH:mm:ss');
+      const nextPlayUuid = uuid();
+      const nextHisUuid = uuid();
       stopVideoPlay(cameraName, cameraUuid);
-      setCameraName(relatedResources[0]?.resourceName);
-      setCameraUuid(uuid());
-    } else if (cameraName !== relatedResources[0]?.resourceName) {
+      stopVideoPlay(cameraName, cameraHisUuid, 'ws');
+      setCameraName(resourceName);
+      setCameraUuid(nextPlayUuid);
+      setCameraHisUuid(nextHisUuid);
+      setReplayStartTime(replayStartTime)
+      setReplayEndTime(replayEndTime)
+      const hisUrl = await fetchHisVideoUrl('/video/playHisVideo', resourceName, nextHisUuid, replayStartTime, replayEndTime);
+      globalHisConfig = {
+        resourceName, replayStartTime, replayEndTime
+      };
+      player.JS_Play(hisUrl, { playURL: hisUrl, mode: 0 }, 0, replayStartTime.replace(' ', 'T') + 'Z', replayEndTime.replace(' ', 'T') + 'Z').then(
+        () => { console.log('playbackStart success') },
+        e => { console.error(e) }
+      );
+      setHisUrl(hisUrl);
+    } else if (cameraName !== resourceName) {
       stopVideoPlay(cameraName, cameraUuid);
+      stopVideoPlay(cameraName, cameraHisUuid, 'ws');
       setCameraName();
       setCameraUuid();
+      setCameraHisUuid();
+      setReplayStartTime();
+      setReplayEndTime();
     }
   }
 
@@ -193,7 +226,7 @@ export default () => {
         setDetailStr(formatEventDetail(item, eventCategoryMapping, sourceCategoryMapping));
         setSelectedRes(item);
         const { relatedResources = [] } = item || {};
-        selectCamera(relatedResources);
+        selectCamera(relatedResources, item?.insertTime);
       }} className="event" style={{ boxSizing: 'border-box', padding: '4px 12px 4px 12px', cursor: 'pointer' }}>
         <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <div>{item.insertTime}</div>
@@ -213,7 +246,7 @@ export default () => {
         setDetailStr(formatCaseDetail(item, caseCategoryMapping, sourceCategoryMapping))
         setSelectedRes(item);
         const { relatedResources = [] } = item || {};
-        selectCamera(relatedResources);
+        selectCamera(relatedResources, item?.insertTime);
       }} className="event" style={{ boxSizing: 'border-box', padding: '4px 12px 4px 12px', cursor: 'pointer' }}>
         <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <div>{item.insertTime}</div>
@@ -251,7 +284,7 @@ export default () => {
         <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
           <div>{item?.name}</div>
         </div>
-        <div style={{ fontSize: 12, color: '#bbb', marginTop: 4 }}>对应人员：{item?.owner?.name}</div>
+        <div style={{ fontSize: 12, color: '#bbb', marginTop: 4 }}>对应人员：{item?.currentUser?.name}</div>
       </div>
     )
   };
@@ -267,12 +300,22 @@ export default () => {
   const leftPanelList = [eventData, caseData, vehicleData, individualData][markerIdx].map([formatEventData, formatCaseData, formatVehicleData, formatIndividualData][markerIdx]);
 
   const markerList = [
-    ...(layerList[0] ? eventData.map(item => ({ ...item?.position, typeIdx: 0, data: item, properties: {}, iconUrl: eventPng, iconSize: 0.1 })) : []),
+    ...(layerList[0] ? eventData.map(item => ({
+      ...item?.position,
+      typeIdx: 0,
+      data: item,
+      properties: {},
+      selected: item.id === selectedRes?.id,
+      iconUrl: selectedRes.id === item.id ? selectedPng : eventPng,
+      iconSize: 0.1
+    })) : []),
     // ...demoPoints,
     ...(layerList[1] ? caseData.map(item => ({ ...item?.position, typeIdx: 1, data: item, properties: {}, iconUrl: casePng, iconSize: 0.1 })) : []),
-    ...(layerList[2] ? vehicleData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 2, data: item, properties: {}, iconUrl: item.workStatus === 'ALERT' ? carRedPng : carPng, iconSize: 0.15 })) : []),
-    ...(layerList[3] ? individualData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 3, data: item, properties: {}, iconUrl: staffPng, iconSize: 0.15 })) : []),
-  ];
+    ...(layerList[2] ? vehicleData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 2, data: item, properties: {}, iconUrl: item.caseProcessing ? carRedPng : carPng, iconSize: 0.15 })) : []),
+    ...(layerList[3] ? individualData.map(item => ({ ...item?.lastDetectedPosition, typeIdx: 3, data: item, properties: {}, iconUrl: item?.currentUser?.id ? staffPng : staffGrayPng, iconSize: 0.15 })) : []),
+  ].sort(item => item.selected ? 1 : -1);
+
+  console.log(markerList)
 
   const selectedLineData = layerList[4] ? pvgLines[lineIdx] : [];
 
@@ -291,6 +334,38 @@ export default () => {
       setSelectedApronName(apron?.properties?.name);
     }
   }, [hoveredApronId]);
+
+  const exitFullScreenCallback = useCallback(() => {
+    player.JS_FullScreenDisplay(false);
+  }, []);
+
+  useEffect(() => {
+    player = new window.JSPlugin({
+      szId: 'player',
+      szBasePath: "./h5player",
+      iMaxSplit: 1,
+      iCurrentSplit: 1,
+      openDebug: false,
+      oStyle: {
+        borderSelect: 'transparent',
+      }
+    });
+    player.JS_SetWindowControlCallback({
+      windowFullCcreenChange: (bFull) => {
+        if (!bFull) exitFullScreenCallback();
+      },
+      StreamEnd: async () => {
+        const {
+          resourceName, replayStartTime, replayEndTime
+        } = globalHisConfig;
+        const hisUrl = await fetchHisVideoUrl('/video/playHisVideo', resourceName, uuid(), replayStartTime, replayEndTime);
+        player.JS_Play(hisUrl, { playURL: hisUrl, mode: 0 }, 0, replayStartTime.replace(' ', 'T') + 'Z', replayEndTime.replace(' ', 'T') + 'Z').then(
+          () => { console.log('playbackStart success') },
+          e => { console.error(e) }
+        );
+      }
+    });
+  }, []);
 
   return (
     <div className="bg">
@@ -350,12 +425,16 @@ export default () => {
               // right click
               if (e._originEvent.button === 2) {
                 setTooltipType('');
+                setSelectedRes({});
+                setReplayStartTime('');
+                setReplayEndTime('');
                 setHoveredMarkerIdx();
                 setHoveredApronId();
                 setHoveredApronData({});
                 setTooltipPos({});
                 setDetailStr('');
                 stopVideoPlay(cameraName, cameraUuid);
+                stopVideoPlay(cameraName, cameraHisUuid, 'ws');
                 setCameraName();
                 setCameraUuid();
               }
@@ -419,7 +498,7 @@ export default () => {
               setHoveredApronId();
               setSelectedRes(markerList[hoveredMarkerIdx]?.data);
               const { relatedResources = [] } = markerList[hoveredMarkerIdx]?.data || {};
-              selectCamera(relatedResources);
+              selectCamera(relatedResources, markerList[hoveredMarkerIdx]?.data?.insertTime);
               setDetailStr([formatEventDetail, formatCaseDetail, formatVehicleDetail, formatIndividualDetail][formatterIdx](markerList[hoveredMarkerIdx]?.data, tooltipCategoryMapping, sourceCategoryMapping));
             }} style={{ fontSize: 12, textDecoration: 'underline', cursor: 'pointer' }}>查看</div> : null}
           </div> : null}
@@ -489,12 +568,16 @@ export default () => {
           <Panel width={panelWidth} height={panel3Height}>
             <div style={{ color: 'white', position: 'absolute', padding: 2, overflow: 'hidden', height: 'calc(100% - 50px)', width: panelWidth, boxSizing: 'border-box' }}>
               <div style={{ fontSize: 14, fontWeight: 500, padding: 12 }}>
-                <div>实时监控</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => setIsReplay(true)}>回放 <span style={{ fontSize: 12 }}>{replayStartTime}</span></div>
+                  <div onClick={() => setIsReplay(false)} style={{ fontSize: 12, textDecoration: 'underline', fontWeight: 400, cursor: 'pointer' }}>实时监控</div>
+                </div>
                 <div style={{ color: '#9a9a9a', fontSize: 13 }}>{cameraName}</div>
               </div>
-              <div ref={videoRef} style={{ width: '100%', height: 'calc(100% - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {videoUrl ? <ReactPlayer height="100%" playing muted controls url={videoUrl} />
+              <div ref={videoRef} style={{ cursor: 'pointer', width: '100%', height: 'calc(100% - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(!isReplay || !hisUrl) ? <ReactPlayer height="100%" playing muted controls url={videoUrl} />
                   : null}
+                <div id="player" onClick={() => { player.JS_FullScreenDisplay(true); }} style={{ position: 'absolute', width: '100%', height: 'calc(100% - 120px)', zIndex: (isReplay && hisUrl) ? 1 : -1, opacity: (isReplay && hisUrl) ? 1 : 0 }}></div>
               </div>
             </div>
           </Panel>

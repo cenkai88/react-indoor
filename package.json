@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "core-js": "^3.6.5",
+    "date-fns": "^2.29.3",
     "earcut": "^2.2.2",
     "qs": "^6.10.5",
     "react": "^16.13.1",

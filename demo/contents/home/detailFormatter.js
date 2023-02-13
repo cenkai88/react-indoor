@@ -38,7 +38,7 @@ export const formatIndividualDetail = item => `单兵设备id：${item.id}
 单兵设备名称：${item.name || '无'}
 所属部门：${item?.ownerDepartment?.name || '无'}
 使用部门：${item?.userDepartment?.name || '无'}
-对应人员：${item?.owner?.name || '无'}
+对应人员：${item?.currentUser?.name || '无'}
 上次定位时间：${item?.lastDetectedTime || '无'}
 `;
 
@@ -90,7 +90,7 @@ export const formatVehicleTooltip = item => item ? `使用部门：${item?.userD
 `: '';
 
 export const formatIndividualTooltip = item => item ? `单兵设备名称：${item.name || '无'}
-对应人员：${item?.owner?.name || '无'}
+对应人员：${item?.currentUser?.name || '无'}
 `: '';
 
 

@@ -149,8 +149,8 @@ export default ({
     if (markersOverlay) markersOverlay.forEach(item => item.remove());
 
     const { bbox } = mapIns.getFloorData().frame.features[0];
-    const deltaX = bbox[1][0] - bbox[0][0];
-    const deltaY = bbox[1][1] - bbox[0][1];
+    // const deltaX = bbox[1][0] - bbox[0][0];
+    // const deltaY = bbox[1][1] - bbox[0][1];
 
     const markers = data.map(item => {
       const [x, y] = convertPercentToWorld(item, bbox);
